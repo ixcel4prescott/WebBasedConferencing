@@ -1,0 +1,14 @@
+<div id="request_header" class="<?= $type ?>">
+    <? if($type == 'failed'): ?>
+    <?= $html->image('notice.gif') ?> This request has <strong>failed</strong>
+    <? else: ?>
+      <?= $html->image('info.gif') ?>
+      This request has been <strong><?= $type ?></strong>
+    <? endif; ?>
+
+    by <?= $html->link($user['User']['name'], '/users/view/' . $user['User']['id']) ?>
+
+    <? if(!empty($request['Request']['comments'])): ?>
+    <br/><strong>Comments:</strong> <pre><?= $request['Request']['comments'] ?></pre>
+    <? endif; ?>
+</div>

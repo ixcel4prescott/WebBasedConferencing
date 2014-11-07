@@ -1,0 +1,276 @@
+<?= $javascript->link('jquery.multiselect') ?>
+<?= $html->css('jquery.multiselect') ?>
+<?= $html->css('ui.datepicker') ?>
+<?= $javascript->link('ui.datepicker.js') ?>
+
+<? 
+   $this_year = date('Y');
+   $cur_day   = strtotime($start);
+   $end_day   = strtotime($end);
+?>
+
+<style type="text/css">
+#reservation_header {
+  text-align: center;
+  margin-bottom: 0.5em;
+}
+
+#reservation_header .title {
+  font-size: x-large;
+  font-weight: bold;
+  margin: 0 3em;
+}
+
+#left_column {
+  float: left; 
+  margin-bottom: 1em;
+}
+
+#right_column {
+  margin-bottom: 1em;
+}
+
+#left_column label.filter, #right_column label.filter {
+  display: inline;
+  float: left;
+  width: 10em;
+  text-align: right;
+  margin-right: 0.5em;
+}
+
+#left_column div, #right_column div {
+  margin-bottom: 0.5em;
+}
+
+#reservations {
+  width: 100%;
+}
+
+#reservations thead th, #reservations tbody .day {
+  padding: 0;
+  width: 14.2%
+}
+
+#reservations thead th {
+  text-align: center;
+  background: #ccddee;
+  padding: 3px;
+}
+
+#reservations tbody .day {
+  vertical-align: top;
+  text-align: left;
+  white-space: normal;
+  height: 150px;
+  font-size: x-small;
+}
+
+#reservations tbody .day a {
+  font-weight: normal;
+}
+
+#reservations tbody .weekday {
+  border: 1px solid #ccddee;
+}
+
+#reservations tbody .weekend {
+  background: #eee;
+  border: 1px solid #ccc;
+}
+
+#reservations tbody .day .header {
+  margin-bottom: 5px;
+  padding: 3px;
+  text-align: right;
+}
+
+#reservations tbody .weekend .header {
+  color: #aaa;
+  background: #ccc;
+}
+
+#reservations tbody .weekday .header {
+  background: #DDEEFF;
+}
+
+#reservations tbody .day .holiday {
+  font-weight: bold;
+  float: left;
+}
+
+#reservations tbody .day .date {
+}
+
+#reservations tbody .day .num {
+  margin-top: 1em;
+  margin-bottom: 0.5em;
+  text-align: center;
+}
+
+#reservations tbody .day .num a {
+  font-weight: 900;
+}
+
+#reservations .events {
+  border: none;
+}
+
+#reservations .events td {
+  height: auto;
+  border: none;
+  width: auto;
+  padding-left: 3px;
+  padding-bottom: 5px;
+  border-bottom: 1px solid #ddd;
+}
+
+#reservations .events .time {
+  width: 6em; 
+  margin-right: 1em;
+}
+
+#reservations .events .event {
+  text-align: left;
+  white-space: normal;
+}
+</style>
+
+<h1 class="center"><?= date('F Y', strtotime(sprintf('%d-%02d-01', $year, $month))) ?></h1>
+
+<form method="get">
+
+  <div id="left_column">
+    
+    <div>
+      <label class="filter" for="company">Company:</label>
+      <input type="text" id="company" name="company" value="<?= $company ?>"/>
+    </div>
+
+    <div>
+      <label class="filter" for="date_scheduled">Date Scheduled:</label>
+      <input type="text" id="date_scheduled" name="date_scheduled" value="<?= $date_scheduled ?>"/>
+    </div>
+
+    <div>
+      <label class="filter">Month:</label>
+      <select name="month">
+	<? for($i=1; $i<=12; $i++): ?>
+	   <option value="<?= $i ?>" <?= $i == $month ? 'selected="selected"' : '' ?>><?= $i ?></option>
+	<? endfor; ?>
+      </select>
+      /
+      <select name="year">
+	<? for($i=$this_year; $i>=$this_year-5; $i--): ?>
+	   <option value="<?= $i ?>" <?= $i == $year ? 'selected="selected"' : '' ?>><?= $i ?></option>
+	<? endfor; ?>
+      </select>
+    </div>
+
+
+  </div>
+  <div id="right_column">
+
+    <div>
+      <label class="filter" for="operators">Operator:</label>
+      <select id="operators" name="operators[]" multiple="multiple">
+	<option value=""></option>
+	<? foreach($operator_list as $k => $v): ?>
+	<option value="<?= $k ?>" <?= in_array($k, $operators) ? 'selected="selected"' : '' ?>><?= $v ?></option>
+	<? endforeach; ?>
+	<option value="WebDialogs" <?= in_array('WebDialogs', $operators) ? 'selected="selected"' : '' ?>>WebDialogs</option>
+      </select>	    
+    </div>
+
+    <div>
+      <label class="filter" for="statuses">Status:</label>
+      <select id="statuses" name="statuses[]" multiple="multiple">
+	<option value=""></option>
+	<? foreach($status_list as $s): ?>
+	<option value="<?= $s ?>" <?= in_array($s, $statuses) ? 'selected="selected"' : '' ?>><?= $s ?></option>
+	<? endforeach; ?>
+      </select>
+    </div>
+
+    <div>
+      <label class="filter" for="services">Service:</label>
+      <select id="services" name="services[]" multiple="multiple">
+	<option value=""></option>
+	<? foreach($service_list as $k => $v): ?>
+	<option value="<?= $k ?>" <?= in_array($k, $services) ? 'selected="selected"' : '' ?>><?= $v ?></option>
+	<? endforeach; ?>
+      </select>
+    </div>    
+
+    <button type="submit" style="margin-left: 13em">
+      <img src="/img/check.gif"> Search
+    </button>
+
+  </div>
+  
+</form>
+
+<table id="reservations">
+  <thead>
+    <tr>
+      <th>Sunday</th>
+      <th>Monday</th>
+      <th>Tuesday</th>
+      <th>Wednesday</th>
+      <th>Thursday</th>
+      <th>Friday</th>
+      <th>Saturday</th>
+    </tr>
+  </thead>
+  <tbody>
+    <? while($cur_day <= $end_day): ?>
+
+    <? $day_num = date('w', $cur_day) ?>
+
+    <? if($day_num == 0): ?>   
+    <tr>
+    <? endif; ?>
+
+    <td class="<?= $day_num == 0 || $day_num == 6 ? 'weekend' : 'weekday' ?> day">
+      <div class="header">
+	<div class="holiday"><?= is_holiday($cur_day) ?></div>
+	<div class="date">
+	  <?= $html->link(date('j', $cur_day), sprintf('/reservations/day/%d/%d/%d', date('Y', $cur_day), date('m', $cur_day), date('j', $cur_day))) ?>
+	</div>
+      </div>
+       
+      <? if(isset($reservations[$cur_day])): ?>
+      <table class="events">
+        <? foreach($reservations[$cur_day] as $r): ?>
+	<tr>
+	  <td class="time"><?= date('g:ia', strtotime($r['ConferenceTime'])) ?></td>
+	  <td class="event"><a href="/reservations/view/<?= $r['ReservationID'] ?>"><?= $r['CompanyName'] ?></a></td>
+	</tr>
+	<? endforeach; ?>
+      </table>
+      <? endif; ?>
+
+      <? if(isset($num_reservations[$cur_day])): ?>
+      <div class="num">
+	<?=  $html->link('View all ' . $num_reservations[$cur_day] . ' reservations', sprintf('/reservations/day/%d/%d/%d', date('Y', $cur_day), date('m', $cur_day), date('j', $cur_day))) ?>
+      </div>
+      <? endif; ?>
+
+    </td>
+
+    <? if(date('w', $cur_day) == 6): ?>   
+    </tr>
+    <? endif; ?>
+
+    <? $cur_day = strtotime(date('Y-m-d', $cur_day) . ' +1 day') ?>
+    <? endwhile; ?>
+  </tbody>
+</table>
+
+<script type="text/javascript">
+$(document).ready( function() {
+ 
+  $('#operators,#statuses,#services').multiSelect({ selectAll: true });
+  $('#date_scheduled').datepicker();
+
+});
+</script>

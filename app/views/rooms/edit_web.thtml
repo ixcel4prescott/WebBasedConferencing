@@ -1,0 +1,274 @@
+<?= $javascript -> link('jquery.spinner') ?>
+<?= $html -> css('jquery.spinner') ?>
+
+<style class="text/css">
+	div#room_frame {
+	margin: auto;
+	border: 1px solid #ccc;
+	padding: 10px 20px;
+	}
+
+	.highlight {
+	background: #FFF391;
+	border: 2px solid #EED821;
+	}
+
+	div.notice {
+	background: #FFECBF;
+	border: 1px solid #EEAA00;
+	padding: 1em;
+	margin: 1em 0;
+	}
+
+	div.selectSetting{
+	vertical-align: text-top;
+	margin-bottom:10px;
+	margin-left: 5px;
+	margin-right: 5px;
+	}
+
+	div.selectSetting label {
+	display: inline;
+	float:left;
+	width: 200px;
+	margin-right: 10px;
+	}
+
+	div.selectSetting select{
+	width: 205px;
+	}
+
+	div.selectSetting p{
+	margin-left: 210px;
+</style>
+
+<div id="room_frame">
+
+	<?= $this -> renderElement('title', aa('title', 'Room Settings for ' . $room['Room']['contact'] . '(' . $room['Room']['accountid'] . ')', 'target', 'room_edit')) ?>
+
+	<form method="post" id="room_form">
+
+		<fieldset>
+			<legend>
+				Conference Room
+			</legend>
+
+			<?= $html -> hidden('Page/state') ?>
+			<?= $html -> hidden('Page/switch_bridge', aa('value', '0')) ?>
+
+			<?= $html -> hidden('Room/accountid') ?>
+			<?= $html -> hidden('Room/acctgrpid') ?>
+			<?= $html -> hidden('Room/bridgeid') ?>
+
+			<div class="input">
+				<label class="right required" for="RoomContact">Name:</label>
+				<?= $html -> input('Room/contact') ?>
+				<span class="smaller">(Name on Invoice)</span>
+				<?= $html -> tagErrorMsg('Room/contact', 'Please enter a contact') ?>
+			</div>
+
+			<div class="input">
+				<label class="right required" for="RoomEmail">Email:</label>
+				<?= $html -> input('Room/email') ?>
+				<?= $html -> tagErrorMsg('Room/email', 'Please enter a valid email address') ?>
+			</div>
+
+			<div class="input">
+				<label class="right required" for="RoomCompany">Company:</label>
+				<?= $html -> input('Room/company') ?>
+				<?= $html -> tagErrorMsg('Room/company', 'Please enter a valid company address') ?>
+			</div>
+		</fieldset>
+		<? if($room['Room']['bridgeid'] == WEBINTERPOINT_BRIDGEID): ?>
+		<fieldset class="extended">
+			<legend>
+				Schedule
+			</legend>
+			<div class="input">
+				<label class="right required" for="RoomMaximumconnections">Maximum Connections:</label>
+				<?= $html -> input('Room/maximumconnections', aa('readonly', $can_set_maxconnections ? '' : 'readonly')) ?>
+				<?= $html -> tagErrorMsg('Room/maximumconnections', 'Please enter a maximum number of connections') ?>
+				<? if(!$can_set_maxconnections):
+				?>
+				<span class="smaller">(Please contact Operations to alter this setting)</span>
+				<? endif; ?>
+			</div>
+		</fieldset>
+		<? endif; ?>
+
+		<fieldset>
+			<legend>
+				Conference Behavior
+			</legend>
+			<div class="select">
+				<label class="right required" for="RoomLang">Language:</label>
+				<?= $html -> selectTag('Room/lang', $languages) ?>
+				<?= $html -> tagErrorMsg('Room/lang', 'Please select a language') ?>
+			</div>
+		</fieldset>
+
+		<fieldset class="extended">
+			<legend>
+				Billing
+			</legend>
+
+			<div class="select" id="bmethod">
+				<label class="right" for="RoomBillingMethodId">Billing Method:</label>
+				<?= $html -> selectTag('Room/billing_method_id', $billingMethods) ?>
+				<?= $html -> tagErrorMsg('Room/billing_method_id', 'Please select a billing method') ?>
+			</div>
+
+			<div class="input">
+				<label class="right" for="RoomBillingcode">Billing Code:</label>
+				<?= $html -> input('Room/billingcode') ?>
+			</div>
+		</fieldset>
+
+		<fieldset class="extended">
+			<legend>
+				Notes
+			</legend>
+
+			<div class="input">
+				<label class="right" for="RoomNote1">Note 1:</label>
+				<?= $html -> textarea('Room/note1') ?>
+			</div>
+
+			<div class="input">
+				<label class="right" for="RoomNote2">Note 2:</label>
+				<?= $html -> textarea('Room/note2') ?>
+			</div>
+
+			<div class="input">
+				<label class="right" for="RoomNote3">Note 3:</label>
+				<?= $html -> textarea('Room/note3') ?>
+			</div>
+
+			<div class="input">
+				<label class="right" for="RoomNote4">Note 4:</label>
+				<?= $html -> textarea('Room/note4') ?>
+			</div>
+		</fieldset>
+
+		<div class="submit">
+			<button class="cancel" type="button">
+				<?= $html -> image('cross.gif') ?> Cancel
+			</button>
+			<button class="submit" type="submit" name="manual">
+				<?= $html -> image('check.gif') ?> Update
+			</button>
+		</div>
+	</form>
+</div>
+
+<script type="text/javascript">
+	$(document).ready( function() {
+		$('button.cancel').back('/rooms/view/<?= $room['Room']['accountid'] ?>');
+		$('#RoomCanada').spinner();
+	
+		if($('#PageState').val() == '1')
+			$('#extended_options').click();
+	});
+</script>
+
+<script type="text/javascript">
+	/*
+	 * 2013-08-29
+	 * Nathan Oliphant
+	 * noliphant@onsm.com
+	 * Check if previous Flat Rate options need to be set on first page load.
+	 * Removed initial call to processFlatRateDivs here, as now handled in processInitialLoad.
+	 */
+	// 
+	$(document).ready(processInitialLoad);
+	// Check if Flat Rate options need to be set when page loads.
+	//$(document).ready(processFlatRateDivs);
+
+	/*
+	 If flat-rate selected, block room_form submission until billing frequency and amount have values.
+	 */
+	$('#room_form').submit(function() {
+		if ($('#RoomBillingMethodId').val() == 3) {
+			// Flat-rate.  Need to validate billing period and charge.
+			if ($('#billing_frequency').val() == '' || $('#flat_rate_charge').val() == '') {
+				alert('You need to enter both a billing frequency and flat rate charge to create a flat rate room.');
+				// Focus on the first missing piece.
+				if ($('#billing_frequency').val() == '') {
+					$('#billing_frequency').focus()
+				} else {
+					$('#flat_rate_charge').focus()
+				}
+				return false;
+			}
+			// Check for 0 value in Flat Rate.  If so, set to 0.000
+			if ($('#flat_rate_charge').val() == '0') {
+				$('#flat_rate_charge').val('0.000');
+			}
+		} else {
+			return true;
+		}
+	});
+
+	/*
+	 Check the billing method onchange to see if we need to add flat-rate options or not.
+	 Added id="bmethod" to billing_method div as well.
+	 */
+	$('#RoomBillingMethodId').change(processFlatRateDivs);
+
+	/*
+	 Use jquery to add or remove flat rate billing and charge options to the page,
+	 depending on whether they are needed or not.
+	 */
+	function processFlatRateDivs() {
+		if ($('#RoomBillingMethodId').val() == 3) {
+			// This is getting called twice in edit_web.thtml.  No idea why, so let's just suppress if div exists already.
+			if ($('#bfrequency').length <= 0) {
+				// Add flat-rate items if flat-rate.
+				var flatRateDivs = '<div class="select" id="bfrequency"><label class="right" for="billing_frequency">Billing Frequency:</label>  <select id="billing_frequency" name="data[Room][billing_frequency_id]">    <option value=""> </option><option selected="selected" value="1">Monthly</option><option value="2">Quarterly</option><option value="3">Semi-Annually</option><option value="4">Annually</option></select></div><div class="input" id="bfrc">  <label class="right" for="flat_rate_charge">Flat Rate Charge:</label><input id="flat_rate_charge" name="data[Room][flat_rate_charge]" type="text" /></div>';
+				$('#bmethod').after(flatRateDivs);
+				// Now bind our validator to the charge input.  numbers and decimal only.
+				$('#flat_rate_charge').bind('input propertychange', function() {
+					$(this).val($(this).val().replace(/[^0-9\.]/g, ''));
+				});
+			}
+		} else {
+			// Remove flat-rate items if exist.
+			if ($('#bfrequency').length > 0) {
+				$('div').remove('#bfrequency');
+				$('div').remove('#bfrc');
+			}
+		}
+	}
+	
+	/*
+	 * 2013-08-29
+	 * Nathan Oliphant
+	 * noliphant@onsm.com
+	 * Added 2013-08-29 to properly load billing method data on first load.
+	 */
+	function processInitialLoad() {
+		var billing_info = new Object;
+		billing_info['billing_method'] = '<?= $billing_info['billing_method'] ?>';
+		billing_info['billing_method_id'] = '<?= $billing_info['billing_method_id'] ?>';
+		billing_info['billing_method_code'] = '<?= $billing_info['billing_method_code'] ?>';
+		billing_info['billing_frequency_id'] = '<?= $billing_info['billing_frequency_id'] ?>';
+		billing_info['flat_rate_charge'] = '<?= $billing_info['flat_rate_charge'] ?>';
+		billing_info['accountid'] = '<?= $billing_info['accountid'] ?>';
+		billing_info['set'] = '<?= $billing_info['set'] ?>';
+		if (billing_info['set'] == 'true') {
+			// Set the billing method dropdown.
+			$('#RoomBillingMethodId').val(billing_info['billing_method_id']);
+			processFlatRateDivs();
+			// If flat-rate, also set the flat-rate values.
+			if (billing_info['billing_method_id'] == '3') {
+				$('#billing_frequency').val(billing_info['billing_frequency_id']);
+				$('#flat_rate_charge').val(billing_info['flat_rate_charge']);
+			}
+		}
+	}
+
+	//
+	function numOnly() {
+		$(this).val($(this).val().replace(/[^0-9]/g, ""));
+	}
+</script>

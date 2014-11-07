@@ -1,0 +1,68 @@
+<style type="text/css">
+div#email {
+  font-family: Verdana, sans-serif;
+}
+
+div#notice {
+  color: #888;
+  text-align: center;
+  font-size: 8pt;
+  font-style: italic;
+  margin-bottom: 0.5em;
+}
+
+div#greeting {
+  margin-bottom: 1em;
+}
+
+div#link {
+  font-size: smaller;
+  margin-bottom: 1em;
+  font-weight: bold;
+}
+
+div#body {
+  margin-bottom: 1em;
+}
+
+table {
+  width: 100%;
+  border: 1px solid #ccc;
+  font-family: Verdana, sans-serif;
+}
+
+td,th {
+  text-align: left;
+  padding: 3px 5px;
+  border-collapse: collapse;
+  border-top: 1px solid #ccc;
+}
+</style>
+
+<div id="email">
+
+  <div id="notice">
+    The following email was automatically generated from MyCA, please do not reply.
+  </div>
+
+  <div id="greeting">
+    <? if(isset($recipient)): ?>
+    Hello <?= $recipient ?>,
+    <? else: ?>
+    Hello,
+    <? endif; ?>
+  </div>
+
+
+  <div id="body">
+    <?= $content_for_layout ?>
+  </div>
+
+  <div id="link">
+    <a href="<?= sprintf('http://myca/requests/index/%d', $request['Request']['id']) ?>">View Request</a>
+  </div>
+
+  <div id="closing">
+    Thank you!
+  </div>
+</div>

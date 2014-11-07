@@ -1,0 +1,120 @@
+<?
+function color($ports) {
+   if($ports>=1000)
+     $rv = 'high';
+   else if($ports>=500)
+     $rv = 'medium';
+   else if($ports>0)
+     $rv = 'low';
+   else 
+     $rv = '';
+
+   return $rv;
+}
+?>
+
+<style type="text/css">
+#utilization {
+  margin: auto;
+  margin-top: 1em;
+}
+
+#utilization th, #utilization td {
+  padding: 5px 10px;
+}
+
+.low {
+  background: #BFFFBF;
+} 
+
+.medium {
+  background: #FFECBF;
+}
+
+.high {
+  background: #FFBFBF;
+}
+
+#utilization thead th {
+  text-align: right;
+}
+
+#utilization tbody th {
+   text-align: right; 
+   width: 3em;
+}
+
+#utilization td {
+  width: 4em; 
+}
+
+</style>
+
+<h1 class="center"><?= date('F Y', strtotime(sprintf('%d-%02d-01', $year, $month)))?></h1>
+
+<div style="text-align: center">
+
+  <form id="month_selector">
+    <select id="month" name="month">
+      <? for($i=1; $i<=12; $i++): ?>
+      <option value="<?= sprintf("%02d", $i) ?>" <?= $month == $i ? 'selected="selected"' : ''?>><?= sprintf("%02d", $i) ?></value>  
+      <? endfor; ?>
+    </select>
+    /
+    <select id="year" name="year">
+      <? for($i=date('Y'); $i>=2004; $i--): ?>
+      <option value="<?= $i ?>" <?= $year == $i ? 'selected="selected"' : ''?>><?= $i ?></value>  
+      <? endfor; ?>
+    </select>
+
+    on bridge
+
+    <select name="bridgeid">
+      <option value="">Any</option>
+      <option value="3" <?= $bridgeid == 3 ? 'selected="selected"' : ''?>>icbr1</option>
+      <option value="4" <?= $bridgeid == 4 ? 'selected="selected"' : ''?>>icbr2</option>      
+    </select>
+
+    <input type="submit" value="Go"/>
+  </form>
+</div>
+
+<table id="utilization">
+  <thead>
+    <tr>
+      <th></th>
+      <th>8a</th>
+      <th>9a</th>
+      <th>10a</th>
+      <th>11a</th>
+      <th>12p</th>
+      <th>1p</th>
+      <th>2p</th>
+      <th>3p</th>
+      <th>4p</th>
+      <th>5p</th>
+      <th>6p</th>
+      <th>7p</th>
+      <th>8p</th>
+    </tr>
+  </thead>
+  <tbody>
+
+    <? for($i=1; $i<=$total_days; $i++): ?>       
+    <tr>
+      <th style="text-align: center">
+	<?= $html->link(date('D, M j', strtotime(sprintf('%d-%02d-%02d', $year, $month, $i))), 
+	    sprintf('/reservations/day/%d/%02d/%02d', $year, $month, $i)) ?>
+      </th>      
+      
+      <? for($j=8; $j<=20; $j++): ?>
+      <td class="<?= color(isset($data[$i][$j]) ? $data[$i][$j]['lines_reserved'] : 0)?>">
+	<?= isset($data[$i][$j]) ? $data[$i][$j]['lines_reserved'] : '0' ?>/<?= isset($data[$i][$j]) ? $data[$i][$j]['num_reservations'] : '0' ?>
+      </td>
+      <? endfor; ?>
+
+    </tr>
+    <? endfor; ?>
+
+  </tbody>
+</table>

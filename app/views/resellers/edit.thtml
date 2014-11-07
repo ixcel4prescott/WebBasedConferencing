@@ -1,0 +1,221 @@
+<?= $javascript->link('jquery.format') ?>
+
+<?= $javascript->link('jquery.spinner') ?>
+<?= $html->css('jquery.spinner') ?>
+
+<style type="text/css">
+#reseller_pane {
+   margin: auto;
+   padding-bottom: 20px;
+   border: 1px solid #ccc;
+   padding: 10px 20px;
+}
+
+#color_preview {
+  padding: 5px 12px;
+}
+
+</style>
+
+<div id="reseller_pane">
+  <h1>Edit Reseller: <?= $reseller['Reseller']['name'] ?></h1>
+
+  <form method="post">
+    <?= $html->hidden('Reseller/resellerid') ?>
+
+    <fieldset>
+      <legend>Reseller Information</legend>
+
+      <div class="input">
+				<label class="right required" for="ResellerName">Company Name:</label>
+				<?= $html->input('Reseller/name') ?>
+				<?= $html->tagErrorMsg('Reseller/name', 'Please enter a name') ?>   
+      </div>
+
+      <div class="input">
+         <label class="right required" for="ResellerRdesc">Company Description:</label>
+         <?= $html->input('Reseller/rdesc') ?>
+      </div>
+
+      <div class="input">
+				<label class="right required" for="Reseller">Billing Contact:</label>
+				<?= $html->input('Reseller/contact') ?>
+				<?= $html->tagErrorMsg('Reseller/contact', 'Please enter a contact') ?>   
+      </div>
+
+      <div class="input">
+         <label class="right required" for="ResellerRcontact">Reporting Contact:</label>
+         <?= $html->input('Reseller/rcontact') ?>
+      </div>
+
+      <div class="input">
+			<label class="right required" for="ResellerRemail">Email:</label>
+			<?= $html->input('Reseller/remail') ?>
+			<span class="smaller">(Multiple email addresses can be joined with commas)</span>
+			<?= $html->tagErrorMsg('Reseller/remail', 'Please enter at least one valid email address') ?>
+      </div>      
+
+      <div class="input">
+				<label class="right required" for="ResellerRaddress1">Address:</label>
+				<?= $html->input('Reseller/raddress1') ?>
+				<?= $html->tagErrorMsg('Reseller/raddress1', 'Please enter an address') ?>   
+      </div>
+
+      <div class="input">
+				<label class="right required" for="ResellerRaddress2">&nbsp;</label>
+				<?= $html->input('Reseller/raddress2') ?>
+      </div>
+      
+      <div class="input">
+				<label class="right required" for="ResellerRcity">City:</label>
+				<?= $html->input('Reseller/rcity') ?>
+				<?= $html->tagErrorMsg('Reseller/rcity', 'Please enter a city') ?>   
+      </div>
+
+      <div class="select">
+				<label class="right required" for="ResellerRstate">State:</label>
+				<?= $html->selectTag('Reseller/rstate', Symbols::$states) ?>
+				<?= $html->tagErrorMsg('Reseller/rstate', 'Please select a state') ?>   
+      </div>
+
+      <div class="input">
+				<label class="right" for="ResellerRzip">Zip:</label>
+				<?= $html->input('Reseller/rzip') ?>
+				<?= $html->tagErrorMsg('Reseller/rzip', 'Please enter a zip code') ?>   
+      </div>
+
+      <div class="input">
+				<label class="right" for="ResellerRphone">Phone:</label>
+				<?= $html->input('Reseller/rphone') ?>
+      </div>
+
+      <div class="input">
+				<label class="right" for="ResellerRfax">Fax:</label>
+				<?= $html->input('Reseller/rfax') ?>
+      </div>
+    </fieldset>
+
+
+
+    <fieldset>
+      <legend>Reseller Properties</legend>
+      
+      <div class="checkbox">
+         <label class="right" for="ResellerActive">Active:</label>
+         <?= $html->checkbox('Reseller/active') ?>
+      </div>
+
+      <div class="checkbox">
+         <label class="right" for="ResellerAgent">Agent:</label>
+         <?= $html->checkbox('Reseller/agent') ?>
+      </div>
+
+      <div class="select">
+         <label class="right" for="ResellerReporttype">Report Type:</label>
+         <?= $html->selectTag('Reseller/reporttype', $report_types) ?>
+      </div>
+
+      <div class="checkbox">
+         <label class="right" for="ResellerEmailusagerpts">Email Usage Reports:</label>
+         <?= $html->checkbox('Reseller/emailusagerpts') ?>
+      </div>
+
+      <div class="input">
+         <label class="right" for="ResellerDirectory">Directory:</label>
+         <?= $html->input('Reseller/directory') ?>
+      </div>
+
+      <div class="input">
+         <label class="right" for="ResellerUsagerptfrom">Usage Report From:</label>
+         <?= $html->input('Reseller/usagerptfrom') ?>
+      </div>
+
+      <div class="input">
+         <label class="right" for="ResellerLogo">Logo:</label>
+         <?= $html->input('Reseller/logo') ?>
+      </div>
+
+      <div class="input">
+         <label class="right" for="ResellerLogoref">Logo Ref:</label>
+         <?= $html->input('Reseller/logoref') ?>
+      </div>
+
+      <div class="input">
+         <label class="right" for="ResellerLogowidth">Logo Width:</label>
+         <?= $html->input('Reseller/logowidth') ?>
+      </div>
+
+      <div class="input">
+         <label class="right" for="ResellerLogoheight">Logo Height:</label>
+         <?= $html->input('Reseller/logoheight') ?>
+      </div>
+
+      <div class="input">
+        <label class="right" for="ResellerCustomcolor">Custom Color:</label>
+        <?= $html->input('Reseller/customcolor') ?>
+	<span id="color_preview">&nbsp;</span>
+      </div>
+
+      <div class="input">
+         <label class="right" for="ResellerOpsEmail">Ops Email:</label>
+         <?= $html->input('Reseller/opsEmail') ?>
+      </div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Account Properties</legend>
+      <div class="input">
+	<label class="right required" for="ResellerRacctprefix">Prefix for Accounts:</label>
+	<?= $html->input('Reseller/racctprefix') ?>
+	<?= $html->tagErrorMsg('Reseller/racctprefix', 'Please enter an unused account prefix') ?>   
+      </div>
+
+      <div class="checkbox">
+	<label class="right" for="ResellerAgidgen">Generate Account ID's:</label>
+	<?= $html->checkbox('Reseller/agidgen') ?>
+      </div>
+
+      <div class="input">
+	<label class="right required" for="ResellerAgidlen">Generated Account length:</label>
+	<?= $html->input('Reseller/agidlen') ?>
+	<?= $html->tagErrorMsg('Reseller/agidlen', 'Please enter a length for generated ID\'s') ?>   
+      </div>
+      
+      <div class="input">
+	<label class="right required" for="ResellerAgidlast">Last Autogenerated ID:</label>
+	<?= $html->input('Reseller/agidlast') ?>
+	<?= $html->tagErrorMsg('Reseller/agidlast', 'Please enter a valid number') ?>   
+      </div>
+
+    </fieldset>
+
+    <div class="submit">
+      <button class="cancel" type="button">
+	<?= $html->image('cross.gif') ?> Cancel
+      </button>
+      <button class="submit" type="submit">
+	<?= $html->image('check.gif') ?> Update
+      </button>
+    </div>    
+  </form>
+</div>
+
+<script type="text/javascript">
+$(document).ready(function() {
+
+  $('button.cancel').back('/resellers/view/<?= $reseller['Reseller']['resellerid'] ?>');
+
+  $('#ResellerRphone,#ResellerRfax').format('phone');
+  $('.spinner').spinner();
+
+  $('#ResellerCustomcolor').keyup( function() {
+
+     var color = '#fff';
+     if(this.value.match(/^(\w{3}|\w{6})$/))
+       var color = '#' + this.value;
+
+     $('#color_preview').css('background', color);       
+  }).keyup();
+
+});
+</script>

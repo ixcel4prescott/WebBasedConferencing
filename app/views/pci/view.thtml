@@ -1,0 +1,74 @@
+<style type="text/css">
+#billing_pane {
+   margin: auto;
+   padding-bottom: 20px;
+   border: 1px solid #ccc;
+   padding: 10px 20px;
+}
+#billing_pane th, #billing_pane td {
+  padding: 3px 5px;
+}
+</style>
+
+<div id="billing_pane">
+  <h1>View Credit Card Information: <?= $account['Account']['acctgrpid'] ?> </h1>
+
+  <? if(!isset($pci)): ?>
+  <fieldset>
+    <legend>Decrypt Credit Card Information</legend>
+    <form method="post" style="margin-top:1em">
+      <div class="input">
+	<label class="right required" for="PciPassword">Password:</label>
+	<?= $html->password('Pci/password') ?>
+      </div>
+      <div class="submit">
+	<button class="cancel"  type="button">
+	  <?= $html->image('cross.gif') ?> Cancel
+	</button>
+	<button class="submit" type="submit">
+	  <?= $html->image('check.gif') ?> Decrypt
+	</button>
+      </div>
+    </form>    
+  </fieldset>
+  <? else: ?>
+  <table  style="margin-top:1em">
+    <tr>
+      <th>Card Type:</th>
+      <td><?= $pci['cctype'] ?></td>
+    </tr>
+    <tr>
+      <th>Card Number:</th>
+      <td><?= $pci['creditcard'] ?></td>
+    </tr>
+    <tr>
+      <th>Card Expiration:</th>
+      <td><?= substr($pci['ccexpire'], 0, 2) ?>/<?= substr($pci['ccexpire'], 2, 4) ?></td>
+    </tr>
+    <tr>
+      <th>Card Holder Name:</th>
+      <td><?= $pci['ccholdername'] ?></td>
+    </tr>
+    <tr>
+      <th>Card Holder Street:</th>
+      <td><?= $pci['ccholderstreet'] ?></td>
+    </tr>
+    <tr>
+      <th>Card Holder Zip:</th>
+      <td><?= $pci['ccholderzip'] ?></td>
+    </tr>
+  </table>
+  <? endif; ?>
+
+  <p style="margin-top: 1em">
+    <a href="/accounts/view/<?= $account['Account']['acctgrpid']?>">&laquo; Back to <?= $account['Account']['acctgrpid'] ?></a>
+  </p>
+
+</div>
+
+<script type="text/javascript">
+$(document).ready( function() {
+  $('button.cancel').back('/accounts/view/<?= $account['Account']['acctgrpid'] ?>');
+});
+</script>
+

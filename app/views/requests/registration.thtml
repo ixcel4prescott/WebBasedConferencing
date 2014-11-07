@@ -1,0 +1,33 @@
+<table style="margin-top: 1em">
+  <tr>
+    <th>Name:</th>
+    <td><?= $request['User']['name'] ?></td>
+  </tr>
+  <tr>
+    <th>User Level:</th>
+    <td><?= $request['User']['level_type'] ?></td>
+  </tr>
+  <? if($$request['User']['level_type'] == 'accountgroup'): ?>
+  <tr>
+    <th>Account:</th>
+    <td><?= $html->link($request['User']['level_id'], '/accounts/view/' . $request['User']['level_id']) ?></td>
+  </tr>
+  <? else: ?>
+  <tr>
+    <th>Room:</th>
+    <td><?= $html->link($request['User']['level_id'], '/rooms/view/' . $request['User']['level_id']) ?></td>
+  </tr>
+  <? endif; ?>
+  <tr>
+    <th>Company:</th>
+    <td><?= $request['User']['company_name'] ?></td>
+  </tr>
+  <tr>
+    <th>Email:</th>
+    <td><?= $html->link($request['User']['email'], 'mailto:' . $request['User']['email']) ?></td>
+  </tr>
+  <tr>
+    <th>Phone:</th>
+    <td><?= $request['User']['phone'] ?></td>
+  </tr>
+</table>

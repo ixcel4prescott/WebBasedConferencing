@@ -1,0 +1,3 @@
+<?
+
+common('components'.DS.'pagination');

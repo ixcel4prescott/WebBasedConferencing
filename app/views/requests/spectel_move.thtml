@@ -1,0 +1,3 @@
+Request to move <strong><?= $conference['SpectelConference']['ConferenceName'] ?> (ReservationRef: <?= $conference['SpectelConference']['ReservationRef'] ?> | CEC: <?= $conference['SpectelConference']['UsesMPIN'] ?> | PEC: <?= $conference['SpectelConference']['UsesCPIN'] ?>)</strong> 
+from <strong><?= $src['SpectelClient']['ClientName'] ?> (ClientRef: <?= $src['SpectelClient']['ClientRef'] ?>)</strong> 
+to <strong><?= $dest['SpectelClient']['ClientName'] ?> (ClientRef: <?= $dest['SpectelClient']['ClientRef'] ?>)</strong>

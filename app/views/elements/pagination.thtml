@@ -1,0 +1,9 @@
+<div class="pagination_set center" style="margin-top: 1em">
+  <?= $pagination->result() ?>
+</div>
+<div class="pagination_pages center">
+  <?= $pagination->prevPage($html->image("previous.gif"), false) ?> <?= $pagination->pageNumbers(" | ") ?> <?= $pagination->nextPage($html->image("next.gif") ,false) ?> 
+</div>
+<div class="pagination_num center">
+  <?= $pagination->resultsPerPage('Results per Page:') ?>
+</div>

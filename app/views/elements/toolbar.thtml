@@ -1,0 +1,55 @@
+<? if($items): ?>
+<style type="text/css">
+.toolbar {
+  margin: auto;
+  width: 100%;
+  margin-bottom: 1em;
+  border-collapse: separate;
+  border: none;
+}
+
+.toolbar td {
+  text-align: left;
+  border: 1px solid #CCDDEE;
+  background: #EFF7FF;
+  padding: 0.5em 1em;
+  font-size: xx-small;
+  cursor: pointer;
+}
+
+.toolbar td a {
+  font-weight: normal;
+} 
+
+.toolbar td:hover {
+  background: #CCDDEE;
+}
+
+.toolbar td:hover a {
+  color: #6BA5BF;
+}
+</style>
+
+<table class="toolbar">
+  <? foreach(array_chunk($items, 4) as $row): ?>
+  <tr>
+    <? foreach($row as $i): ?>
+    <td>
+      <? if(!empty($i['icon'])): ?>
+      <img src="/img/<?= $i['icon'] ?>" alt="" class="valign"/>
+      <? endif; ?>
+      <a href="<?= $i['url']?>" <?= isset($i['new']) && $i['new'] ? 'target="_blank"' : '' ?> ><?= $i['text'] ?></a>
+    </td>
+    <? endforeach; ?>
+  </tr>
+  <? endforeach; ?>
+</table>
+
+<script type="text/javascript">
+$(document).ready( function() {
+    $('table.toolbar td').click(function() {
+	window.location = $(this).children('a').attr('href');
+    });
+});
+</script>
+<? endif; ?>

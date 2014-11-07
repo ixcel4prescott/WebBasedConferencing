@@ -1,0 +1,72 @@
+<?= $html->css('ui.datepicker') ?>
+<?= $javascript->link('ui.datepicker.js') ?>
+
+<style type="text/css">
+#logs_pane {
+   margin: auto;
+   padding-bottom: 20px;
+   border: 1px solid #ccc;
+   padding: 10px 20px;
+}
+
+#logs_pane th,td {
+  padding: 3px 5px;
+  text-align: left;
+}
+
+tr.even td {
+  background: #EFF7FF;
+}
+
+.datepicker td, .datepicker th {
+  padding: inherit;
+  text-align: center;
+}
+
+span.current {
+  color: #FF9C2A;
+  font-weight: bold;
+}
+</style>
+
+<? $pagination->setPaging($paging) ?>
+
+<div id="logs_pane">
+  <h1>Backend Logs</h1>
+
+  <form method="get">
+
+    <div>
+      <?= $html->submit('Update Filter') ?>
+    </div>
+
+    <table id="logs_table" style="margin-top: 1em; width: 100%">
+      <tr>
+	<th>
+	  <?= $pagination->sortBy('created') ?><br />
+	  <input type="text" name="created" id="created" value="<?= !empty($_GET['created']) ? $_GET['created'] : '' ?>"/>
+	</th>
+	<th>
+	  <?= $pagination->sortBy('message') ?><br/
+	  <input type="text" name="message" id="message" value="<?= !empty($_GET['message']) ? $_GET['message'] : '' ?>"/>
+	</th>
+      </tr>
+      
+      <? for($i=0; $i<count($data); $i++): ?>
+	 <tr class="<?= $i%2 ? 'odd' : 'even' ?>">
+	   <td><?= $data[$i]['Backend']['created'] ?></td>
+	   <td><pre><?= $data[$i]['Backend']['message']  ?></pre></td>
+	 </tr>
+	 <? endfor; ?>
+    </table>
+  </form>
+
+  <?= $this->renderElement('pagination') ?>
+</div>
+
+<script type="text/javascript">
+$(document).ready( function() {
+    $('#created').datepicker();
+    window.setTimeout(function() { window.location='';}, (<?= BACKEND_RUN_WINDOW ?>)/2 * 1000)
+});
+</script>

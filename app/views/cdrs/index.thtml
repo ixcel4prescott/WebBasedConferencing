@@ -1,0 +1,120 @@
+<?= $html->css('ui.datepicker') ?>
+<?= $javascript->link('ui.datepicker.js') ?>
+
+<?
+  $menu_items = Array();
+  if(!empty($_GET['acctgrpid'])){
+    $menu_items[] = Array('text' => 'Back to '.$_GET['acctgrpid'],
+                          'icon' => 'previous.gif',
+                          'url'  => '/accounts/view/' . $_GET['acctgrpid']);
+  }
+  if(!empty($_GET['accountid'])){
+    $menu_items[] = Array('text' => 'Back to '.$_GET['accountid'],
+                          'icon' => 'previous.gif',
+                          'url'  => '/rooms/view/' . $_GET['accountid']);
+  }
+  if(!empty($_GET['acctgrpid']) && !empty($_GET['startdate']) && $_GET['startdate'] === $_GET['enddate']){
+    $menu_items[] = Array('text' => 'Back to CODR index for '.$_GET['startdate'],
+                          'icon' => 'previous.gif',
+                          'url'  => '/codrs/index/?acctgrpid=' . $_GET['acctgrpid'].'&startdate='.$_GET['startdate'].'&enddate='.$_GET['enddate']);
+  }
+?>
+
+<style type="text/css">
+#accounts_pane {
+   margin: auto;
+   padding-bottom: 20px;
+   border: 1px solid #ccc;
+   padding: 10px 20px;
+}
+
+#cdrs th, #cdrs td {
+  padding: 3px 5px;
+  text-align: left;
+}
+
+tr.even td {
+  background: #EFF7FF;
+}
+
+#filters{
+    margin-bottom:15px;
+}
+#filters, #filters tr td {
+    border:none;
+}
+
+</style>
+
+<? $pagination->setPaging($paging) ?>
+
+<div id="accounts_pane">
+
+  <?= $this->renderElement('toolbar', Array('items' => $menu_items)) ?>
+
+  <h1>CDR Index</h1>
+  
+    <form method="get" style="margin-top: 1em; margin-bottom: 1em">
+
+    <table id="filters">
+        <tr>
+            <td><label for="account">Account:</label>
+                <input id="account" type="text" name="account" value="<?= $account ?>"/></td>
+            <td><label for="confirmation">Confirmation Number:</label>
+                <input id="confirmation" type="text" name="confirmation" value="<?= $confirmation ?>"/></td>
+        </tr>
+        <tr>
+            <td><label class="right" for="startdate" style="width: 50px">Date Range Start:</label>
+                <input type="text" id="startdate" name="startdate" value="<?= !empty($_GET['startdate'])?$_GET['startdate']:'' ?>" /></td>
+            <td><label class="right" for="enddate" style="width: 50px">Date Range End:</label>
+                <input type="text" id="enddate" name="enddate" value="<?= !empty($_GET['enddate'])?$_GET['enddate']:'' ?>" /></td>
+        </tr>
+    </table>
+
+    <button type="submit">
+        <?= $html->image('search.gif', aa('class', 'valign')) ?> Search
+    </button>
+    <p style="float: right;">
+        <a href="<?= '?'.http_build_query(Array('export' => 1, 'codr_id' => @$_GET['codr_id'], 'acctgrpid' => @$_GET['acctgrpid'], 'account' => @$_GET['account'], 'confirmation' => @$_GET['confirmation'], 'startdate' => @$_GET['startdate'], 'enddate' => @$_GET['enddate'],)) ?>">
+            <img src="/img/excel.gif">
+            <strong>Export to Excel</strong>
+        </a>
+    </p>
+  </form>
+  
+  <table id="cdrs" style="width: 100%; margin-top: 1em">
+    <tr>
+      <th><?= $pagination->sortBy('acctgrpid', 'Account') ?></th>
+      <th><?= $pagination->sortBy('accountid', 'Confirmation<br>Number') ?></th>
+      <th><?= $pagination->sortBy('billing_code', 'Billing Code') ?></th>
+      <th><?= $pagination->sortBy('call_start', 'Call Start') ?></th>
+      <th><?= $pagination->sortBy('call_end', 'Call End') ?></th>
+      <th><?= $pagination->sortBy('minutes', 'Minutes') ?></th>
+      <th><?= $pagination->sortBy('ppm', 'PPM') ?></th>
+      <th><?= $pagination->sortBy('call_cost', 'Call<br>Cost') ?></th>
+      <th> Details </th>
+    </tr>
+
+    <? for($i=0; $i<count($data); $i++): ?>
+       <tr class="<?= $i%2 ? 'odd' : 'even' ?>">
+       <td><?= $html->link($data[$i]['Cdr']['acctgrpid'], "/cdrs/index/?acctgrpid={$data[$i]['Cdr']['acctgrpid']}") ?></td>
+       <td><?= $html->link($data[$i]['Cdr']['accountid'], "/cdrs/index/?accountid={$data[$i]['Cdr']['accountid']}") ?></td>
+       <td><?= $data[$i]['Cdr']['billing_code'] ?></td>
+       <td><?= date('m/d/Y G:i',strtotime($data[$i]['Cdr']['call_start'])) ?></td>
+       <td><?= date('m/d/Y G:i',strtotime($data[$i]['Cdr']['call_end'])) ?></td>
+       <td><?= $data[$i]['Cdr']['minutes'] ?></td>
+       <td><?= $data[$i]['Cdr']['ppm'] ?></td>
+       <td><?= $data[$i]['Cdr']['call_cost'] ?></td>
+       <td style="text-align: center"><a href="/cdrs/view/<?= $data[$i]['Cdr']['id'] ?>"><?= $html->image('user.gif') ?></a></td>
+    <? endfor; ?>
+    
+  </table>
+
+  <?= $this->renderElement('pagination') ?>
+
+</div>
+<script type="text/javascript">
+$(document).ready( function() {
+  $('#startdate,#enddate').datepicker();
+});
+</script>

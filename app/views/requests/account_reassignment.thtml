@@ -1,0 +1,4 @@
+<div style="margin-top: 1em">
+  <strong><?= $html->link(ucfirst($request['Account']['bcompany']), '/accounts/view/' . $request['Account']['acctgrpid']) ?>(<?= $html->link($request['Account']['acctgrpid'], '/accounts/view/' . $request['Account']['acctgrpid']) ?>)</strong> requested to change their 
+  salesperson from <strong><?= $old['Salesperson']['name'] ?></strong> to <strong><?= $new['Salesperson']['name'] ?></strong>
+</div>

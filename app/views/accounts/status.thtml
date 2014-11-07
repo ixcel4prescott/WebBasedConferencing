@@ -1,0 +1,54 @@
+<?= $html->css('ui.datepicker') ?>
+<?= $javascript->link('ui.datepicker.js') ?>
+
+<style type="text/css">
+#status_pane {
+   margin: auto;
+   padding-bottom: 20px;
+   width: 500px;
+   border: 1px solid #ccc;
+   padding: 10px 20px;
+}
+</style>
+
+<div id="status_pane">
+
+  <?= $this->renderElement('title', aa('title', 'Change Account Status: ' . $account['Account']['acctgrpid'], 'target', 'account_status_change' )) ?>
+
+  <form method="post">
+    <div class="select">
+      <label class="right required" for="AccountStatus">Status:</label>
+      <?= $html->selectTag('Account/status', $account_statuses, null, null, null, false) ?>
+      <?= $html->tagErrorMsg('Account/status', 'Please select a status other than current') ?>   
+    </div>
+
+    <div class="input">
+      <label class="right required" for="AccountReason">Reason for Change:</label>
+      <?= $html->textarea('Account/reason') ?>
+      <?= $html->tagErrorMsg('Account/reason', 'Please state the reason for the change') ?>   
+    </div>
+
+    <div class="input">
+      <label class="right required" for="AccountEffectiveDate">Effective Date:</label>
+      <?= $html->input('Account/effective_date') ?>
+      <?= $html->tagErrorMsg('Account/effective_date', 'Please specify a date this rate change becomes effective') ?>   
+    </div>
+
+
+     <div class="submit">
+      <button class="cancel" type="button">
+	<?= $html->image('cross.gif') ?> Cancel
+      </button>
+      <button class="submit" type="submit">
+	<?= $html->image('check.gif') ?> Update
+      </button>
+    </div>
+  </form>
+</div>
+
+<script type="text/javascript">
+$(document).ready( function() {
+  $('button.cancel').back('/accounts/view/<?= $account['Account']['acctgrpid'] ?>');
+  $('#AccountEffectiveDate').datepicker();
+})
+</script>

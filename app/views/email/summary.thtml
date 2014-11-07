@@ -1,0 +1,53 @@
+<style type="text/css">
+#accounts_pane {
+   margin: auto;
+   padding-bottom: 20px;
+   border: 1px solid #ccc;
+   padding: 10px 20px;
+}
+
+#accounts th, #accounts td {
+  padding: 3px 5px;
+  text-align: left;
+}
+
+tr.even td {
+  background: #EFF7FF;
+}
+
+</style>
+
+<? $pagination->setPaging($paging) ?>
+
+<div id="accounts_pane">
+
+  <h1>Welcome Email Summary for  <span style="font-weight:normal;font-style:italic;"><?= $account['Account']['acctgrpid'] ?></span></h1>
+
+  <table id="accounts" style="width: 100%; margin-top: 1em">
+    <tr>
+      <th><?= $pagination->sortBy('accountid', 'Room ID') ?></th>
+      <th>Sent</th>      
+    </tr>
+    
+    <? for($i=0; $i<count($rooms); $i++): ?>
+       <tr class="<?= $i%2 ? 'odd' : 'even' ?>">
+	 <td><?= $html->link($rooms[$i]['Room']['accountid'], "/rooms/view/{$rooms[$i]['Room']['accountid']}") ?></td>
+	   <? $emailDate = ''; 
+	   for($j =0; $j<count($roomsWEmails);$j++){
+         if ($roomsWEmails[$j]['WelcomeEmailLog']['accountid'] == $rooms[$i]['Room']['accountid']){ 
+           $emailDate = $roomsWEmails[$j]['WelcomeEmailLog']['sent'];
+           break;
+         }}
+         if (empty($emailDate))
+           print '<td class=sent_link>'.$html->link("Not Sent", "/rooms/select/{$account['Account']['acctgrpid']}/email?room={$rooms[$i]['Room']['accountid']}").'</td>';
+         else
+           print '<td> '.$emailDate.' </td>';
+         ?>
+       </tr>
+    <? endfor; ?>
+    
+  </table>
+
+  <?= $this->renderElement('pagination') ?>
+
+</div>

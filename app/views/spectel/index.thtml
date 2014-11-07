@@ -1,0 +1,51 @@
+<style type="text/css">
+#clients_pane {
+   padding-bottom: 20px;
+}
+
+#clients_table th,#clients_table td {
+  padding: 3px 5px;
+  text-align: left;
+}
+
+tr.even td {
+  background: #EFF7FF;
+}
+
+span.current {
+  color: #FF9C2A;
+  font-weight: bold;
+}
+</style>
+
+<? $pagination->setPaging($paging) ?>
+
+<div id="clients_pane">
+  <?= $this->renderElement('title', aa('title', 'Spectel Clients Index')) ?>
+
+  <form method="get" style="margin-top: 1em; margin-bottom: 1em">
+    <label for="query">Search:</label>
+    <input id="query" type="text" name="query" value="<?= $query ?>"/>
+    <button type="submit" id="submit">
+      <?= $html->image('search.gif', aa('class', 'valign')) ?> Search
+    </button>
+  </form>
+
+  <table id="clients_table" style="margin-top: 1em; width: 100%">
+    <tr>
+      <th><?= $pagination->sortBy('ClientName', 'Name') ?></th>
+      <th><?= $pagination->sortBy('ClientMainICC', 'Account') ?></th>
+      <th><?= $pagination->sortBy('ContactName', 'Contact') ?></th>
+    </tr>
+    
+    <? for($i=0; $i<count($data); $i++): ?>
+    <tr class="<?= $i%2 ? 'odd' : 'even' ?>">
+    <td><?= $html->link($data[$i]['SpectelClient']['ClientName'], '/spectel/view/' . $data[$i]['SpectelClient']['ClientRef'])  ?></td>
+    <td><?= $html->link($data[$i]['SpectelClient']['ClientMainICC'], '/accounts/view/' . $data[$i]['SpectelClient']['ClientMainICC'])  ?></td>
+    <td><?= $data[$i]['SpectelClient']['ContactName'] ?></td>
+  </tr>
+  <? endfor; ?>
+</table>
+
+  <?= $this->renderElement('pagination') ?>
+</div>

@@ -1,0 +1,49 @@
+<style type="text/css">
+#ie6_notice {
+  border: 1px solid #900;
+  background: #FFDFDF;
+  color: #900;
+  text-align: center;
+  font-weight: bold;
+  margin-bottom: 10px;
+  padding: 10px 20px;
+}
+
+#login_pane {
+   margin: auto;
+   padding-bottom: 20px;
+   width: 500px;
+   border: 1px solid #ccc;
+   padding: 10px 20px;
+   margin-top: 5em;
+}
+</style>
+<div id="login_pane">
+
+  <form method="post" style="margin-top: 2em">
+    <div class="input">
+      <label class="right required" for="UserEmail">Email:</label>
+      <?= $html->input('User/email') ?>
+    </div>
+    
+    <div class="input">
+      <label class="right required" for="UserPassword">Password:</label>
+      <?= $html->password('User/password') ?>
+    </div>
+    
+    <div style="margin-left: 215px; margin-bottom: 10px">
+      <?= $html->link('Forgot your password?', "/users/forgot") ?>
+    </div>
+    
+    <div style="margin-left: 215px; margin-bottom: 10px">
+      <?= $html->checkbox('User/Remember') ?><label style="margin-left: 5px; display: inline; float: none" for="UserRemember">Remember Me</label>
+    </div>
+    
+    <div class="submit">
+      <button class="submit cancel" type="submit">
+	<?= $html->image('check.gif') ?> Login
+      </button>
+    </div>
+
+  </form>
+</div>

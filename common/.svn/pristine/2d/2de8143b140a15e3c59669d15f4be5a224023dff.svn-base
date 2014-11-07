@@ -1,0 +1,5 @@
+<? if(isset($request['RequestData']['number'])): ?>
+Multiple room creation requests are in the queue for account <strong><?= $request['Request']['acctgrpid'] ?></strong>
+<? else: ?>
+A <strong><?= $request['RequestStatus']['name'] ?></strong> request is in the queue to create a new room for account <strong><?= $request['Request']['acctgrpid'] ?></strong>
+<? endif; ?>

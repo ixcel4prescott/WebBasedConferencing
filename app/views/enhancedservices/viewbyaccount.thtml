@@ -1,0 +1,95 @@
+<style type="text/css">
+th,td {
+  padding: 3px 5px;
+  text-align: left;
+}
+
+tr.even td {
+  background: #EFF7FF;
+}
+</style>
+
+<? $monthname = date('F',strtotime("$myYear-$myMonth-01")) ?>
+	 	
+<h1>Enhanced Services Report</h1>
+
+<div id="breadcrumbs" style="margin-bottom:10px;font-size:10pt">
+<?= $html->link('Home', "/enhancedservices/viewbyaccount/$myAccount") ?> &raquo; 
+<?= $html->link($myAccount, "/enhancedservices/viewbyaccount/$myAccount") ?>
+
+<? if($myMonth): ?>
+&raquo; <?= $html->link($myYear, "/enhancedservices/viewbyaccount/$myAccount/$myYear") ?>
+
+  <? if($myDay): ?>
+  &raquo; <?= $html->link($monthname, "/enhancedservices/viewbyaccount/$myAccount/$myYear/$myMonth") ?>
+  &raquo; <?= $myDay ?> 
+  <? else: ?>
+  &raquo; <?= $myMonth ?>
+  <? endif; ?>
+
+<? else: ?>
+  &raquo; <?= $myYear ?>
+<? endif; ?>
+</div>
+
+<? 
+   $total_cost = 0;
+   $total_rcost = 0;
+?>
+
+<table>
+  <thead>
+    <tr>
+      <th>Company</th>
+      <th></th>
+      <th>Date</th>
+      <th>Status</th>
+      <th>Room</th>
+      <th>Cost</th>
+      <th>RCost</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  
+  <? for($i=0; $i<count($dates); $i++): ?>
+     <?
+	$total_cost += $dates[$i]['Enhancedservices']['cost'];
+	$total_rcost += $dates[$i]['Enhancedservices']['rcost'];
+	$link = "/accounts/view/".$dates[$i]['Enhancedservices']['acctgrpid'];
+
+	if($myYear)
+	 $link .= "/$myYear";
+	
+	if($myMonth)
+	 $link .= "/$myMonth";
+
+	if($myDay)
+	 $link .= "/$myDay";
+     ?>
+     
+  <tr class="<?= $i%2 ? 'odd' : 'even' ?>">
+    <td><?= $html->link($dates[$i]['Enhancedservices']['company']." (".$dates[$i]['Enhancedservices']['acctgrpid'].")", $link) ?></td>
+    <td class="cellspace">&nbsp;</td>
+    <td><?= date('m-d-Y', strtotime($dates[$i]['Enhancedservices']['date'])) ?></td>
+    <td><?= $dates[$i]['Enhancedservices']['status'] ?></td>
+    <td><?= ($dates[$i]['Enhancedservices']['accountid'])?$dates[$i]['Enhancedservices']['accountid']:'&nbsp;' ?></td>
+    <td>$<?= number_format($dates[$i]['Enhancedservices']['cost'],2,'.',',') ?></td>
+    <td>$<?= number_format($dates[$i]['Enhancedservices']['rcost'],2,'.',',') ?></td>
+    <td><?= $dates[$i]['Enhancedservices']['description'] ?></td>
+  </tr>
+  <? endfor; ?>
+
+  <tfoot>
+    <tr>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th class="right bold">Total:</th>
+      <th>$<?= number_format($total_cost,2,'.',',') ?></th>
+      <th>$<?= number_format($total_rcost,2,'.',',') ?></th>
+      <th></th>
+    </tr>
+  </tfoot>
+
+</table>

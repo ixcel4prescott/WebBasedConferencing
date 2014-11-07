@@ -1,0 +1,110 @@
+<?= $html->css('ui.datepicker') ?>
+<?= $javascript->link('ui.datepicker.js') ?>
+
+<style type="text/css">
+#accounts_pane {
+   margin: auto;
+   padding-bottom: 20px;
+   border: 1px solid #ccc;
+   padding: 10px 20px;
+}
+
+#accounts th, #accounts td {
+  padding: 3px 5px;
+  text-align: center;
+}
+
+#accounts  tr.second td {
+  border-top: 1px dashed #cde;
+}
+
+#accounts .break {
+  border-left: 1px dotted #cde;
+}
+
+#accounts tr.even td {
+  background: #EFF7FF;
+}
+
+span.current {
+  color: #FF9C2A;
+  font-weight: bold;
+}
+</style>
+
+<div id="accounts_pane">
+
+  <h1>Usage Report by Date</h1>
+
+  <form method="get">
+    <div>
+      <label class="right" for="ReportStart" style="width: 50px">Week Starting:</label>
+      <input type="text" id="start" name="start" value="<?= $_GET['start'] ?>" />            
+      <input type="submit" value="Update" style="margin-left: 10px"/>
+    </div>
+  </form>
+
+  <table id="accounts" style="width: 100%; margin-top: 1em">
+    <thead>
+      <tr>
+	<th></th>
+	<th></th>
+	<th class="center break" colspan="4">Reservationless</th>
+	<th class="center break" colspan="3">Operator-Assisted</th>
+	<th class="center break" colspan="3">Event</th>
+      </tr>
+      <tr>
+	<th style="border-top: none"></th>
+	<th style="border-top: none"></th>
+	<th class="break">Toll-Free<br/>Dial-in</th>
+	<th>Toll<br/>Dial-in</th>
+	<th>Dial-out</th>
+	<th>IVR</th>
+
+	<th class="break">Toll-Free<br/>Dial-in</th>
+	<th>Toll<br/>Dial-in</th>
+	<th>Dial-out</th>
+
+	<th class="break">Toll-Free<br/>Dial-in</th>
+	<th>Toll<br/>Dial-in</th>
+	<th>Dial-out</th>        
+      </tr>
+    </thead>
+    
+    <? for($i=0; $i<count($data); $i++): ?>
+       <tr class="<?= $i%2 ? 'odd' : 'even' ?>">
+ 	 <th rowspan="2" style="width: 3em"><?= $data[$i]['ReportUsageByDate']['confstartdate'] ?></th>
+	 <th>icbr1</th>
+	 <td class="break"><?= $data[$i]['ReportUsageByDate']['total_icbr1_RLF'] ?></td>
+	 <td><?= $data[$i]['ReportUsageByDate']['total_icbr1_RLT'] ?></td>
+	 <td><?= $data[$i]['ReportUsageByDate']['total_icbr1_RLO'] ?></td>
+	 <td><?= $data[$i]['ReportUsageByDate']['total_icbr1_RLIVR'] ?></td>
+	 <td class="break"><?= $data[$i]['ReportUsageByDate']['total_icbr1_OAF'] ?></td>
+	 <td><?= $data[$i]['ReportUsageByDate']['total_icbr1_OAT'] ?></td>
+	 <td><?= $data[$i]['ReportUsageByDate']['total_icbr1_OAD'] ?></td>
+	 <td class="break"><?= $data[$i]['ReportUsageByDate']['total_icbr1_OAEF'] ?></td>
+	 <td><?= $data[$i]['ReportUsageByDate']['total_icbr1_OAET'] ?></td>
+	 <td><?= $data[$i]['ReportUsageByDate']['total_icbr1_OAED'] ?></td>	 
+       </tr>
+       <tr class="second <?= $i%2 ? 'odd' : 'even' ?>">
+	 <th style="border-top: none">icbr2</th>
+	 <td class="break"><?= $data[$i]['ReportUsageByDate']['total_icbr2_RLF'] ?></td>
+	 <td><?= $data[$i]['ReportUsageByDate']['total_icbr2_RLT'] ?></td>
+	 <td><?= $data[$i]['ReportUsageByDate']['total_icbr2_RLO'] ?></td>
+	 <td><?= $data[$i]['ReportUsageByDate']['total_icbr2_RLIVR'] ?></td>
+	 <td class="break"><?= $data[$i]['ReportUsageByDate']['total_icbr2_OAF'] ?></td>
+	 <td><?= $data[$i]['ReportUsageByDate']['total_icbr2_OAT'] ?></td>
+	 <td><?= $data[$i]['ReportUsageByDate']['total_icbr2_OAD'] ?></td>
+	 <td class="break"><?= $data[$i]['ReportUsageByDate']['total_icbr2_OAEF'] ?></td>
+	 <td><?= $data[$i]['ReportUsageByDate']['total_icbr2_OAET'] ?></td>
+	 <td><?= $data[$i]['ReportUsageByDate']['total_icbr2_OAED'] ?></td>	 
+       </tr>
+    <? endfor; ?>
+  </table>
+</div>
+
+<script type="text/javascript">
+$(document).ready( function() {
+  $('#start,#end').datepicker();
+});
+</script>

@@ -1,0 +1,231 @@
+<?
+common('vendors/charts');
+
+function color_weekday($date)
+{
+  //This may need to be modified since it isn't working quiet right if salesperson doesn't have activity throughout the entire month.
+   $day_num = date('N', strtotime($date));
+ 
+   if($day_num > 5)
+     $rv = 'weekend';
+   elseif($day_num == 2 || $day_num == 4) 
+     $rv = 'even';
+   else
+     $rv = 'odd';
+
+   return $rv;
+}
+
+function sum_days($dates, $only_biz_days, $model) {
+  $rv = Array( 'reservationless_minutes'      => 0,
+               'reservationless_cost'      => 0,
+               'operator_assisted_minutes'      => 0,
+               'operator_assisted_cost'      => 0,
+               'web_minutes'      => 0,
+               'web_cost'      => 0,
+               'enhanced_service_cost'   => 0,
+               'total_cost' => 0,
+               'total_minutes'         => 0,
+               'other_cost'         => 0,
+               'flat_cost'         => 0,
+               'count'           => 0);   
+
+  foreach($dates as $d) {    
+    $dow = date('w', strtotime($d[$model]['date']));
+       
+    if(!$only_biz_days || ($dow > 0 && $dow < 6)) {
+      $rv['reservationless_minutes']      += $d[$model]['reservationless_minutes'];
+      $rv['reservationless_cost']      += $d[$model]['reservationless_cost'];
+      $rv['operator_assisted_minutes']      += $d[$model]['operator_assisted_minutes'];
+      $rv['operator_assisted_cost']      += $d[$model]['operator_assisted_cost'];
+      $rv['web_minutes']      += $d[$model]['web_minutes'];
+      $rv['web_cost']      += $d[$model]['web_cost'];
+      $rv['enhanced_service_cost']   += $d[$model]['enhanced_service_cost'];
+      $rv['total_cost'] += $d[$model]['total_cost'];
+      $rv['total_minutes']         += $d[$model]['total_minutes'];
+      $rv['other_cost']         += $d[$model]['other_cost'];
+      $rv['flat_cost']         += $d[$model]['flat_cost'];
+      $rv['count']++;
+    }
+  }
+
+  return $rv;
+}
+
+$biz_total = sum_days($dates, true, $model);
+$total     = sum_days($dates, false, $model);
+
+$totaldays     = date('t', strtotime($dates[0][$model]['date']));
+//print_r($dates);
+$totalworkdays = 0;
+
+for($i=1; $i<=$totaldays; $i++) {
+  $dayofweek = date('w', strtotime("$myMonth/$i/$myYear"));
+  
+  if ($dayofweek > 0 && $dayofweek < 6)
+    $totalworkdays++;
+}
+?>
+
+<style type="text/css">
+#report, #report_summary{
+  margin: 1em auto; 
+  width: 100%;
+}
+
+#report th,#report td {
+  padding: 3px 5px;
+  text-align: right;
+}
+
+tr.odd td {
+  background: #def;
+}
+
+.highlight {
+   font-weight: bold;
+}
+
+.weekend {
+  background: #eee;
+  color: #bbb;
+}
+
+.dim {
+  background: #eee;
+}
+</style>
+
+<h1>Month To Date Report</h1>
+
+<div id="breadcrumbs" style="margin-bottom:10px; font-size:10pt">
+  <?= $html->link('Home', "/reports/usage") ?> &raquo; <?= $html->link($myYear, "/reports/usage/$myYear") ?> &raquo; <?= date('F',strtotime("$myYear-$myMonth-01")) ?>
+</div>
+
+<div style="width: 500px; margin: 1em auto">
+  <?= InsertChart( "/img/charts.swf", "/graphs/charts_library", "/graphs/usage/$myYear/$myMonth/?nocache=".date('s'), 500, 200, "FFFFFF", false) ?>
+</div>
+
+<p style="float: right">
+  <a href="<?= '?'.http_build_query(Array('export' => 1, 'query' => @$_GET['query'])) ?>">
+    <img src="/img/excel.gif">	
+    <strong>Export to Excel</strong>
+  </a>
+</p>
+
+<br style="clear: right"/>
+
+<table id="report">
+  <tr>
+    <th>Day</th>
+    <th>Date</th>
+    <th>RL Mins</th>
+    <th>OA Mins</th>
+    <th>WB Mins</th>
+    <th>Total Mins</th>
+    <th>RL Cost</th>
+    <th>OA Cost</th>
+    <th>WB Cost</th>
+    <th>Flat Cost</th>
+    <th>Enhncd Svcs</th>
+    <th>Other Cost</th>
+    <th>Grand Total</th>
+  </tr>
+
+  <? for($i=0; $i<count($dates); $i++): ?>
+    <?
+      $day = date('d', strtotime($dates[$i][$model]['date']));
+    ?>
+    <tr class="<?= $i%2 ? 'odd' : 'even' ?>">
+      <td class="italic" ><?= date('D', strtotime($dates[$i][$model]['date'])) ?></td>
+      <td><?= $html->link(date('m/d/y', strtotime($dates[$i][$model]['date'])), "/reports/usage/$myYear/$myMonth/$day") ?></td>
+      <td><?= number_format($dates[$i][$model]['reservationless_minutes']) ?></td>
+      <td><?= number_format($dates[$i][$model]['operator_assisted_minutes']) ?></td>
+      <td><?= number_format($dates[$i][$model]['web_minutes']) ?></td>
+      
+      <td class="highlight"><?= number_format($dates[$i][$model]['total_minutes']) ?></td>
+      
+      <td>$<?= number_format($dates[$i][$model]['reservationless_cost'],2,'.',',') ?></td>
+      <td>$<?= number_format($dates[$i][$model]['operator_assisted_cost'],2,'.',',') ?></td>
+      <td>$<?= number_format($dates[$i][$model]['web_cost'],2,'.',',') ?></td>
+
+      <td>$<?= number_format($dates[$i][$model]['flat_cost'],2,'.',',') ?></td>
+      <td>$<?= number_format($dates[$i][$model]['enhanced_service_cost'],2,'.',',') ?></td>
+      <td>$<?= number_format($dates[$i][$model]['other_cost'],2,'.',',') ?></td>
+      <td class="highlight">$<?= number_format($dates[$i][$model]['total_cost'],2,'.',',') ?></td>
+    </tr>
+  <? endfor; ?>
+</table>
+
+<table id="report_summary">
+  <tr>
+    <th>Summary</th>
+    <th>RL Mins</th>
+    <th>OA Mins</th>
+    <th>WB Mins</th>
+    <th>Total Mins</th>
+    <th>RL Cost</th>
+    <th>OA Cost</th>
+    <th>WB Cost</th>
+    <th>Flat Cost</th>
+    <th>Enhncd Svcs</th>
+    <th>Other Cost</th>
+    <th>Grand Total</th>
+  </tr>
+  <tr>
+    <td> Total for <?= $total['count'] ?> Days</td>
+    <td><?= number_format($total['reservationless_minutes']) ?></td>
+    <td><?= number_format($total['operator_assisted_minutes']) ?></td>
+    <td><?= number_format($total['web_minutes']) ?></td>
+    <td class="highlight"><?= number_format($total['total_minutes']) ?></td>
+    <td>$<?= number_format($total['reservationless_cost'],2,'.',',') ?></td>
+    <td>$<?= number_format($total['operator_assisted_cost'],2,'.',',') ?></td>
+    <td>$<?= number_format($total['web_cost'],2,'.',',') ?></td>
+    <td>$<?= number_format($total['flat_cost'],2,'.',',') ?></td>
+    <td>$<?= number_format($total['enhanced_service_cost'],2,'.',',') ?></td>
+    <td>$<?= number_format($total['other_cost'],2,'.',',') ?></td>
+    <td class="highlight">$<?= number_format($total['total_cost'],2,'.',',') ?></td>
+  </tr>
+  <tr>
+    <td> Total for <?= $biz_total['count'] ?> Biz Days</td>
+    <td><?= number_format($biz_total['reservationless_minutes']) ?></td>
+    <td><?= number_format($biz_total['operator_assisted_minutes']) ?></td>
+    <td><?= number_format($biz_total['web_minutes']) ?></td>
+    <td class="highlight"><?= number_format($biz_total['total_minutes']) ?></td>
+    <td>$<?= number_format($biz_total['reservationless_cost'],2,'.',',') ?></td>
+    <td>$<?= number_format($biz_total['operator_assisted_cost'],2,'.',',') ?></td>
+    <td>$<?= number_format($biz_total['web_cost'],2,'.',',') ?></td>
+    <td>$<?= number_format($biz_total['flat_cost'],2,'.',',') ?></td>
+    <td>$<?= number_format($biz_total['enhanced_service_cost'],2,'.',',') ?></td>
+    <td>$<?= number_format($biz_total['other_cost'],2,'.',',') ?></td>
+    <td class="highlight">$<?= number_format($biz_total['total_cost'],2,'.',',') ?></td>
+  </tr>
+  <tr>
+    <td class="dim">Biz Day Average</td>
+    <td class="dim"><?= number_format($biz_total['reservationless_minutes']/$biz_total['count']) ?></td>
+    <td class="dim"><?= number_format($biz_total['operator_assisted_minutes']/$biz_total['count']) ?></td>
+    <td class="dim"><?= number_format($biz_total['web_minutes']/$biz_total['count']) ?></td>
+    <td class="dim highlight"><?= number_format($biz_total['total_minutes']/$biz_total['count']) ?></td>
+    <td class="dim">$<?= number_format($biz_total['reservationless_cost']/$biz_total['count'],2,'.',',') ?></td>
+    <td class="dim">$<?= number_format($biz_total['operator_assisted_cost']/$biz_total['count'],2,'.',',') ?></td>
+    <td class="dim">$<?= number_format($biz_total['web_cost']/$biz_total['count'],2,'.',',') ?></td>
+    <td class="dim">$<?= number_format($biz_total['flat_cost']/$biz_total['count'],2,'.',',') ?></td>
+    <td class="dim">$<?= number_format($biz_total['enhanced_service_cost']/$biz_total['count'],2,'.',',') ?></td>
+    <td class="dim">$<?= number_format($biz_total['other_cost']/$biz_total['count'],2,'.',',') ?></td>
+    <td class="dim highlight">$<?= number_format($biz_total['total_cost']/$biz_total['count'],2,'.',',') ?></td>
+  </tr>
+  <tr>
+    <td class="dim">Projection for <?=$totalworkdays?> Biz Days</td>
+    <td class="dim"><?= number_format(($biz_total['reservationless_minutes']/$biz_total['count'])*$totalworkdays) ?></td>
+    <td class="dim"><?= number_format(($biz_total['operator_assisted_minutes']/$biz_total['count'])*$totalworkdays) ?></td>
+    <td class="dim"><?= number_format(($biz_total['web_minutes']/$biz_total['count'])*$totalworkdays) ?></td>
+    <td class="dim highlight"><?= number_format(($biz_total['total_minutes']/$biz_total['count'])*$totalworkdays) ?></td>
+    <td class="dim">$<?= number_format(($biz_total['reservationless_cost']/$biz_total['count'])*$totalworkdays,2,'.',',') ?></td>
+    <td class="dim">$<?= number_format(($biz_total['operator_assisted_cost']/$biz_total['count'])*$totalworkdays,2,'.',',') ?></td>
+    <td class="dim">$<?= number_format(($biz_total['web_cost']/$biz_total['count'])*$totalworkdays,2,'.',',') ?></td>
+    <td class="dim">$<?= number_format(($biz_total['flat_cost']/$biz_total['count'])*$totalworkdays,2,'.',',') ?></td>
+    <td class="dim">$<?= number_format(($biz_total['enhanced_service_cost']/$biz_total['count'])*$totalworkdays) ?></td>
+    <td class="dim">$<?= number_format(($biz_total['other_cost']/$biz_total['count'])*$totalworkdays,2,'.',',') ?></td>
+    <td class="dim highlight">$<?= number_format(($biz_total['total_cost']/$biz_total['count'])*$totalworkdays,2,'.',',') ?></td>
+  </tr>
+</table>

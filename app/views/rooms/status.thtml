@@ -1,0 +1,54 @@
+<?= $html->css('ui.datepicker') ?>
+<?= $javascript->link('ui.datepicker.js') ?>
+
+<style type="text/css">
+#status_pane {
+   margin: auto;
+   padding-bottom: 20px;
+   width: 500px;
+   border: 1px solid #ccc;
+   padding: 10px 20px;
+}
+</style>
+
+<div id="status_pane">
+
+  <?= $this->renderElement('title', aa('title', 'Change Room Status for ' . $room['Room']['acctgrpid'] . ': ' . $room['Room']['contact'], 'target', 'room_status' )) ?>
+
+  <form method="post">
+    <div class="select">
+      <label class="right required" for="RoomStatus">Status:</label>
+      <?= $html->selectTag('Room/status', $room_statuses, null, null, null, false) ?>
+      <?= $html->tagErrorMsg('Room/status', 'Please select a status other than the current') ?>   
+    </div>
+
+    <div class="input">
+      <label class="right required" for="RoomReason">Reason for Change:</label>
+      <?= $html->textarea('Room/reason') ?>
+      <?= $html->tagErrorMsg('Room/reason', 'Please state the reason for the change') ?>   
+    </div>
+      
+    <div class="input">
+      <label class="right required" for="RoomEffectiveDate">Effective Date:</label>
+      <?= $html->input('Room/effective_date') ?>
+      <?= $html->tagErrorMsg('Room/effective_date', 'Please specify a date this request becomes effective') ?>   
+    </div>
+
+    <div class="submit">
+      <button class="cancel" type="button">
+	<?= $html->image('cross.gif') ?> Cancel
+      </button>
+      <button class="submit" type="submit">
+	<?= $html->image('check.gif') ?> Update
+      </button>
+    </div>
+
+  </form>
+</div>
+
+<script type="text/javascript">
+$(document).ready( function() {
+  $('button.cancel').back('/accounts/view/<?= $room['Room']['acctgrpid'] ?>');
+  $('#RoomEffectiveDate').datepicker();
+});
+</script>

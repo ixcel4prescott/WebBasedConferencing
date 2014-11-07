@@ -1,0 +1,357 @@
+<?= $javascript->link('jquery.blockUI.js') ?>
+
+<?= $html->css('ui.datepicker') ?>
+<?= $javascript->link('ui.datepicker.js') ?>
+
+<?= $javascript->link('jquery.spinner') ?>
+<?= $html->css('jquery.spinner') ?>
+
+<style type="text/css">
+#bulk_updates_pane {
+    margin: auto;
+}
+
+#rooms th,#rooms td {
+    padding: 3px 5px;
+}
+
+#rooms td, #results td {
+    text-align: left;
+}
+
+#results th {
+    text-align: center;
+}
+
+tr.even td {
+    background: #EFF7FF;
+}
+
+#rooms {
+    border-collapse: separate;
+    border: 1px solid #CCDDEE;
+}
+
+#rooms td, #rooms th {
+    border: 1px solid #CCDDEE;
+}
+
+#results {
+    margin-left: 215px;
+    margin-bottom: 1em;
+}
+div.selectSetting{
+    vertical-align: text-top;
+    margin-bottom:10px;
+    margin-left: 5px;
+    margin-right: 5px;
+  }
+
+div.selectSetting label {
+    display: inline;
+    float:left;
+    width: 200px;
+    margin-right: 10px;
+  }
+
+div.selectSetting select{
+    width: 205px;
+  }
+
+div.selectSetting p{
+    margin-left: 210px;
+</style>
+
+<div id="bulk_updates_pane">
+    <?= $this->renderElement('title', aa('title', 'Change Room Settings')) ?>
+
+    <p>
+        Confirm rooms to be changed then select the new settings for the rooms
+    </p>
+
+    <form id="statuses_form" method="post" style="margin-top: 1em">
+        <?= $html->hidden('Account/src', aa('value', $account['Account']['acctgrpid'])) ?>
+
+        <input type="hidden" name="data[Room][accountid][]" value=""/>
+
+        <div id="room_selector">
+            <fieldset>
+                <legend>Confirm Rooms</legend>
+
+                <table id="rooms" style="margin-top: 1em; width: 100%">
+                    <thead>
+                        <tr>
+                            <th class="small center"><a href="" id="all">All</a><br/><a href="" id="none">None</a></th>
+                            <th>Confirmation #</th>
+                            <th>Contact</th>
+                            <th>CEC</th>
+                            <th>PEC</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    <? //should put in something to check if all of the bridges are the same ?>
+                    <? for($i=0; $i<count($account['Room']); $i++): ?>
+                        <tr class="<?= $i%2 ? 'odd' : 'even' ?>">
+                            <td style="text-align:center"><input type="checkbox" name="data[Room][accountid][]" value="<?= $account['Room'][$i]['accountid'] ?>"
+                            <?= in_array($account['Room'][$i]['accountid'], $this->data['Room']['accountid']) ? 'checked="checked"' : '' ?>/></td>
+                            <td><?= $account['Room'][$i]['accountid'] ?></td>
+                            <td><?= $account['Room'][$i]['contact']  ?></td>
+                            <td><?= format_passcode($account['Room'][$i]['cec']) ?></td>
+                            <td><?= format_passcode($account['Room'][$i]['pec']) ?></td>
+                        </tr>
+                    <? endfor; ?>
+                    </tbody>
+                </table>
+            </fieldset>
+        </div>
+        
+        <div class="select">
+            <label class="right" for="RoomDialinNoid">Dialin Number:</label>
+            <?= $html->selectTag('Room/dialinNoid', $dialin_numbers, $default_dialin) ?>
+
+            <? if($dialin_number_error): ?>
+            <div class="error_message">
+                Dialin number is not aligned to reseller
+            </div>
+            <? endif; ?>
+
+            <?= $html->tagErrorMsg('Room/dialinNoid', 'Please select a dialin number') ?>
+            <table id="dialin_numbers" style="display:none">
+                <tr>
+                    <th>Toll-Free Number:</th><td id="toll_free"></td>
+                </tr>
+                <tr>
+                    <th>Toll Number:</th><td id="toll"></td>
+                </tr>
+            </table>
+        </div>
+
+        <fieldset class="extended">
+            <legend>Schedule</legend>
+            <div class="input">
+                <label class="right required" for="RoomMaximumconnections">Maximum Connections:</label>
+                <?= $html->input('Room/maximumconnections', aa('readonly', $can_set_maxconnections ? '' : 'readonly')) ?>
+                <?= $html->tagErrorMsg('Room/maximumconnections', 'Please enter a maximum number of connections') ?>
+                <? if(!$can_set_maxconnections): ?>
+                <span class="smaller">(Please contact Operations to alter this setting)</span>
+                <? endif; ?>
+            </div>
+
+            <? if(in_array('securitytype', $activeBridgeSettings)): ?>
+            <div class="selectSetting">
+                <label class="right required" for="RoomSecuritytype">Security Type:</label>
+                <?= $html->selectTag('Room/securitytype', $security_types) ?>
+                <?= $html->tagErrorMsg('Room/securitytype', 'Please select a security type') ?>
+                <p class="hint"></p>
+            </div>
+            <? endif; ?>
+        </fieldset>
+
+        <fieldset>
+            <legend>Conference Start</legend>
+            <? if(in_array('startmode', $activeBridgeSettings)): ?>
+            <div class="selectSetting">
+                <label class="right required" for="RoomStartmode">Start Mode:</label>
+                <?= $html->selectTag('Room/startmode', $start_modes) ?>
+                <?= $html->tagErrorMsg('Room/startmode', 'Please select a start mode') ?>
+                <p class="hint"></p>
+            </div>
+            <? endif; ?>
+
+            <? if(in_array('namerecording', $activeBridgeSettings)): ?>
+            <div class="selectSetting">
+                <label class="right required" for="RoomNamerecording">Name Recording:</label>
+                <?= $html->selectTag('Room/namerecording', $namerecording) ?>
+                <?= $html->tagErrorMsg('Room/namerecording', 'Please select an option') ?>
+                <p class="hint"></p>
+            </div>
+            <? endif; ?>
+        </fieldset>
+        
+        <fieldset>
+            <legend>Chair Functions</legend>
+            <? if(in_array('endonchairhangup', $activeBridgeSettings)): ?>
+            <div class="selectSetting">
+                <label class="right required" for="RoomEndonchairhangup">End on Chair Hangup:</label>
+                <?= $html->selectTag('Room/endonchairhangup', $endonchairhangup) ?>
+                <?= $html->tagErrorMsg('Room/endonchairhangup', 'Please select an option') ?>
+                <p class="hint"></p>
+            </div>
+            <? endif; ?>
+            <? if(in_array('dialout', $activeBridgeSettings)): ?>
+            <div class="selectSetting">
+                <label class="right required" for="RoomEndonchairhangup">Allow Dial Out:</label>
+                <?= $html->selectTag('Room/dialout', $dialout) ?>
+                <?= $html->tagErrorMsg('Room/dialout', 'Please select an option') ?>
+                <p class="hint"></p>
+            </div>
+            <? endif; ?>
+            <? if(in_array('record_playback', $activeBridgeSettings)): ?>
+            <div class="selectSetting">
+                <label class="right required" for="RoomRecordPlayback">Enable Record/Playback</label>
+                <?= $html->selectTag('Room/record_playback', $dialout) ?>
+                <?= $html->tagErrorMsg('Room/record_playback', 'Please select an option') ?>
+                <p class="hint"></p>
+            </div>
+            <? endif; ?>
+        </fieldset>
+        
+        <fieldset>
+            <legend>Activity Notifications</legend>
+            <? if(in_array('entryannouncement', $activeBridgeSettings)): ?>
+            <div class="selectSetting">
+                <label class="right required" for="RoomEntryannouncement">Entry Announcement:</label>
+                <?= $html->selectTag('Room/entryannouncement', $entryannouncement) ?>
+                <?= $html->tagErrorMsg('Room/entryannouncement', 'Please select an entry announcement') ?>
+                <p class="hint"></p>
+            </div>
+            <? endif; ?>
+            <? if(in_array('exitannouncement', $activeBridgeSettings)): ?>
+            <div class="selectSetting">
+                <label class="right required" for="RoomExitannouncement">Exit Annoucement:</label>
+                <?= $html->selectTag('Room/exitannouncement', $exitannouncement) ?>
+                <?= $html->tagErrorMsg('Room/exitannouncement', 'Please select an exit announcement') ?>
+                <p class="hint"></p>
+            </div>
+            <? endif; ?>
+            <? if(in_array('endingsignal', $activeBridgeSettings)): ?>
+            <div class="selectSetting">
+                <label class="right required" for="RoomEndingsignal">Ending Signal:</label>
+                <?= $html->selectTag('Room/endingsignal', $endingsignal) ?>
+                <?= $html->tagErrorMsg('Room/endingsignal', 'Please select an ending signal') ?>
+                <p class="hint"></p>
+            </div>
+            <? endif; ?>
+            <? if(in_array('dtmfsignal', $activeBridgeSettings)): ?>
+            <div class="selectSetting">
+                <label class="right required" for="RoomDtmfsignal">DTMF Signal:</label>
+                <?= $html->selectTag('Room/dtmfsignal', $dtmfsignal) ?>
+                <?= $html->tagErrorMsg('Room/dtmfsignal', 'Please select a DTMF signal') ?>
+                <p class="hint"></p>
+            </div>
+            <? endif; ?>
+            <? if(in_array('recordingsignal', $activeBridgeSettings)): ?>
+            <div class="selectSetting">
+                <label class="right required" for="RoomRecordingsignal">Recording Signal:</label>
+                <?= $html->selectTag('Room/recordingsignal', $recordingsignal) ?>
+                <?= $html->tagErrorMsg('Room/recordingsignal', 'Please select a recording signal') ?>
+                <p class="hint"></p>
+            </div>
+            <? endif; ?>
+        </fieldset>
+        
+        <fieldset>
+            <legend>Conference Behavior</legend>
+            <? if(in_array('digitentry1', $activeBridgeSettings)): ?>
+            <div class="selectSetting">
+                <label class="right required" for="RoomDigitentry1">Bill Code Prompt/Bill back:</label>
+                <?= $html->selectTag('Room/digitentry1', $digitentry1) ?>
+                <?= $html->tagErrorMsg('Room/digitentry1', 'Please select a digit entry') ?>
+                <p class="hint"></p>
+            </div>
+            <? endif; ?>
+            <? if(in_array('confirmdigitentry1', $activeBridgeSettings)): ?>
+            <div class="selectSetting">
+                <label class="right required" for="RoomDigitentry1">Confirm Digit Entry 1:</label>
+                <?= $html->selectTag('Room/confirmdigitentry1', $confirmdigitentry1) ?>
+                <?= $html->tagErrorMsg('Room/confirmdigitentry1', 'Please select a digit entry') ?>
+                <p class="hint"></p>
+            </div>
+            <? endif; ?>
+            <? if(in_array('digitentry2', $activeBridgeSettings)): ?>
+            <div class="selectSetting">
+                <label class="right required" for="RoomDigitentry1">Digit Entry 2:</label>
+                <?= $html->selectTag('Room/digitentry2', $digitentry2) ?>
+                <?= $html->tagErrorMsg('Room/digitentry2', 'Please select a digit entry') ?>
+                <p class="hint"></p>
+            </div>
+            <? endif; ?>
+            <? if(in_array('confirmdigitentry2', $activeBridgeSettings)): ?>
+            <div class="selectSetting">
+            <label class="right required" for="RoomConfirmdigitentry2">Confirm Digit Entry 2:</label>
+                <?= $html->selectTag('Room/confirmdigitentry2', $confirmdigitentry2) ?>
+                <?= $html->tagErrorMsg('Room/confirmdigitentry2', 'Please select a digit entry') ?>
+                <p class="hint"></p>
+            </div>
+            <? endif; ?>
+            <? if(in_array('muteallduringplayback', $activeBridgeSettings)): ?>
+            <div class="selectSetting">
+                <label class="right required" for="RoomMuteallduringplayback">Mute All During Playback:</label>
+                <?= $html->selectTag('Room/muteallduringplayback', $muteallduringplayback) ?>
+                <?= $html->tagErrorMsg('Room/muteallduringplayback', 'Please select a digit entry') ?>
+                <p class="hint"></p>
+            </div>
+            <? endif; ?>
+            <? if(in_array('conference_viewer', $activeBridgeSettings)): ?>
+            <div class="selectSetting">
+                <label class="right required" for="RoomConferenceViewer">Conference Viewer:</label>
+                <?= $html->selectTag('Room/conference_viewer', $conference_viewer) ?>
+                <?//= $html->tagErrorMsg('Room/conference_viewer', 'Please select a digit entry') ?>
+                <p class="hint"></p>
+            </div>
+            <? endif; ?>
+            <? if(in_array('bill_code_prompt', $activeBridgeSettings)): ?>
+            <div class="selectSetting">
+                <label class="right required" for="RoomBillCodePrompt">Bill Code Prompt:</label>
+                <?= $html->selectTag('Room/bill_code_prompt', $bill_code_prompt) ?>
+                <?//= $html->tagErrorMsg('Room/conference_viewer', 'Please select a digit entry') ?>
+                <p class="hint"></p>
+            </div>
+            <? endif; ?>
+
+            <div class="select">
+                <label class="right required" for="RoomLang">Language:</label>
+                <?= $html->selectTag('Room/lang', $languages) ?>
+                <?= $html->tagErrorMsg('Room/lang', 'Please select a language') ?>
+            </div>
+        </fieldset>
+
+        <div class="submit">
+            <button class="cancel" type="button">
+            <?= $html->image('cross.gif') ?> Cancel
+            </button>
+            <button class="submit" type="submit">
+            <?= $html->image('check.gif') ?> Update
+            </button>
+        </div>
+    </form>
+
+    <div id="spin_box" style="display:none">
+        <h1 class="center">Please wait while the requests are created...</h1>
+    </div>
+</div>
+
+<script type="text/javascript">
+$(document).ready( function() {
+
+    $('button.cancel').back('/accounts/view/<?= $account['Account']['acctgrpid'] ?>');
+
+    $('#all').click( function() {
+       $('#rooms :checkbox').attr('checked', 'checked');
+       return false;
+    });
+
+    $('#none').click( function() {
+        $('#rooms :checkbox').attr('checked', '');
+        return false;
+    });
+
+    $('#RoomEffectiveDate').datepicker();
+
+    $('#statuses_form').submit(function() {
+        $.blockUI({ message: $('#spin_box'),
+            css: { width: '60%',
+            left:  '20%' }});
+    });
+    
+    $('div.selectSetting select').change(function() {
+        if (this.value === ""){
+            $(this).parent().find('.hint').html("");
+        } else {
+            var regex=new RegExp(/data\[Room\]\[(\w+)\]/);
+            var match = regex.exec(this.name);
+            $(this).parent().find('.hint').html(Settings[match[1]][this.value]);
+        }}).change();
+});
+var Settings = <? echo json_encode($settingsDescription)?>
+</script>

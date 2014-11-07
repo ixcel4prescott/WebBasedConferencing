@@ -1,0 +1,14 @@
+<h1>Register</h1>
+<style>.label{font-size:xx-small;font-weight:bold;}</style>
+<br />
+Please fill out the following form to request access...
+<br />
+<br />
+<form method="POST">
+	<div class="label">Your Name:</div><div><?=$html->input('User/name');?> <?=$html->tagErrorMsg('User/name', '* Missing name')?></div>
+	<div class="label">Company:</div><div><?=$html->input('User/company');?> <?=$html->tagErrorMsg('User/company', '* Missing company')?></div>
+	<br />
+	<div class="label">Email Address:</div><div><?=$html->input('User/email');?> <?=$html->tagErrorMsg('User/email', '* Invalid email address')?></div>
+	<div class="label">Password: <span style="font-weight:normal">(6+ chars)</span></div><div><?=$html->password('User/password');?> <?=$html->tagErrorMsg('User/password', '* Password must be at least 6 characters')?></div>
+	<div><?=$html->submit('Register');?></div>
+</form>

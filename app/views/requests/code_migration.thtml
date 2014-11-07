@@ -1,0 +1,1 @@
+This is a request to create a backup room for account <strong><?= $request['Request']['acctgrpid'] ?></strong> on bridge <strong><?= Symbols::$bridges[$request['RequestData']['bridgeid']] ?></strong> with CEC <strong><?= $request['RequestData']['cec'] ?></strong> and PEC <strong><?= $request['RequestData']['pec'] ?></strong> 

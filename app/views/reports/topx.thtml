@@ -1,0 +1,222 @@
+<?
+
+unset($_GET['url']);
+
+function is_sorted_by($data, $field) {
+  return !empty($data['sort']) && $data['sort'] == $field;
+}
+
+function build_sort($data, $field) {
+
+  if(is_sorted_by($data, $field)) {
+    $data['order'] = ($data['order'] == 'asc') ? 'desc' : 'asc';
+  } else {
+    $data['sort']  = $field;
+    $data['order'] = 'asc';
+  }
+
+  return http_build_query($data);
+}
+?>
+
+<style type="text/css">
+table.filter {
+  border: none;
+  margin-top: 1em;
+}
+
+table.filter td, table.filter th {
+  font-size: smaller;
+  margin-bottom: 0.5em;
+  border: none;
+}
+
+table.filter th {
+  text-align: right;
+  background: #fff;
+}
+
+table.filter td {
+  text-align: left;
+}
+
+table.filter select {
+  margin-bottom: 0.25em;
+}
+
+div.filter label {
+  font-weight: bold;
+}
+
+table.topx {
+  margin-top: 1em;
+  width: 100%
+
+}
+
+table.topx th,table.topx td {
+  padding: 3px 5px;
+}
+
+tr.odd td {
+  background: #def;
+}
+
+table.info, table.info th, table.info td {
+  border: none;
+}
+
+table.info th {
+  background: inherit;
+  text-align: right;
+}
+
+table.info td {
+  text-align: left;
+}
+</style>
+
+<h1>Top <?= $count ?> Accounts Measured by <?= ucfirst($measure) ?> for <?= $month ?>/<?= $year ?></h1>
+
+<form method="get">
+  <table class="filter">
+    <tr>
+      <th><label for="month">Month</label></th>
+      <td>
+  <select name="month" id="month">
+    <? for($i=1; $i<13; $i++): ?>
+    <option value="<?= $i ?>"
+      <?= ((!empty($_GET['month']) && $i==$_GET['month']) || (empty($_GET['month']) && $i==$current_month)) ? 'selected="selected"' : '' ?>>
+      <?= $i ?>
+    </option>
+    <? endfor; ?>
+  </select>
+  <select name="year" id="year">
+    <? for($i=$current_year; $i>=2007; $i--): ?>
+    <option value="<?= $i ?>" <?= ((!empty($_GET['year']) && $i==$_GET['year']) || (empty($_GET['year']) && $i==$current_year)) ? 'selected="selected"' : ''?>>
+      <?= $i ?>
+    </option>
+    <? endfor; ?>
+  </select>
+      </td>
+      <th><label for="count">Number of Accounts:</label></th>
+      <td>
+  <select name="count" id="count">
+    <option value="40" <?= (empty($_GET['count']) || $_GET['count']=='40') ? 'selected="selected"' : '' ?>>40</option>
+    <option value="80" <?= (!empty($_GET['count']) && $_GET['count']=='80') ? 'selected="selected"' : '' ?>>80</option>
+    <option value="100" <?= (!empty($_GET['count']) && $_GET['count']=='100') ? 'selected="selected"' : '' ?>>100</option>
+    <option value="250" <?= (!empty($_GET['count']) && $_GET['count']=='250') ? 'selected="selected"' : '' ?>>250</option>
+  </select>
+      </td>
+    </tr>
+    <tr>
+      <th><label for="type">Report Type:</label></th>
+      <td>
+  <select name="type" id="type">
+    <option value="" <?= empty($_GET['type']) ? 'selected="selected"' : '' ?>>All</option>
+    <option value="web" <?= (!empty($_GET['type']) && $_GET['type']=='web') ? 'selected="selected"' : '' ?>>Web Only</option>
+    <option value="reservationless" <?= (!empty($_GET['type']) && $_GET['type']=='reservationless') ? 'selected="selected"' : '' ?>>Reservationless Only</option>
+    <option value="opassist" <?= (!empty($_GET['type']) && $_GET['type']=='opassist') ? 'selected="selected"' : '' ?>>OpAssist Only</option>
+    <option value="flat" <?= (!empty($_GET['type']) && $_GET['type']=='flat') ? 'selected="selected"' : '' ?>>Flat Charges Only</option>
+    <option value="enhanced" <?= (!empty($_GET['type']) && $_GET['type']=='enhanced') ? 'selected="selected"' : '' ?>>Enhanced Services Only</option>
+    <option value="other" <?= (!empty($_GET['type']) && $_GET['type']=='other') ? 'selected="selected"' : '' ?>>Other Charges Only</option>
+  </select>
+      </td>
+      <th><label for="measure">Measure:</label></th>
+      <td>
+  <select name="measure" id="measure">
+    <option value="minutes" <?= empty($_GET['measure']) ? 'selected="selected"' : '' ?>>Minutes</option>
+    <option value="cost" <?= (!empty($_GET['measure']) && $_GET['measure']=='cost') ? 'selected="selected"' : '' ?>>Cost</option>
+  </select>
+      </td>
+      <td>
+  <button type="submit">
+    <img src="/img/check.gif"/>
+    <span>
+      Update
+    </span>
+  </button>
+      </td>
+    </tr>
+  </table>
+</form>
+
+<table class="topx">
+  <tr>
+    <th></th>
+    <th>
+      <? if(is_sorted_by($_GET, 'company')): ?>
+        <?= $html->image($_GET['order'] == 'asc' ? 'up.gif' : 'down.gif', aa('class', 'valign')) ?>
+      <? endif; ?>
+      <?= $html->link('Company', '/'.$_REQUEST['url'].'?'.build_sort($_GET, 'company')) ?>
+    </th>
+    <th>
+      <? if(is_sorted_by($_GET, 'salesperson_name')): ?>
+        <?= $html->image($_GET['order'] == 'asc' ? 'up.gif' : 'down.gif', aa('class', 'valign')) ?>
+      <? endif; ?>
+      <?= $html->link('Salesperson', '/'.$_REQUEST['url'].'?'.build_sort($_GET, 'salesperson_name')) ?>
+    </th>
+    <th class="right">
+      <? if(is_sorted_by($_GET, 'current_data')): ?>
+        <?= $html->image($_GET['order'] == 'asc' ? 'up.gif' : 'down.gif', aa('class', 'valign')) ?>
+      <? endif; ?>
+      <?= $html->link('Current Data', '/'.$_REQUEST['url'].'?'.build_sort($_GET, 'current_data')) ?>
+    </th>
+    <th class="right">
+      <? if(is_sorted_by($_GET, 'previous_data')): ?>
+        <?= $html->image($_GET['order'] == 'asc' ? 'up.gif' : 'down.gif', aa('class', 'valign')) ?>
+      <? endif; ?>
+      <?= $html->link('Previous Data', '/'.$_REQUEST['url'].'?'.build_sort($_GET, 'previous_data')) ?>
+    </th>
+    <th class="right">
+      <? if(is_sorted_by($_GET, 'delta')): ?>
+        <?= $html->image($_GET['order'] == 'asc' ? 'up.gif' : 'down.gif', aa('class', 'valign')) ?>
+      <? endif; ?>
+      <?= $html->link('Difference', '/'.$_REQUEST['url'].'?'.build_sort($_GET, 'delta')) ?>
+    </th>
+    <th class="right">
+      <? if(empty($_GET['sort']) || is_sorted_by($_GET, 'percent_change')): ?>
+        <?= $html->image(!empty($_GET['order']) && ($_GET['order'] == 'asc') ? 'up.gif' : 'down.gif', aa('class', 'valign')) ?>
+      <? endif; ?>
+      <?= $html->link('Percent Change', '/'.$_REQUEST['url'].'?'.build_sort($_GET, 'percent_change')) ?>
+    </th>
+  </tr>
+
+  <? for($i=0; $i<count($data); $i++): ?>
+     <tr class="<?= $i%2 ? 'odd' : 'even' ?>">
+
+       <td class="left">
+   <?= $html->link(shorten($data[$i][0]['acctgrpid']),"/accounts/view/".$data[$i][0]['acctgrpid']); ?>
+       </td>
+       <td class="left">
+   <?= $html->link(shorten($data[$i][0]['company_name'], 40),"/accounts/view/".$data[$i][0]['acctgrpid']); ?>
+       </td>
+       <td class="left">
+   <?= $html->link($data[$i][0]['account_manager'], "/reports/topx/".$data[$i][0]['salespid']."?".http_build_query($_GET)) ?></td>
+       <td><?= number_format($data[$i][0]['current_data'], $measure == 'minutes' ? 0 : 2,'.',',') ?></td>
+       <td><?= number_format($data[$i][0]['previous_data'], $measure == 'minutes' ? 0 : 2,'.',',') ?></td>
+       <td>
+   <? if($data[$i][0]['delta']>0): ?>
+   <span style="color:#090">
+   <? elseif($data[$i][0]['delta']<0): ?>
+   <span style="color:#f00">
+   <? else: ?>
+   <span>
+   <? endif; ?>
+   <?= number_format($data[$i][0]['delta'], $measure == 'minutes' ? 0 : 2,'.',',') ?>
+   </span>
+       </td>
+       <td>
+   <? if($data[$i][0]['percent_change']>100): ?>
+   <span style="color:#090">
+   <? elseif($data[$i][0]['percent_change']<100): ?>
+   <span style="color:#f00">
+   <? else: ?>
+   <span>
+   <? endif; ?>
+   <?= number_format($data[$i][0]['percent_change'],0,'.',',') ?>%
+   </span>
+       </td>
+     </tr>
+   <? endfor; ?>
+</table>

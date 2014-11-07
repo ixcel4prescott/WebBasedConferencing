@@ -1,0 +1,94 @@
+<style type="text/css">
+#users_pane {
+   margin: auto;
+   padding-bottom: 20px;
+   border: 1px solid #ccc;
+   padding: 10px 20px;
+}
+
+#users_pane th,#users_pane td {
+  padding: 3px 5px;
+  text-align: left;
+}
+
+tr.even td {
+  background: #EFF7FF;
+}
+
+span.current {
+  color: #FF9C2A;
+  font-weight: bold;
+}
+
+.filter {
+  margin-bottom: 0.3em;
+}
+
+.filter label {
+   width: 10em;
+   display: inline;
+   float:left;
+   margin-right: 0.5em;
+   text-align: right;
+}
+
+.filter input, .filter select {
+  width: 15em;
+}
+</style>
+
+<? $pagination->setPaging($paging) ?>
+
+<div id="users_pane">
+  <h1>User Index</h1>
+
+  <p class="smaller">
+    <?= $html->image('user.gif', aa('class', 'valign')) ?> <a href="/users/create">Add a User</a>
+  </p>
+
+<form method="get" style="margin-top: 1em; margin-bottom: 1em">
+      <div class="filter">
+         <label for="query">Search:</label>
+         <input id="query" type="text" name="query" value="<?= $query ?>"/>
+             <button type="submit">
+	            <?= $html->image('search.gif', aa('class', 'valign')) ?> Search
+             </button>
+      </div>
+      <div class="filter">
+          <label for="group">Group:</label>    
+          <select name="group">
+	         <option></option>
+	         <? foreach($group as $grp): ?>
+	         <option value="<?= $grp ?>" <?= $selected_grp == $grp ? 'selected="selected"' : '' ?> ><?= $grp ?></option>
+	         <? endforeach; ?>
+          </select>
+       </div>
+         <div style="margin-left: 10.5em">
+         <input type="hidden" name="active_only" value="0"/>
+         <input type="checkbox" id="active_only" name="active_only" value="1" <?= $active_only ? 'checked="checked"' : '' ?>/>
+         <label for="active_only">Active Users Only</label>
+         </div>
+  </form>
+
+  <table style="width: 100%; margin-top: 1em">
+    <tr>
+      <th><?= $pagination->sortBy('name') ?></th>
+      <th><?= $pagination->sortBy('email') ?></th>
+      <th><?= $pagination->sortBy('company_name', 'Company') ?></th>
+      <th><?= $pagination->sortBy('level_type', 'Group') ?></th>
+      <th class="center">Edit</th>
+    </tr>
+    
+    <? for($i=0; $i<count($data); $i++): ?>
+       <tr class="<?= $i%2 ? 'odd' : 'even' ?>">
+	 <td><?= $html->link($data[$i]['User']['name'], "/users/view/{$data[$i]['User']['id']}") ?></td>
+	 <td><?= $html->link($data[$i]['User']['email'], "mailto:{$data[$i]['User']['email']}") ?></td>
+	 <td><?= $data[$i]['User']['company_name'] ?></td>
+	 <td><?= ucfirst($data[$i]['User']['level_type']) ?></td>
+	 <td class="center"><?= $html->link($html->image('edit.gif'), "/users/edit/{$data[$i]['User']['id']}", a(), false, false) ?></td>
+       </tr>
+    <? endfor; ?>
+  </table>
+
+  <?= $this->renderElement('pagination') ?>
+</div>

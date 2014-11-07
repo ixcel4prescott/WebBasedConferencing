@@ -1,0 +1,64 @@
+<style type="text/css">
+#salesperson_pane {
+   margin: auto;
+   padding-bottom: 20px;
+   border: 1px solid #ccc;
+   padding: 10px 20px;
+}
+</style>
+
+<div id="salesperson_pane">
+  <h1>Edit a Salesperson</h1>
+
+  <form method="post">
+    <?= $html->hidden('Salesperson/salespid') ?>
+
+    <div class="select">
+       <label class="right required" for="SalespersonResellerid">Reseller:</label>
+       <?= $html->selectTag('Salesperson/resellerid', $resellers) ?>
+       <?= $html->tagErrorMsg('Salesperson/resellerid', 'Please select a reseller') ?>   
+    </div>
+
+    <div class="input">
+       <label class="right required" for="SalespersonName">Name:</label>
+       <?= $html->input('Salesperson/name') ?>
+       <?= $html->tagErrorMsg('Salesperson/name', 'Please enter a name') ?>   
+    </div>
+    
+    <div class="input">
+       <label class="right required" for="SalespersonAccountmanager">Account Manager:</label>
+       <?= $html->input('Salesperson/accountmanager') ?>
+       <?= $html->tagErrorMsg('Salesperson/accountmanager', 'Please enter a account manager') ?>   
+    </div>
+
+    <div class="input">
+       <label class="right required" for="SalespersonEmail">Email:</label>
+       <?= $html->input('Salesperson/email') ?>
+       <?= $html->tagErrorMsg('Salesperson/email', 'Please enter an email address') ?>   
+    </div>    
+
+    <div class="input">
+       <label class="right" for="SalespersonFranchiseId">Franchise ID:</label>
+       <?= $html->input('Salesperson/franchise_id') ?>
+    </div>
+
+    <div class="submit">
+      <button class="cancel" type="button">
+	<?= $html->image('cross.gif') ?> Cancel
+      </button>
+      <button class="submit" type="submit">
+	<?= $html->image('check.gif') ?> Create
+      </button>
+    </div>
+
+  </form>
+</div>
+
+<script type="text/javascript">
+$(document).ready(function() {
+
+  $('button.cancel').back('/salespeople');
+
+});
+</script>
+

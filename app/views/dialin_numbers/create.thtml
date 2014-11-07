@@ -1,0 +1,72 @@
+<?= $javascript->link('jquery.format') ?>
+<?= $javascript->link('jquery.multiselect') ?>
+<?= $html->css('jquery.multiselect') ?>
+
+<style type="text/css">
+#dialin_number_pane {
+   margin: auto;
+   padding-bottom: 20px;
+   width: 500px;
+   border: 1px solid #ccc;
+   padding: 10px 20px;
+}
+</style>
+
+<div id="dialin_number_pane">
+  <h1>Create a Dialin Number</h1>
+
+  <form method="post">
+    <div class="input">
+      <label class="right required" for="DialinNumberDescription">Description:</label>
+      <?= $html->input('DialinNumber/description') ?>
+      <?= $html->tagErrorMsg('DialinNumber/description', 'Please enter a description') ?>   
+    </div>
+
+    <div class="input">
+       <label class="right required" for="DialinNumberTollfreeno">Toll-Free Number:</label>
+       <?= $html->input('DialinNumber/tollfreeno') ?>
+       <?= $html->tagErrorMsg('DialinNumber/tollfreeno', 'Please enter a phone number in form (XXX) YYY-ZZZZ') ?>   
+    </div>
+
+    <div class="input">
+       <label class="right required" for="DialinNumberTollno">Toll Number:</label>
+       <?= $html->input('DialinNumber/tollno') ?>
+       <?= $html->tagErrorMsg('DialinNumber/tollno', 'Please enter a phone number in form (XXX) YYY-ZZZZ') ?>   
+    </div>
+
+    <div class="checkbox">
+      <label class="right" for="DialinNumberActive">Active:</label>
+      <?= $html->checkbox('DialinNumber/active') ?>
+    </div>
+
+    <div class="select">
+      <label class="right required" for="DialinNumberBridgeid">Bridge:</label>
+      <?= $html->selectTag('DialinNumber/bridgeid', $bridges) ?>
+      <?= $html->tagErrorMsg('DialinNumber/bridgeid', 'Please select a bridge') ?>   
+    </div>
+
+    <div class="select" style="overflow:visible">
+      <label class="right" for="DialinNumberResellers">Associated Resellers:</label>
+      <?= $html->selectTag('DialinNumber/resellers', $resellers, $aligned_resellers, aa('multiple', 'multiple'), null, false) ?>
+      <?= $html->tagErrorMsg('DialinNumber/resellers', 'Please select one or more resellers to align this number to'); ?>
+    </div>
+
+    <div class="submit">
+      <button class="cancel" type="button">
+	<?= $html->image('cross.gif') ?> Cancel
+      </button>
+      <button class="submit" type="submit">
+	<?= $html->image('check.gif') ?> Create
+      </button>
+    </div>
+
+  </form>
+</div>
+
+<script type="text/javascript">
+$(document).ready(function() {
+  $('button.cancel').back('/dialinnumbers/index');
+  $('#DialinNumberResellers').multiSelect({ selectAll: true });
+  $('#DialinNumberTollfreeno,#DialinNumberTollno').format('phone');
+});
+</script>

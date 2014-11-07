@@ -1,0 +1,38 @@
+<style type="text/css">
+  #bridge_frame {
+    text-align: center;
+  }
+
+  #bridge_frame .bridge {
+    margin: auto;
+    margin-bottom: 1em;
+  }
+
+</style>
+
+<div id="bridge_frame">
+
+  <h1>Bridge Activity</h1>
+
+  <div id="graphs_24h">
+    <img class="bridge" src="/bridges/activity/icbr1_24h" alt="icbr1" />
+    <img class="bridge" src="/bridges/activity/icbr2_24h" alt="icbr2" />
+  </div>
+
+  <div id="graphs_7d">
+    <img class="bridge" src="/bridges/activity/icbr1_7d" alt="icbr1" />
+    <img class="bridge" src="/bridges/activity/icbr2_7d" alt="icbr2" />
+  </div>
+
+  <div id="graphs_30d">
+    <img class="bridge" src="/bridges/activity/icbr1_30d" alt="icbr1" />
+    <img class="bridge" src="/bridges/activity/icbr2_30d" alt="icbr2" />
+  </div>
+    
+</div>
+
+<script type="text/javascript">
+$(document).ready( function() {
+    window.setTimeout(function() { window.location='';}, 5*60*1000)
+});
+</script>

@@ -1,0 +1,10 @@
+<h1>Caller</h1>
+<table>
+	<tr><th>id</th><th>name</th></tr>
+    <?php foreach ($callers as $caller): ?>
+    <tr>
+        <td><?php echo $caller['Caller']['confirnum']; ?></td>
+        <td><?php echo $caller['Caller']['confname']; ?></td>
+    </tr>
+    <?php endforeach; ?>
+</table>

@@ -1,0 +1,88 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>MyCA : <?= $title_for_layout ?></title>
+    <link rel="icon" href="<?= $this->webroot . 'favicon.ico' ?>" type="image/x-icon" />
+    <link rel="shortcut icon" href="<?= $this->webroot . 'favicon.ico' ?>" type="image/x-icon" />
+    <?= $html->charset('UTF-8') ?>
+
+    <? $theme = $session->check('theme') ? $session->read('theme') : 'default' ?>
+    <?= $html->css("themes/$theme/styles") ?>
+    <?= $html->css("themes/$theme/styles-print",'stylesheet', aa('media', 'print')) ?>
+
+    <? if(Configure::read('debug') > 0): ?>
+    <?= $html->css("debug") ?>
+    <? endif; ?>
+
+    <?= $javascript->link('jquery.js') ?>
+    <?= $javascript->link('jquery.util.js') ?>
+  </head>
+  <body>
+    <div id="container">
+      <div id="header">
+	<?= $html->link(sprintf('<img id="logo" src="/img/themes/%s/header.gif" style="float:left"/>', $theme), '/', a(), null, false) ?>
+      </div>
+
+      <div id="main" style="margin: 0">
+
+	<? if($session->check('Message.flash')): ?>
+	<div id="flash_messages" class="error_message">
+  	  <? $session->flash() ?>
+	</div>
+	<? endif; ?>
+	
+	<div class="content" >
+	  <?= $content_for_layout ?>
+	</div>
+
+      </div>
+	
+      <div id="footer">
+	<div>Copyright &copy; 2007-2010 Infinite Conferencing Inc. - All rights reserved - <?= $html->link('Terms of use','/pages/terms') ?></div>
+	<? if(Configure::read('debug')): ?>
+	<div><a id="cake_sql" href="">Show SQL</a></div>
+	<? endif?>
+      </div>
+
+    </div>
+
+    <script type="text/javascript">
+    <? if(Configure::read('debug')): ?>
+      $(document).ready(function() {
+
+	$('.cakeSqlLog').hide();
+
+	$('#cake_sql').toggle(
+	  function() {
+	    $('.cakeSqlLog').show();
+	    return false;
+	  }, 
+	  function() {
+	    $('.cakeSqlLog').hide();
+	    return false;
+	  }
+        );
+    });
+    <? endif; ?>
+    </script>
+
+    <script type="text/javascript">
+      var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+      document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+    </script>
+    <script type="text/javascript">
+      var pageTracker = _gat._getTracker("UA-5590094-2");
+      pageTracker._trackPageview();
+    </script>
+
+    <!--[if IE 6]>
+    <script type="text/javascript"> 
+      var IE6UPDATE_OPTIONS = {
+        icons_path: "http://static.ie6update.com/hosted/ie6update/images/"
+      }
+    </script>
+    <script type="text/javascript" src="http://static.ie6update.com/hosted/ie6update/ie6update.js"></script>
+    <![endif]-->
+
+  </body>
+</html>

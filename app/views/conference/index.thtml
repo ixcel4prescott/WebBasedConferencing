@@ -1,0 +1,10 @@
+<h1>Conference</h1>
+<table>
+	<tr><th>id</th><th>name</th></tr>
+    <?php foreach ($conferences as $conference): ?>
+    <tr>
+        <td><?php echo $conference['Conference']['confirmnum']; ?></td>
+        <td><?php echo $conference['Conference']['confname']; ?></td>
+    </tr>
+    <?php endforeach; ?>
+</table>

@@ -1,0 +1,1 @@
+A <strong><?= $request['RequestStatus']['name'] ?></strong> room status change request is in the queue for account <strong><?= $request['Request']['acctgrpid'] ?></strong>

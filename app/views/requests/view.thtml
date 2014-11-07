@@ -1,0 +1,8 @@
+<table>
+  <? foreach($request['RequestData'] as $k => $v): ?>
+  <tr>
+    <th class="right"><?= $k ?></th>
+    <td><?= $v ?></td>
+  </tr>
+  <? endforeach; ?>
+</table>

@@ -1,0 +1,55 @@
+<h1>Month To Date Report</h1>
+<table cellpadding=5 cellspacing=0 width="100%">
+	<tr>
+		<th>Date</th>
+		<th>RL Minutes</th>
+		<th>OA Minutes</th>
+		<th>WB Minutes</th>
+		<th>Total Minutes</th>
+		<th>RL Cost</th>
+		<th>OA Cost</th>
+		<th>WB Cost</th>
+		<th>Total Cost</th>
+		<th>Enhanced Svcs</th>
+		<th>Grand Total</th>
+	</tr>
+	
+    <?php 
+    	foreach ($days as $day): 
+    	
+    		if (date('N',strtotime($day['Report']['date'])) > 5){
+    			// Grey
+    			echo '<tr style="background:#eee;color: #bbb">';
+    		}else if(date('N',strtotime($day['Report']['date'])) == 2 || date('N',strtotime($day['Report']['date'])) == 4){
+    			// Blue
+    			echo '<tr style="background:#def">';
+    		}else{
+    			// White
+    			echo '<tr style="background:#fff">';
+    		}
+    		if ($even){
+    		}else{
+    		}
+    		
+    		$minutes = $day['Report']['rl_minutes'] + $day['Report']['oa_minutes'] + $day['Report']['wb_minutes'];
+    		$dollars = $day['Report']['rl_cost'] + $day['Report']['oa_cost'] + $day['Report']['wb_cost'];
+    		
+    		
+    ?>
+        <td style="border-right:1px solid #def;border-left:1px solid #def"><?php echo date('m-d-Y',strtotime($day['Report']['date'])); ?></td>
+        <td><?php echo $day['Report']['rl_minutes']; ?></td>
+        <td><?php echo $day['Report']['oa_minutes']; ?></td>
+        <td><?php echo $day['Report']['wb_minutes']; ?></td>
+        
+        <td style="color:#d22"><?php echo $minutes; ?></td>
+        
+        <td><?php echo sprintf("$%.2f",$day['Report']['rl_cost']); ?></td>
+        <td><?php echo sprintf("$%.2f",$day['Report']['oa_cost']); ?></td>
+        <td><?php echo sprintf("$%.2f",$day['Report']['wb_cost']); ?></td>
+        
+        <td style="color:#d22"><?php echo sprintf("$%.2f",$dollars); ?></td>
+        <td><?php echo sprintf("$%.2f",$day['Report']['enhanced_cost']); ?></td>
+        <td  style="border-right:1px solid #def;border-left:1px solid #def;color:#d22"><?php echo sprintf("$%.2f",$day['Report']['enhanced_cost']+$dollars); ?></td>
+    </tr>
+    <?php endforeach; ?>
+</table>

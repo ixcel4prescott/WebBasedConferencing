@@ -1,0 +1,248 @@
+<style type="text/css">
+#create_pane {
+   margin: auto;
+   padding-bottom: 20px;
+   border: 1px solid #ccc;
+   padding: 10px 20px;
+}
+
+#emailSuggestions{
+  margin-left: 180px;
+  width: 500px;
+}
+
+</style>
+
+<div id="create_pane">
+
+  <?= $this->renderElement('title', aa('title', 'Edit Contact: ' . $full_name)) ?>
+
+  <form method="post" id="account_form">
+    <fieldset>
+      <legend>Contact Information</legend>
+
+      <div class="select">
+         <label class="right" for="ContactTitle">Title:</label>
+         <?= $html->selectTag('Contact/title', $titles) ?>	
+         <?= $html->tagErrorMsg('Contact/title', 'Please enter a title (Mr., Ms., Dr., etc.)') ?>
+      </div>
+
+      <div class="input">
+         <label class="right required" for="ContactFirstName">First Name:</label>
+         <?= $html->input('Contact/first_name') ?>
+         <?= $html->tagErrorMsg('Contact/first_name', 'Please enter a first name') ?>
+      </div>
+
+      <div class="input">
+         <label class="right" for="ContactMiddleName">Middle Name:</label>
+         <?= $html->input('Contact/middle_name') ?>
+      </div>
+
+      <div class="input">
+         <label class="right required" for="ContactLastName">Last Name:</label>
+         <?= $html->input('Contact/last_name') ?>
+         <?= $html->tagErrorMsg('Contact/last_name', 'Please enter a last name') ?>
+      </div>
+
+      <div class="input">
+         <label class="right required" for="ContactCompany">Company:</label>
+         <?= $html->input('Contact/company') ?>
+         <?= $html->tagErrorMsg('Contact/company', 'Please enter a company name') ?>
+      </div>
+
+      <div class="input">
+         <label class="right" for="ContactPosition">Position:</label>
+         <?= $html->input('Contact/position') ?>
+         <?= $html->tagErrorMsg('Contact/position', 'Please enter a position') ?>
+      </div>
+      
+      <div class="input">
+         <label class="right required" for="ContactPhone">Phone Number:</label>
+         <?= $html->input('Contact/phone') ?>
+         <?= $html->tagErrorMsg('Contact/phone', 'Please enter a phone number') ?>
+      </div>
+
+      <div class="input">
+         <label class="right required" for="ContactEmail">Email:</label>
+         <?= $html->input('Contact/email') ?>
+         <?= $html->tagErrorMsg('Contact/email', 'Please enter an email') ?>
+      </div>
+
+      <fieldset id = emailSuggestions>
+        <legend> Email Suggestions</legend>
+          <div id="suggestedEmails">
+          </div>
+      </fieldset>
+
+    </fieldset>
+    <fieldset>
+      <legend>Address Information</legend>
+
+      <div class="input">
+        <label class="right required" for="ContactAddress1">Address:</label>
+        <?= $html->input('Contact/address1') ?>
+        <?= $html->tagErrorMsg('Contact/address1', 'Please enter an address') ?>
+      </div>
+
+      <div class="input">
+        <label class="right required" for="ContactAddress2">&nbsp;</label>
+        <?= $html->input('Contact/address2') ?>
+        <?= $html->tagErrorMsg('Contact/address2', 'Please enter an address') ?>
+      </div>
+
+      <div class="input">
+        <label class="right required" for="ContactAddress3">&nbsp;</label>
+        <?= $html->input('Contact/address3') ?>
+        <?= $html->tagErrorMsg('Contact/address3', 'Please enter an address') ?>
+      </div>
+
+      <div class="input">
+        <label class="right required" for="ContactCity">City:</label>
+        <?= $html->input('Contact/city') ?>
+        <?= $html->tagErrorMsg('Contact/city', 'Please enter a city') ?>
+      </div>
+
+      <div class="input">
+        <label class="right required" for="ContactZip">Postal Code:</label>
+        <?= $html->input('Contact/zip') ?>
+        <?= $html->tagErrorMsg('Contact/zip', 'Please enter a postal code') ?>
+      </div>
+
+      <div class="select">
+        <label class="right" for="ContactState">State:</label>
+        <?= $html->selectTag('Contact/state', $states) ?>
+        <?= $html->tagErrorMsg('Contact/state', 'Please select a state') ?>
+      </div>
+
+      <div class="select">
+        <label class="right required" for="ContactCountry">Country:</label>
+        <?= $html->selectTag('Contact/country', $countries) ?>
+        <?= $html->tagErrorMsg('Contact/country', 'Please select a country') ?>
+      </div>
+
+      <div class="select">
+        <label class="right required" for="ContactTimezone">Time Zone:</label>
+        <?= $html->selectTag('Contact/time_zone', $time_zones) ?>
+        <?= $html->tagErrorMsg('Contact/time_zone', 'Please select a time zone') ?>
+      </div>
+    </fieldset>
+
+    <div class="submit">
+      <button class="cancel" type="button">
+	<?= $html->image('cross.gif') ?> Cancel
+      </button>
+      <button class="submit" type="submit">
+	<?= $html->image('check.gif') ?> Update
+      </button>
+    </div>
+
+  </form>
+</div>
+
+<script type="text/javascript">
+function buildLocalParts(firstName, lastName, domains){
+  localPartOptions = "";
+    var dot = "";
+    var under = "";
+  if ((firstName) && (lastName)){
+    dot = ".";
+    under = "_";
+  }
+  if ((firstName) || (lastName)){
+    var suggestedEmails = new Array();
+    for ( var i in domains ){
+      suggestedEmails.push(firstName + dot + lastName + "@" + domains[i]);
+    }
+    for ( var i in domains ){
+      suggestedEmails.push(firstName.charAt(0) + lastName + "@" + domains[i]);
+    }
+    for ( var i in domains ){
+      suggestedEmails.push(firstName + under + lastName + "@" + domains[i]);
+    }
+    return suggestedEmails;
+  }
+}
+
+function pushEmail(){
+  $('#ContactEmail').val($(this).html());
+  return false;
+}
+
+function get_time_zones(){
+    $.ajax({
+      type: "POST",
+      url: "/time_zones/get_time_zones",
+      data: "country=" + $('#ContactCountry').val() + '&type=Contact',
+      success: function(html){
+        tz_select_parent = $('#ContactTimeZone').parent()
+        tz_select_parent.replaceWith(html);
+      }
+    });
+}
+
+$(document).ready( function() {
+
+  $('button.cancel').back('/contacts');
+  
+  $('#ContactFirstName,#ContactLastName').change( function() {
+      var localPartOptions = "";
+      var firstName = $('#ContactFirstName').val().toLowerCase();
+      var lastName = $('#ContactLastName').val().toLowerCase();
+      var suggestedEmails = buildLocalParts(firstName, lastName, domains)
+      if(suggestedEmails){
+        suggestedEmails = suggestedEmails.slice(0, 10);
+        //need to change the following to something that will put in false links
+        while (suggestedEmails.length)
+        {
+          email = suggestedEmails.shift();
+          localPartOptions = localPartOptions + "<a class=\"emailSuggestion\" href = \"" + email +"\">"
+                                            + email + "</a><br>";
+        }
+        $('#suggestedEmails').html(localPartOptions);
+        $('.emailSuggestion').unbind('click',pushEmail).bind('click',pushEmail);
+      }
+      if (!$('#ContactFirstName').val() && !$('#ContactLastName').val()){
+        $('#emailSuggestions').hide('fast');
+      } else {
+        $('#emailSuggestions').show('fast');
+      }
+  });
+  $('#ContactFirstName,#ContactLastName').load(function (){
+      if ($('#ContactFirstName').val() && $('#ContactLastName').val() && !$('#ContactEmail').val()){
+        $('#emailSuggestions').show();
+      } else {
+        $('#emailSuggestions').hide();
+      }
+  });
+  $('#ContactFirstName,#ContactLastName').change();
+  $('#ContactFirstName,#ContactLastName').load();
+  
+  $('#ContactState').change(function (){
+    if ($('#ContactState').val()){
+      if ($('#ContactState').val() == 'XX'){
+        $('#ContactCountry').val('');
+      } else if ($('#ContactState').val() in us_states){
+        $('#ContactCountry').val('US');
+      } else if ($('#ContactState').val() in provinces){
+        $('#ContactCountry').val('CA');
+      }
+      get_time_zones();
+    }
+  });
+  
+  $('#ContactCountry').change(function (){
+    if ($('#ContactCountry').val() != 'CA' && $('#ContactCountry').val() != 'US'){
+      $('#ContactState').val('XX');
+    } else {
+      $('#ContactState').val('');
+    }
+    get_time_zones();
+  });
+
+});
+
+var domains = <? echo json_encode($domains)?>;
+var us_states = <? echo json_encode($us_states)?>;
+var provinces = <? echo json_encode($provinces)?>;
+
+</script>

@@ -1,0 +1,29 @@
+<table width="90%" border="0" cellspacing="0" cellpadding="0" style="border-color:#cccccc; border-width:1px; border-style:solid;">
+  <tr>
+    <td>
+      <table width="100%" border="0" cellspacing="0" cellpadding="0">
+	<tr>
+          <td colspan="2"><div align="left"><br /><img src="http://www.infiniteconferencing.com/email/img/myca_logo.png" alt="Myca" width="205" height="21" /></div></td>
+          <td width="19%">&nbsp;</td>
+          <td width="38%"><div align="right"><br />
+          </div></td>
+	</tr>
+	<tr>
+          <td colspan="4">&nbsp;</td>
+	</tr>
+	<tr>
+          <td colspan="4" style="border-top-color:#000000; border-top-width:2px; border-top-style:solid; background-color:#F0F0F0;">&nbsp;</td>
+	</tr>
+	<tr>
+          <td colspan="4" style="background-color:#4D6A79;">&nbsp;</td>
+	</tr>
+	<tr>
+          <td width="19%" style="background-color:#F0F0F0;">&nbsp;</td>
+          <td colspan="3" style="padding-left:10px;">
+	    <?= $content_for_layout ?>
+	  </td>
+	</tr>
+      </table>
+    </td>
+  </tr>
+</table>

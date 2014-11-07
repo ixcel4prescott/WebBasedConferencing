@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?><?xml-stylesheet type='text/xsl' href='_UpgradeReport_Files/UpgradeReport.xslt'?><UpgradeLog>
+<Properties><Property Name="Solution" Value="MyCA">
+</Property><Property Name="Solution File" Value="F:\MyCA\MyCA.sln">
+</Property><Property Name="User Options File" Value="F:\MyCA\MyCA.suo">
+</Property><Property Name="Date" Value="Friday, November 07, 2014">
+</Property><Property Name="Time" Value="11:06 AM">
+</Property></Properties><Event ErrorLevel="0" Project="" Source="MyCA.sln" Description="File successfully backed up as F:\MyCA\MyCA.sln.old">
+</Event><Event ErrorLevel="0" Project="" Source="MyCA.suo" Description="File successfully backed up as F:\MyCA\MyCA.suo.old">
+</Event><Event ErrorLevel="1" Project="F:\MyCA\MyCA.phpproj" Source="MyCA.phpproj" Description="'app\tmp\cache\models\default_ICDev_list' was not found. The item will reference non existing location.">
+</Event><Event ErrorLevel="1" Project="F:\MyCA\MyCA.phpproj" Source="MyCA.phpproj" Description="'MYCA_CHANGELOG.txt' was not found. The item will reference non existing location.">
+</Event><Event ErrorLevel="0" Project="" Source="MyCA.sln" Description="The solution file does not require conversion.">
+</Event><Event ErrorLevel="3" Project="" Source="MyCA.sln" Description="No Conversion Required">
+</Event></UpgradeLog>

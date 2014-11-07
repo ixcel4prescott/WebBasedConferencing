@@ -1,0 +1,171 @@
+<div><span style="font-weight:bold">Reservations</span><span style="margin-left:20px;">(for <?=$myDate?>)</span></div>
+
+<?
+		$xtracols_style  = "";
+		if ($litelayout){
+			$xtracols_style .= 'display:none;';
+		}
+?>
+<table>
+	<tr>
+		<th>Time</th>
+		<th>Company</th>
+		<th>Bridge</th>
+		<th>Operator</th>
+		<th>Lines</th>
+		<th style="<?=$xtracols_style; ?>">Confirm#</th>
+		<th style="<?=$xtracols_style; ?>">Role</th>
+		<th style="<?=$xtracols_style; ?>">AcctManager</th>
+		<th style="<?=$xtracols_style; ?>">Calltype</th>
+		<th style="<?=$xtracols_style; ?>">Services</th>
+	</tr>
+  <?
+  	$today = date('m/d/Y');
+  	$current_hour = date('G');
+  	for($i=0; $i<count($Reservations); $i++): 
+  		$row = $Reservations[$i];
+  		$date = date('m/d/Y', strtotime($row['ConferenceDate']));
+  		$hour = date('G', strtotime($date." ".$row['ConferenceTime']));
+  		$past = ($date == $today && $hour < $current_hour);
+  		
+  		$date = date('g:i a', strtotime($date." ".$row['ConferenceTime']));
+ 	?>
+
+  	<?
+  		$row_style = "";
+			
+			if ($past){
+				if ($litelayout){
+					$row_style .= 'display:none;';
+				}else{
+					$row_style .= 'background:#dddddd;';
+				}
+			}else{
+				if(IsEvent($row)){
+					$row_style .= 'background:#ddffdd;';
+				}else if (IsOpassist($row)){
+					$row_style .= 'background:#ffdddd;';
+				}
+
+				if (IsImportant($row)){
+					$row_style .= 'border:solid 2px #aa5555;font-weight:bold;';
+				}
+			}
+  	?>
+  	<tr style="<?=$row_style?>">
+  		<td><?=$date ?></td>
+  		<td><?= $html->link(substr($row['CompanyName'],0,25)." (".$row['AccountNumber'].")", "/accounts/view/".$row['AccountNumber']."/$myYear/$myMonth/$myDay") ?></td>
+  		<td><?=GetBridge($row['ConfirmNumber'])?></td>
+  		<td><?=$row['OperatorName']?></td>
+  		<td><?=$row['LinesReserved']?></td>
+  		<td style="<?=$xtracols_style; ?>"><?=$row['ConfirmNumber']?></td>
+  		<td style="<?=$xtracols_style; ?>"><?=$row['Role']?></td>
+  		<td style="<?=$xtracols_style; ?>"><?=$row['AccountManager']?></td>
+  		<td style="<?=$xtracols_style; ?>"><?=GetCalltype($row)?></td>
+  		<td style="<?=$xtracols_style; ?>"><?=GetServices($row)?></td>
+  	</tr>
+  <? endfor; ?>
+</table>
+
+<script type="text/javascript">
+$(document).ready( function() {
+  window.setTimeout(function() { window.location='';}, 60 * 1000)
+});
+</script>
+
+<?
+function GetBridge($confirmnum){
+	if ($confirmnum){
+		switch (substr($confirmnum,0,1)){
+			case 'S':
+				$bridge = 'Avaya';
+				break;
+			case '2':
+				$bridge = 'OCI';
+				break;
+			default:
+				$bridge = 'Unknown';
+				break;
+		}
+		
+		return $bridge;
+	}
+}
+
+function GetServices($record){
+	$list = array();
+	
+	if ($record['Presentation'] == 1) array_push($list, 'Presentation');
+	if ($record['QandA'] == 1) array_push($list, 'QandA');
+	if ($record['Polling'] == 1) array_push($list, 'Polling');
+	if ($record['Lock'] == 1) array_push($list, 'Lock');
+	if ($record['Communications'] == 1) array_push($list, 'Communications');
+	if ($record['SubConference'] == 1) array_push($list, 'SubConference');
+	if ($record['Music'] == 1) array_push($list, 'Music');
+	if ($record['RollCall'] == 1) array_push($list, 'RollCall');
+	if ($record['Tones'] == 1) array_push($list, 'Tones');
+	if ($record['PasswordProtect'] == 1) array_push($list, 'PasswordProtect');
+	if ($record['CD'] == 1) array_push($list, 'CD');
+	if ($record['DigitalReplay'] == 1) array_push($list, 'DigitalReplay');
+	if ($record['LiveReport'] == 1) array_push($list, 'LiveReport');
+	if ($record['Transcription'] == 1) array_push($list, 'Transcription');
+	if ($record['WavFile'] == 1) array_push($list, 'WavFile');
+	if ($record['AudioEditing'] == 1) array_push($list, 'AudioEditing');
+	if ($record['BrandedDialIn'] == 1) array_push($list, 'BrandedDialIn');
+	if ($record['MakeTape'] == 1) array_push($list, 'MakeTape');
+	if ($record['BrandedLogin'] == 1) array_push($list, 'BrandedLogin');
+	if ($record['WebRecordingEditing'] == 1) array_push($list, 'WebRecordingEditing');
+	if ($record['WebCast'] == 1) array_push($list, 'WebCast');
+	if ($record['MP3'] == 1) array_push($list, 'MP3');
+	if ($record['SetupFee'] == 1) array_push($list, 'SetupFee');
+	if ($record['EMSRegistration'] == 1) array_push($list, 'EMSRegistration');
+	if ($record['EMSHTML'] == 1) array_push($list, 'EMSHTML');
+	if ($record['EMSBlastEmail'] == 1) array_push($list, 'EMSBlastEmail');
+	if ($record['EMSReminder'] == 1) array_push($list, 'EMSReminder');
+	if ($record['EMSRegistrantProcessing'] == 1) array_push($list, 'EMSRegistrantProcessing');
+	if ($record['EMSContentEditing'] == 1) array_push($list, 'EMSContentEditing');
+	if ($record['EMSCreditCardProcessing'] == 1) array_push($list, 'EMSCreditCardProcessing');
+	if ($record['EMSPostConferenceSurvey'] == 1) array_push($list, 'EMSPostConferenceSurvey');
+	if ($record['EnhancedMonitoring'] == 1) array_push($list, 'EnhancedMonitoring');
+	if ($record['OverbookingFee'] == 1) array_push($list, 'OverbookingFee');
+	if ($record['AfterHoursFee'] == 1) array_push($list, 'AfterHoursFee');
+	if ($record['ShippingFee'] == 1) array_push($list, 'ShippingFee');
+	if ($record['EventNoShow'] == 1) array_push($list, 'EventNoShow');
+	if ($record['Other'] == 1) array_push($list, 'Other');
+	
+	return implode(', ', $list);
+}
+
+function GetCalltype($record){
+	$list = array();
+	
+	if ($record['OpAssistIn'] == 1) array_push($list, 'OpAssist');
+	if ($record['OpAssistOut'] == 1) array_push($list, 'OpAssistOut');
+	if ($record['Enhanced'] == 1) array_push($list, 'Enhanced');
+	if ($record['Event'] == 1) array_push($list, 'Event');
+	if ($record['AutoEvent'] == 1) array_push($list, 'AutoEvent');
+	if ($record['Automated'] == 1) array_push($list, 'Automated');
+	if ($record['Merge'] == 1) array_push($list, 'Merge');
+	if ($record['Playback'] == 1) array_push($list, 'Playback');
+	if ($record['LinkLine'] == 1) array_push($list, 'LinkLine');
+	
+	return implode(', ', $list);
+}
+
+function IsOpassist($record){
+	if ($record['OpAssistIn']
+		|| $record['OpAssistOut']
+	   ) return true;
+}
+
+function IsEvent($record){
+	if ($record['Event']
+		|| $record['LinesReserved'] >= 50
+	   ) return true;
+}
+
+function IsImportant($record){
+	if ($record['QandA']
+		|| $record['EnhancedMonitoring']
+	   ) return true;
+}

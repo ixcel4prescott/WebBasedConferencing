@@ -1,0 +1,114 @@
+<?
+	if (!(isset($settings) && isset($data))){
+		echo "<h1>Missing Report</h1><h2>Unfortunately, we were unable to find the report you requested</h2>";
+	}else{
+?>
+	<?= $html->css('ui.datepicker') ?>
+	<?= $javascript->link('ui.datepicker.js') ?>
+
+	<style type="text/css">
+	#accounts_pane {
+		 margin: auto;
+		 padding-bottom: 20px;
+		 border: 1px solid #ccc;
+		 padding: 10px 20px;
+	}
+
+	#accounts th, #accounts td {
+		padding: 3px 5px;
+		text-align: left;
+	}
+
+	tr.even td {
+		background: #EFF7FF;
+	}
+
+	span.current {
+		color: #FF9C2A;
+		font-weight: bold;
+	}
+
+	</style>
+
+	<? $pagination->setPaging($paging) ?>
+	<?
+		$cols = array_keys($data[0]['RapidviewReport']);
+		$noshow = explode(',', $settings['noshow_fields']);
+	?>
+	<div id="accounts_pane">
+
+		<h1>
+			<?=$settings['title'];?>
+
+			<? if ($settings['date_field']): ?>
+			: <?= $_GET['start'] ?> to <?= $_GET['end'] ?>
+			<? endif; ?>
+		</h1>
+
+		<? if ($settings['description']): ?>
+			<h2 style="border-left: solid 1px; margin-left:10px; padding-left:5px;"><?=$settings['description'];?></h2>
+		<? endif; ?>
+		<br />
+		<? if ($settings['date_field']): ?>
+		<form method="get">
+			<div>
+				<span div class="input">
+					<label class="right" for="ReportStart" style="width: 50px">Start:</label>
+					<input type="text" id="start" name="start" value="<?= $_GET['start'] ?>" />
+				</span>
+				<span class="input">
+					<label class="right" for="ReportEndDate" style="width: 50px">End:</label>
+					<input type="text" id="end" name="end" value="<?= $_GET['end'] ?>" />
+				</span>
+
+				<span class="submit">
+					<input type="submit" value="Update" style="margin-left: 60px"/>
+				</span>
+			</div>
+		</form>
+		<? endif; ?>
+
+		<table id="report" style="width: 100%; margin-top: 1em">
+			<tr>
+				<? for($i=0; $i<count($cols); $i++): ?>
+					<? if (!(in_array($cols[$i], $noshow))): ?>
+						<th style="text-align:right;"><?= $pagination->sortBy($cols[$i]) ?></th>
+					<? endif; ?>
+				<? endfor; ?>
+			</tr>
+
+			<? for($i=0; $i<count($data); $i++): ?>
+				<tr class="<?= $i%2 ? 'odd' : 'even' ?>">
+					<? for($j=0; $j<count($cols); $j++): ?>
+						<? if (!(in_array($cols[$j], $noshow))): ?>
+							<? if (array_key_exists($cols[$j], $url_map)){
+								$url = $url_map[$cols[$j]]['url'];
+								$url = str_replace('{id}', $data[$i]['RapidviewReport'][$cols[$j]], $url);
+								if (in_array($url_map[$cols[$j]]['label'],$cols)){
+									$url_label = "{$data[$i]['RapidviewReport'][$url_map[$cols[$j]]['label']]} - {$data[$i]['RapidviewReport'][$cols[$j]]}";
+								}else{
+									$url_label = $data[$i]['RapidviewReport'][$cols[$j]];
+								}
+							?>
+								<td><?= $html->link($url_label, $url) ?></td>
+							<? }else{ ?>
+								<td><?= $data[$i]['RapidviewReport'][$cols[$j]] ?></td>
+							<? } ?>
+						<? endif; ?>
+					<? endfor; ?>
+				</tr>
+			<? endfor; ?>
+		</table>
+
+		<?= $this->renderElement('pagination') ?>
+
+	</div>
+
+	<script type="text/javascript">
+	$(document).ready( function() {
+		$('#start,#end').datepicker();
+	});
+	</script>
+<?
+}
+?>

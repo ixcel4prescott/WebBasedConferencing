@@ -1,0 +1,25 @@
+<style type="text/css">
+#others {
+  border-collapse: separate;
+  border: 1px solid #CCDDEE;
+}
+
+#others td, #others th {
+  border: 1px solid #CCDDEE;
+  padding: 3px 5px;
+}
+
+#others td {
+  text-align: left;
+}
+
+#others th {
+  text-align: center;
+}
+</style>
+
+<strong><?= $html->link($request['Account']['bcompany'], '/accounts/view/' . $request['Account']['acctgrpid']) ?></strong>(<strong><?= $html->link($request['Account']['acctgrpid'], '/accounts/view/' . $request['Account']['acctgrpid'] ) ?></strong>) 
+
+requested to move room <strong><?= $html->link($room['Room']['accountid'], '/rooms/view/' . $room['Room']['accountid']) ?></strong>(<strong><?= $html->link($room['Room']['contact'], '/rooms/view/' . $room['Room']['accountid']) ?></strong>) 
+
+to account <strong><?= $html->link($dest['Account']['bcompany'], $dest['Account']['acctgrpid']) ?></strong>(<strong><?= $html->link($dest['Account']['acctgrpid'], '/accounts/view/' . $dest['Account']['acctgrpid'])?></strong>) with service rate <strong><?= $service_rate['ServiceRate']['name'] ?></strong>

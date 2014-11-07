@@ -1,0 +1,42 @@
+<style type="text/css">
+tr.odd td {
+  background: #eee;
+}
+</style>
+
+<h1>PINs Created</h1>
+
+<p style="font-weight: bold">
+  Please commit these pins to the bridge.
+</p>
+
+<table>
+  <tr>
+    <th>Account</th>
+    <th>First Name</th>
+    <th>Last Name</th>
+    <th>Address 1</th>
+    <th>Address 2</th>
+    <th>City</th>
+    <th>State</th>
+    <th>ZIP</th>
+    <th>Login</th>
+    <th>PIN</th>
+  </tr>
+
+  <? for($i=1; $i<count($rows); $i++): ?>
+     <tr class="<?= $i%2 ? 'odd' : 'even' ?>">
+       <td><?= $rows[$i]['BillingCode'] ?></td>
+       <td><?= $rows[$i]['FirstName'] ?></td>
+       <td><?= $rows[$i]['LastName'] ?></td>
+       <td><?= $rows[$i]['Address1'] ?></td>
+       <td><?= $rows[$i]['Address2'] ?></td>
+       <td><?= $rows[$i]['City'] ?></td>
+       <td><?= $rows[$i]['State'] ?></td>
+       <td><?= $rows[$i]['PostalCode'] ?></td>
+       <td><?= $rows[$i]['LoginName'] ?></td>
+       <td style="font-weight: bold"><?= $rows[$i]['PIN'] ?></td>
+     </tr>
+     <? endfor; ?>
+</table>
+

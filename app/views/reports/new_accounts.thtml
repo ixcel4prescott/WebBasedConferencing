@@ -1,0 +1,83 @@
+<?= $html->css('ui.datepicker') ?>
+<?= $javascript->link('ui.datepicker.js') ?>
+
+<style type="text/css">
+#accounts_pane {
+   margin: auto;
+   padding-bottom: 20px;
+   border: 1px solid #ccc;
+   padding: 10px 20px;
+}
+
+#accounts th, #accounts td {
+  padding: 3px 5px;
+  text-align: left;
+}
+
+tr.even td {
+  background: #EFF7FF;
+}
+
+span.current {
+  color: #FF9C2A;
+  font-weight: bold;
+}
+
+</style>
+
+<? $pagination->setPaging($paging) ?>
+
+<div id="accounts_pane">
+
+  <h1>Accounts Created Between <span style="font-weight:normal;font-style:italic;"><?= $_GET['start'] ?> and <?= $_GET['end'] ?></span></h1>
+
+  <form method="get">
+    <div>
+      <label class="right" for="ReportStart" style="width: 50px">Start:</label>
+      <input type="text" id="start" name="start" value="<?= $_GET['start'] ?>" />
+      
+      <label class="right" for="ReportEndDate" style="margin-left:10px;width: 50px">End:</label>
+      <input type="text" id="end" name="end" value="<?= $_GET['end'] ?>" />
+      
+      <input type="submit" value="Update" style="margin-left: 10px"/>
+    </div>
+  </form>
+
+  <p style="float: right">
+    <a href="<?= '?'.http_build_query(Array('export' => 1, 'start' => @$_GET['start'], 'end' => @$_GET['end'])) ?>">
+      <img src="/img/excel.gif">	
+      <strong>Export to Excel</strong>
+    </a>
+  </p>
+
+  <table id="accounts" style="width: 100%; margin-top: 1em">
+    <tr>
+      <th><?= $pagination->sortBy('acctgrpid', 'Account ID') ?></th>
+      <th><?= $pagination->sortBy('company') ?></th>
+      <th><?= $pagination->sortBy('salesperson_name', 'Salesperson') ?></th>
+      <th><?= $pagination->sortBy('created') ?></th>      
+      <th style="text-align:center"><?= $pagination->sortBy('minutes', 'Total<br/>Usage') ?></th>
+      <th style="text-align:center"><?= $pagination->sortBy('cost', 'Total<br/>Cost') ?></th>
+    </tr>
+    
+    <? for($i=0; $i<count($data); $i++): ?>
+       <tr class="<?= $i%2 ? 'odd' : 'even' ?>">
+	 <td><?= $html->link($data[$i]['NewAccountReport']['acctgrpid'], "/accounts/view/{$data[$i]['NewAccountReport']['acctgrpid']}") ?></td>
+	 <td><?= $data[$i]['NewAccountReport']['company'] ?></td>
+	 <td><?= $data[$i]['NewAccountReport']['salesperson_name'] ?></td>	 
+	 <td><?= date('m/d/Y', strtotime($data[$i]['NewAccountReport']['created'])) ?></td>
+	 <td style="text-align:center"><?= $data[$i]['NewAccountReport']['minutes'] ?></td>
+	 <td style="text-align:center">$<?= $data[$i]['NewAccountReport']['cost'] ?></td>
+       </tr>
+    <? endfor; ?>
+  </table>
+
+  <?= $this->renderElement('pagination') ?>
+
+</div>
+
+<script type="text/javascript">
+$(document).ready( function() {
+  $('#start,#end').datepicker();
+});
+</script>

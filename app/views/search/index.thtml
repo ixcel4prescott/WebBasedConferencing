@@ -1,0 +1,108 @@
+<style type="text/css">
+#search_pane {
+   margin: auto;
+   padding-bottom: 20px;
+   border: 1px solid #ccc;
+   padding: 10px 20px;
+}
+
+#search_pane th, #search_pane td {
+  padding: 3px 5px;
+  text-align: left;
+}
+
+tr.even td {
+  background: #EFF7FF;
+}
+
+span.current {
+  color: #FF9C2A;
+  font-weight: bold;
+}
+
+fieldset {
+  padding: 0px 10px 10px 5px;
+}
+
+.filter {
+  margin-bottom: 0.3em;
+}
+
+.filter label {
+   width: 10em;
+   display: inline;
+   float:left;
+   margin-right: 0.5em;
+   text-align: right;
+}
+</style>
+
+<div id="search_pane">
+  
+  <?= $this->renderElement('title', aa('title', !empty($query) ? sprintf('Searching for: <em>%s</em>', $query) : 'Search', 'target', 'search' )) ?>
+  
+  <form method="get" style="margin-top: 1em; margin-bottom: 1em">
+    <div class="filter">
+      <label for="query"><strong>Search:</strong></label>
+      <input id="query" type="text" name="query" value="<?= $query ?>"/>
+      <button type="submit">
+	<?= $html->image('search.gif', aa('class', 'valign')) ?> Search
+      </button>
+    </div>
+  </form>
+
+  <? if($query): ?>
+  <fieldset>
+    <legend>Accounts Matching: <em><?= $query ?></em></legend>
+    <div id="accounts_pane">
+      <h2 class="center">Please wait, searching...</h2>      
+    </div>    
+  </fieldset>
+
+  <fieldset>
+    <legend>Contacts Matching: <em><?= $query ?></em></legend>
+    <div id="contacts_pane">
+      <h2 class="center">Please wait, searching...</h2>
+    </div>    
+  </fieldset>
+
+  <fieldset>
+    <legend>Rooms Matching: <em><?= $query ?></em></legend>
+    <div id="rooms_pane">
+      <h2 class="center">Please wait, searching...</h2>
+    </div>    
+  </fieldset>
+  <? endif; ?>
+
+</div>
+
+<? if($query): ?>
+<script type="text/javascript">
+$(document).ready( function() {
+
+    $('#accounts_pane').load(
+	'/accounts/index?query=<?= urlencode($query) ?>&embed=true&show=10', 
+        null,
+	function() { 
+	  $('#accounts_pane').paginate(); 
+	}
+    );
+
+    $('#contacts_pane').load(
+	'/contacts/index?query=<?= urlencode($query) ?>&embed=true&show=10', 
+        null,
+	function() { 
+	  $('#contacts_pane').paginate(); 
+	}
+    );    
+
+    $('#rooms_pane').load(
+	'/rooms/index?query=<?= urlencode($query) ?>&embed=true&show=10', 
+        null,
+	function() { 
+	  $('#rooms_pane').paginate(); 
+	}
+    );    
+});
+</script>
+<? endif; ?>

@@ -1,0 +1,100 @@
+<style type="text/css">
+div#cdr_frame {
+  margin: auto;
+}
+
+.headline {
+  font-weight: bold;
+  border-bottom: 1px solid #ccc;
+  margin-bottom: 10px;
+}
+
+.headline a {
+  font-size: smaller;
+}
+
+div.box {
+  margin-bottom: 10px;
+  margin-right: 5px;
+}
+
+div.box table {
+  table-layout: fixed;
+  width: 100%;
+  border: none;
+}
+
+div.box td, div.box th {
+  border: none;
+}
+
+div.full_box {
+  margin-bottom: 20px;
+  clear: right;
+}
+
+div.box table th {
+  width: 15em;
+  text-align: right;
+}
+
+th, td {
+  padding: 3px 5px;
+  text-align: left;
+  white-space: normal
+}
+
+div.box tr.noborder th {
+  border-top: none;
+}
+
+tr.even td {
+  background: #EFF7FF;
+}
+</style>
+
+<div id="cdr_frame">
+  <h1>CDR Details for <?=$data['Cdr']['id']?></h1>
+  <div class="box" style="height: 260px">
+    <div class="headline">
+      Caller Information
+    </div>
+    <table>
+      <tr><th>Caller Name</th><td><?=$data['Cdr']['user_name']?></td></tr>
+      <tr><th>Participant Type</th><td><?=$data['Cdr']['participant_type']?></td></tr>
+      <tr><th>Call Type</th><td><?=$serviceTypes[$data['Cdr']['call_type']]?></td></tr>
+      <tr><th>Billing Code</th><td><?=$data['Cdr']['billing_code']?></td></tr>
+      <? if(!empty($data['DNISCountryCode'])) :?>
+        <tr><th>DNIS Region</th><td><?=$data['DNISCountryCode']['description']?></td></tr>
+      <? endif ?>
+      <? if(!empty($data['DNISCountryCode'])) :?>
+        <tr><th>DNIS Country Code</th><td><?=$data['Cdr']['dnis_country_code']?></td></tr>
+      <? endif ?>
+      <tr><th>DNIS City Number</th><td><?=format_phone($data['Cdr']['dnis_city_number'])?></td></tr>
+      <? if(!empty($data['ANICountryCode'])) :?>
+        <tr><th>ANI Region</th><td><?=$data['ANICountryCode']['description']?></td></tr>
+      <? endif ?>
+      <? if(!empty($data['DNISCountryCode'])) :?>
+        <tr><th>ANI Country Code</th><td><?=$data['Cdr']['ani_country_code']?></td></tr>
+      <? endif ?>
+      <tr><th>ANI City Number</th><td><?=format_phone($data['Cdr']['ani_city_number'])?></td></tr>
+    </table>
+  </div>
+
+  <div class="box" style="height: 175px">
+    <div class="headline">
+      General Information
+    </div>
+    <table>
+      <tr><th>Account</th><td><?=$data['Cdr']['acctgrpid']?></td></tr>
+      <tr><th>Confirmation Number</th><td><?=$data['Cdr']['accountid']?></td></tr>
+      <tr><th>Call Start</th><td><?=$data['Cdr']['call_start']?></td></tr>
+      <tr><th>Call End</th><td><?=$data['Cdr']['call_end']?></td></tr>
+      <tr><th>Minutes</th><td><?=$data['Cdr']['minutes']?></td></tr>
+      <tr><th>Call Cost</th><td><?=$data['Cdr']['call_cost']?></td></tr>
+      <tr><th>PPM</th><td><?=$data['Cdr']['ppm']?></td></tr>
+    </table>
+  </div>
+</div>
+
+

@@ -1,0 +1,101 @@
+<style type="text/css">
+#report {
+  margin: 1em auto; 
+  width: 100%;
+}
+
+#report th,#report td {
+  padding: 3px 5px;
+  text-align: right;
+}
+
+tr.odd td {
+  background: #def;
+}
+
+.highlight {
+   font-weight: bold;
+}
+</style>
+
+<h1>Year To Date Report</h1>
+
+<div id="breadcrumbs" style="margin-bottom:10px; font-size:10pt">
+
+  <?= $html->link('Home', "/reports/usage")." &raquo;" ?>
+
+  <select id="year">
+    <? $focusYear = (int)date(Y);
+      while ($focusYear >= 2007): ?>
+    <option value="<?= $focusYear ?>" <?= $myYear == $focusYear ? 'selected="selected"' : '' ?> ><?= $focusYear ?></option>
+    <? $focusYear--;
+      endwhile ?>
+  </select>
+</div>
+
+<div style="width: 500px; margin: 1em auto">
+  <? common('vendors/charts') ?>
+  <?= InsertChart ( "/img/charts.swf", "/graphs/charts_library", "/graphs/usage/$myYear/?nocache=".date('s'), 500, 200, "FFFFFF", false) ?>
+</div>
+
+<p style="float: right">
+  <a href="<?= '?'.http_build_query(Array('export' => 1, 'query' => @$_GET['query'])) ?>">
+    <img src="/img/excel.gif">	
+    <strong>Export to Excel</strong>
+  </a>
+</p>
+
+<br style="clear: right"/>
+
+<table id="report">
+  <tr>
+    <th>Date</th>
+    <th>RL Mins</th>
+    <th>OA Mins</th>
+    <th>WB Mins</th>
+    <th>Total Mins</th>
+    <th>RL Cost</th>
+    <th>OA Cost</th>
+    <th>WB Cost</th>
+    <th>Flat Cost</th>
+    <th>Enhncd Svcs</th>
+    <th>Other Cost</th>
+    <th>Grand Total</th>
+  </tr>
+
+  <? for($i=0; $i<count($dates); $i++): ?>
+
+     <? 
+      $year = "20".substr($dates[$i][$model]['date'], 2, 2);
+      $month = substr($dates[$i][$model]['date'], 5, 2);
+      $dateColumn = substr($dates[$i][$model]['date'], 5, 2).'/'.substr($dates[$i][$model]['date'], 0, 4)
+     ?>
+
+  <tr class="<?= $i%2 ? 'odd' : 'even' ?>">
+    <td><?= $html->link($dateColumn,"/reports/usage/$year/$month") ?></td>
+    <td><?= number_format($dates[$i][$model]['reservationless_minutes'],0,'.',',') ?></td>
+    <td><?= number_format($dates[$i][$model]['operator_assisted_minutes'],0,'.',',') ?></td>
+    <td><?= number_format($dates[$i][$model]['web_minutes'],0,'.',',') ?></td>
+    
+    <td class="highlight"><?= number_format($dates[$i][$model]['total_minutes'],0,'.',',') ?></td>
+    
+    <td>$<?= number_format($dates[$i][$model]['reservationless_cost'],2,'.',',') ?></td>
+    <td>$<?= number_format($dates[$i][$model]['operator_assisted_cost'],2,'.',',') ?></td>
+    <td>$<?= number_format($dates[$i][$model]['web_cost'],2,'.',',') ?></td>
+    
+    <td>$<?= number_format($dates[$i][$model]['flat_cost'],2,'.',',') ?></td>
+    <td>$<?= number_format($dates[$i][$model]['enhanced_service_cost'],2,'.',',') ?></td>
+    <td>$<?= number_format($dates[$i][$model]['other_cost'],2,'.',',') ?></td>
+    <td class="highlight">$<?= number_format($dates[$i][$model]['total_cost'],2,'.',',') ?></td>
+  </tr>
+
+  <? endfor; ?>
+</table>
+
+<script type="text/javascript">
+$(document).ready( function() {
+  $('#year').change( function() {
+    window.location = '/reports/usage/' + this.value;
+  });
+});
+</script>

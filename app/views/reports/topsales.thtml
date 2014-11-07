@@ -1,0 +1,200 @@
+<style type="text/css">
+#extended_p {
+  margin-top: 1em;
+}
+
+div.filter {
+  color: #a00;
+  font-size: smaller;
+  margin-bottom: 0.5em;
+}
+
+div.filter label {
+  font-weight: bold;
+  text-align: right;
+  width: 15em;
+  display: inline;
+  float: left;
+  margin-right: 1em;
+}
+
+div.filter a {
+  font-weight: normal;
+}
+
+div.filter a.current {
+  font-weight: bold;
+}
+
+table.topx {
+   margin-top: 1em;
+   width: 100%;
+}
+
+table.topx th,table.topx td {
+  padding: 3px 5px;
+}
+
+tr.odd td {
+  background: #def;
+}
+
+table.info, table.info th, table.info td {
+  border: none;
+}
+
+table.info th {
+  background: inherit;
+  text-align: right;
+}
+
+table.info td {
+  text-align: left;
+}
+</style>
+
+<h1>Top Salespersons</h1>
+
+<p id="extended_p" class="small">
+  <?= $html->image('add.gif', aa('class', 'valign')) ?><a href="" id="extended_options">Extended Options</a>
+</p>
+
+
+<div class="filter">
+  <label>Report Type:</label> 
+
+  <?=$html->link("All","/reports/topsales/$myMeasure/all/$myField/$mySort/$myRange", aa('class', $myType == 'all' ? 'current' : ''))?> |
+  <?=$html->link("Audio Only","/reports/topsales/$myMeasure/audio/$myField/$mySort/$myRange", aa('class', $myType == 'audio' ? 'current' : ''))?> |
+  <?=$html->link("Web Only","/reports/topsales/$myMeasure/web/$myField/$mySort/$myRange", aa('class', $myType == 'web' ? 'current' : ''))?> |
+  <?=$html->link("Reservationless Only","/reports/topsales/$myMeasure/reservationless/$myField/$mySort/$myRange", 
+    aa('class', $myType == 'reservationless' ? 'current' : ''))?> |
+  <?=$html->link("OpAssist Only","/reports/topsales/$myMeasure/opassist/$myField/$mySort/$myRange", aa('class', $myType == 'opassist' ? 'current' : ''))?> |
+  <?=$html->link("Enhanced Services Only","/reports/topsales/$myMeasure/enhanced/$myField/$mySort/$myRange", aa('class', $myType == 'enhanced' ? 'current' : ''))?>
+</div>
+
+<div class="filter extended"  style="display:none">
+  <label>Window Size:</label> 
+
+  <?=$html->link("30 days","/reports/topsales/$myMeasure/$myType/$myField/$mySort/30", aa('class', $myRange == '30' ? 'current' : ''))?> |
+  <?=$html->link("60 days","/reports/topsales/$myMeasure/$myType/$myField/$mySort/60", aa('class', $myRange == '60' ? 'current' : ''))?> |
+  <?=$html->link("90 days","/reports/topsales/$myMeasure/$myType/$myField/$mySort/90", aa('class', $myRange == '90' ? 'current' : ''))?> |
+  <?=$html->link("180 days","/reports/topsales/$myMeasure/$myType/$myField/$mySort/180", aa('class', $myRange == '180' ? 'current' : ''))?> 
+</div>
+
+<div class="filter">
+  <label>Measure By:</label> 
+
+  <?=$html->link("Minutes", "/reports/topsales/minutes/$myType/$myField/$mySort/$myRange", aa('class', $myMeasure == 'minutes' ? 'current' : ''))?> |
+  <?=$html->link("Cost", "/reports/topsales/cost/$myType/$myField/$mySort/$myRange", aa('class', $myMeasure == 'cost' ? 'current' : ''))?>
+</div>
+
+<?php
+   if($mySort == 'asc') {
+     $mySort_new = 'desc';
+     $mySort_current = 'asc';
+   } else {
+     $mySort_new = 'asc';
+     $mySort_current = 'desc';
+   }
+?>
+
+<table class="topx">
+  <tr>
+    <th>
+      <? if($myField == 'salesperson_name'): ?>
+        <?= $html->link('Salesperson', "/reports/topsales/$myMeasure/$myType/salesperson_name/$mySort_new/$myRange") ?>
+        <?= $html->image($mySort_new == 'asc' ? 'up.gif' : 'down.gif', aa('class', 'valign')) ?>
+      <? else: ?>
+        <?= $html->link('Salesperson', "/reports/topsales/$myMeasure/$myType/salesperson_name/$mySort_current/$myRange") ?>
+      <? endif; ?>
+    </th>
+
+    <th>
+      <? if($myField == 'current_data'): ?>
+        <?= $html->link("Last $myRange Days", "/reports/topsales/$myMeasure/$myType/current_data/$mySort_new/$myRange") ?>
+        <?= $html->image($mySort_new == 'asc' ? 'up.gif' : 'down.gif', aa('class', 'valign')) ?>
+      <? else: ?>
+        <?= $html->link("Last $myRange Days", "/reports/topsales/$myMeasure/$myType/current_data/$mySort_current/$myRange") ?>
+      <? endif; ?>
+    </th>
+
+    <th>
+      <? if($myField == 'previous_data'): ?>
+        <?= $html->link("Previous $myRange Days", "/reports/topsales/$myMeasure/$myType/previous_data/$mySort_new/$myRange") ?>
+        <?= $html->image($mySort_new == 'asc' ? 'up.gif' : 'down.gif', aa('class', 'valign')) ?>
+      <? else: ?>
+        <?= $html->link("Previous $myRange Days", "/reports/topsales/$myMeasure/$myType/previous_data/$mySort_current/$myRange") ?>
+      <? endif; ?>
+    </th>
+    <th>
+      <? if($myField == 'delta'): ?>
+        <?= $html->link('Change', "/reports/topsales/$myMeasure/$myType/delta/$mySort_new/$myRange") ?>
+        <?= $html->image($mySort_new == 'asc' ? 'up.gif' : 'down.gif', aa('class', 'valign')) ?>
+      <? else: ?>
+        <?= $html->link('Change', "/reports/topsales/$myMeasure/$myType/delta/$mySort_current/$myRange") ?>
+      <? endif; ?>
+    </th>
+    <th>
+      <? if($myField == 'percent_change'): ?>
+        <?= $html->link('%Growth', "/reports/topsales/$myMeasure/$myType/percent_change/$mySort_new/$myRange") ?>
+        <?= $html->image($mySort_new == 'asc' ? 'up.gif' : 'down.gif', aa('class', 'valign')) ?>
+      <? else: ?>
+        <?= $html->link('%Growth', "/reports/topsales/$myMeasure/$myType/percent_change/$mySort_current/$myRange") ?>
+      <? endif; ?>
+    </th>
+    <th>
+      <? if($myField == 'newaccounts'): ?>
+        <?= $html->link('New Accts', "/reports/topsales/$myMeasure/$myType/newaccounts/$mySort_new/$myRange") ?>
+        <?= $html->image($mySort_new == 'asc' ? 'up.gif' : 'down.gif', aa('class', 'valign')) ?>
+      <? else: ?>
+        <?= $html->link('New Accts', "/reports/topsales/$myMeasure/$myType/newaccounts/$mySort_current/$myRange") ?>
+      <? endif; ?>
+    </th>
+  </tr>
+	
+  <? for($i=0; $i<count($myData); $i++): ?>
+  <tr class="<?= $i%2 ? 'odd' : 'even' ?>">
+    <td class="left"><?= $html->link($myData[$i]['salesperson_name'], "/reports/topx/".$myData[$i]['salesperson_id']); ?></td>
+    <td><?= number_format($myData[$i]['current_data'],0,'.',','); ?></td>
+    <td><?= number_format($myData[$i]['previous_data'],0,'.',','); ?></td>
+    <td>
+      <? if($myData[$i]['delta']>0): ?>
+      <span style="color:#090">
+      <? elseif($myData[$i]['delta']<0): ?>
+      <span style="color:#f00">
+      <? else: ?>
+      <span>
+     <? endif; ?>
+     <?= number_format($myData[$i]['delta'],0,'.',',') ?>
+     </span>
+    </td>
+    <td>
+      <? if($myData[$i]['percent_change']>0): ?>
+      <span style="color:#090">
+      <? elseif($myData[$i]['percent_change']<0): ?>
+      <span style="color:#f00">
+      <? else: ?>
+      <span>
+      <? endif; ?>
+      <?= number_format($myData[$i]['percent_change'],0,'.',',') ?>%
+      </span>
+    </td>
+    <td><?= number_format($myData[$i]['newaccounts'],0,'.',','); ?></td>
+   </tr>
+  <? endfor; ?>
+</table>
+
+<script type="text/javascript">
+$(document).ready( function() {
+
+  $('#extended_options').toggle( 
+      function() {
+	  $('div.extended').slideDown();
+      }, 
+      function() {
+	  $('div.extended').slideUp();	  
+      }
+  );
+
+})
+</script>

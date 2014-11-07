@@ -1,0 +1,99 @@
+<style type="text/css">
+#report {
+  margin: 1em auto; 
+  width: 100%;
+}
+
+#report th,#report td {
+  text-align: right;
+  font-size: xx-small;
+  padding: 5px 0;
+}
+
+tr.odd td {
+  background: #def;
+}
+
+.highlight {
+  font-weight: bold;
+}
+
+.weekend {
+  background: #eee;
+  color: #bbb;
+}
+</style>
+
+<? $pagination->setPaging($paging) ?>
+
+<?
+   $monthname = date('F',strtotime("$myYear-$myMonth-01"));
+?>
+
+<h1>Daily Summary Report</h1>
+
+<div id="breadcrumbs" style="margin-bottom:10px;font-size:10pt">
+  <?= $html->link('Home', "/reports/usage") ?> &raquo; <?= $html->link($myYear, "/reports/usage/$myYear") ?> &raquo; <?= $html->link($monthname, "/reports/usage/$myYear/$myMonth") ?> &raquo; <?= $myDay ?>
+</div>
+
+<p style="float: right">
+  <a href="<?= '?'.http_build_query(Array('export' => 1, 'query' => @$_GET['query'])) ?>">
+    <img src="/img/excel.gif">	
+    <strong>Export to Excel</strong>
+  </a>
+</p>
+
+<br style="clear: right"/>
+
+<table id="report">
+  <tr>
+      <th><?= $pagination->sortBy('company_name', 'Company') ?></th>
+      <th><?= $pagination->sortBy('reservationless_minutes', 'RL<br/>Mins<br/>') ?></th>
+      <th><?= $pagination->sortBy('operator_assisted_minutes', 'OA<br/>Mins<br/>') ?></th>
+      <th><?= $pagination->sortBy('web_minutes', 'WB<br/>Mins<br/>') ?></th>
+      <th>Total<br/>Mins</th>
+      <th><?= $pagination->sortBy('reservationless_cost', 'RL<br/>Cost<br/>') ?></th>
+      <th>Avg<br/>RL<br/>PPM</th>
+      <th><?= $pagination->sortBy('operator_assisted_cost', 'OA<br/>Cost<br/>') ?></th>
+      <th>Avg<br/>OA<br/>PPM</th>
+      <th><?= $pagination->sortBy('web_cost', 'WB<br/>Cost<br/>') ?></th>
+      <th>Total<br/>Cost</th>
+      <th><?= $pagination->sortBy('flat_cost', 'Flat Cost') ?></th>
+      <th><?= $pagination->sortBy('enhanced_service_cost', 'Enhncd<br/>Svcs<br/>') ?></th>
+      <th><?= $pagination->sortBy('other_cost', 'Other Cost') ?></th>
+      <th><?= $pagination->sortBy('total_cost', 'Grand<br/>Total<br/>') ?></th>
+      
+  </tr>
+  <? for($i=0; $i<count($dates); $i++): ?>
+    <?
+      $minutes = $dates[$i][$model]['reservationless_minutes'] + $dates[$i][$model]['operator_assisted_minutes'] + $dates[$i][$model]['web_minutes'];
+      $dollars = $dates[$i][$model]['reservationless_cost'] + $dates[$i][$model]['operator_assisted_cost'] + $dates[$i][$model]['web_cost'];
+    ?>
+
+  <tr class="<?= $i%2 ? 'odd' : 'even' ?>">
+    <td class="left" style="width: 200px">
+      <? $startDate = date('m/d/Y',strtotime($dates[$i][$model]['date']))?>
+      <?= $html->link((empty($dates[$i][$model]['company_name'])?$dates[$i][$model]['acctgrpid']:$dates[$i][$model]['company_name']), "/codrs/index/?acctgrpid=".$dates[$i][$model]['acctgrpid'].'&startdate='.$startDate.'&enddate='.$startDate) ?>
+    </td>
+    <td><?= number_format($dates[$i][$model]['reservationless_minutes'],0,'.',',') ?></td>
+    <td><?= number_format($dates[$i][$model]['operator_assisted_minutes'],0,'.',',') ?></td>
+    <td><?= number_format($dates[$i][$model]['web_minutes'],0,'.',',') ?></td>
+    <td class="highlight"><?= number_format($minutes,0,'.',',') ?></td>
+    <td>$<?= number_format($dates[$i][$model]['reservationless_cost'],2,'.',',')?></td>
+    <td><?= $dates[$i][$model]['reservationless_minutes'] > 0 ? sprintf('$%.02f', $dates[$i][$model]['reservationless_cost']/$dates[$i][$model]['reservationless_minutes']) : '&mdash;' ?></td>
+    <td>$<?= number_format($dates[$i][$model]['operator_assisted_cost'],2,'.',',') ?></td>
+    <td><?=  $dates[$i][$model]['operator_assisted_minutes'] > 0 ? sprintf('$%.02f', $dates[$i][$model]['operator_assisted_cost']/$dates[$i][$model]['operator_assisted_minutes']) : '&mdash;' ?></td>
+    <td>$<?= number_format($dates[$i][$model]['web_cost'],2,'.',',') ?></td>
+
+    <td class="highlight">$<?= number_format($dollars,2,'.',',') ?></td>
+    <td>$<?= number_format($dates[$i][$model]['flat_cost'],2,'.',',') ?></td>
+    <td>
+      <?= $html->link('$'.number_format($dates[$i][$model]['enhanced_service_cost'],2,'.',','),"/enhancedservices/viewbyaccount/".$dates[$i][$model]['acctgrpid']."/$myYear/$myMonth/$myDay") ?>
+    </td>
+    <td>$<?= number_format($dates[$i][$model]['other_cost'],2,'.',',') ?></td>
+    <td class="highlight">$<?= number_format($dates[$i][$model]['total_cost'],2,'.',',') ?></td>
+  </tr>
+  <? endfor; ?>
+</table>
+
+  <?= $this->renderElement('pagination') ?>

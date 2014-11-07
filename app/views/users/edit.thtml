@@ -1,0 +1,115 @@
+<?= $javascript->link('jquery.dimensions') ?>
+<?= $javascript->link('jquery.multiselect') ?>
+<?= $html->css('jquery.multiselect') ?>
+
+<style type="text/css">
+#register_pane {
+   margin: auto;
+   padding-bottom: 20px;
+   width: 500px;
+   border: 1px solid #ccc;
+   padding: 10px 20px;
+}
+</style>
+
+<div id="register_pane">
+
+  <h1>Edit User</h1>
+
+  <form method="post">
+    <?= $html->hidden('User/id') ?>
+ 
+   <div class="input">
+      <label class="right required" for="UserName">Your Name:</label>
+      <?= $html->input('User/name') ?>
+      <?=$html->tagErrorMsg('User/name', 'Please specify your name')?>
+    </div>
+
+    <div class="input">
+      <label class="right required" for="UserCompanyName">Company:</label>
+      <?= $html->input('User/company_name') ?>
+      <?=$html->tagErrorMsg('User/company_name', 'Please specify a company')?>
+    </div>
+
+    <div class="input">
+      <label class="right" for="UserUsername">Username:</label>
+      <?= $html->input('User/username') ?>
+      <?=$html->tagErrorMsg('User/username_taken', 'This username is already registered')?>      
+    </div>
+
+    <div class="input">
+      <label class="right required" for="UserEmail">Email:</label>
+      <?= $html->input('User/email') ?>
+      <?=$html->tagErrorMsg('User/email', 'Please specify a valid email address')?>
+      <?=$html->tagErrorMsg('User/email_taken', 'This email address is already registered')?>
+    </div>
+
+    <div class="input">
+       <label class="right" for="UserPhone">Phone Number:</label>
+       <?= $html->input('User/phone') ?>
+       <?= $html->tagErrorMsg('User/phone', 'Please enter your telephone number') ?>   
+    </div>
+
+    <div class="select">
+      <label class="right required" for="UserLevelType">Group:</label>
+      <?= $html->selectTag('User/level_type', aa('account', 'Account', 'accountgroup', 'Account Group', 'admin', 'Administrator', 'reseller', 'Reseller', 'salesperson', 'Salesperson', 'reseller_admin', 'Reseller Admin'), null, aa('id', 'level_type')) ?>
+      <?=$html->tagErrorMsg('User/level_type', 'Please select a group')?>
+    </div>
+
+    <div class="select" style="overflow:visible;display:none" id="reseller_group">
+      <label class="right" for="ResellerReseller">Associated Resellers:</label>
+      <?= $html->selectTag('Reseller/Reseller', $resellers, $grouped_resellers, aa('id', 'reseller', 'disabled', 'disabled', 'multiple', 'multiple'), null, false) ?>
+    </div>
+
+    <div class="select" style="overflow:visible;display:none" id="salesperson_group">
+      <label class="right" for="SalespeopleSalespeople">Associated Salespeople:</label>
+      <?= $html->selectTag('Salesperson/Salesperson', $salespeople, $grouped_salespeople, aa('id', 'salesperson', 'disabled', 'disabled', 'multiple', 'multiple'), null, false) ?>
+    </div>
+
+    <div class="checkbox">
+      <label class="right" for="UserActive">Active:</label>
+      <?= $html->checkbox('User/active') ?>
+    </div>
+
+    <div class="checkbox">
+      <label class="right" for="UserVerified">Verified:</label>
+      <?= $html->checkbox('User/verified') ?>
+    </div>
+
+    <div class="submit">
+      <button class="cancel" type="button">
+	<?= $html->image('cross.gif') ?> Cancel
+      </button>
+      <button class="submit" type="submit">
+	<?= $html->image('check.gif') ?> Update
+      </button>
+    </div>
+
+  </form>
+</div>
+
+<script type="text/javascript">
+$(document).ready( function() {
+
+  $('button.cancel').back('/users/view/<?= $user['User']['id'] ?>');
+
+    $('#reseller').multiSelect({ selectAll: true });
+    $('#salesperson').multiSelect({ selectAll: true });
+
+     $('#level_type').change( function() {
+	var val = $(this).val();
+	
+	if(val == 'reseller' || val == 'admin' || val =='reseller_admin') {
+	    $('#reseller_group').show();
+	    $('#salesperson_group').hide();
+	} else if(val == 'salesperson') {
+	    $('#reseller_group').hide();
+	    $('#salesperson_group').show();
+	} else {
+	    $('#reseller_group').hide();
+	    $('#salesperson_group').hide();
+	}
+
+    }).change();
+});
+</script>

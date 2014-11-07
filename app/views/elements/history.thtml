@@ -1,0 +1,13 @@
+<style type="text/css">
+.history {
+  margin-top: 1em;
+  border-top: 1px solid #ccc;
+  padding-top: 1em;
+  font-size: smaller;
+  font-style: italic;
+}
+</style>
+
+<div class="history">
+  <a href="/audit?entity=<?= $entity ?>&object_id=<?= $object_id ?>">Revision History</a>
+</div>

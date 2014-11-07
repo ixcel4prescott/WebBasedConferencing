@@ -1,0 +1,104 @@
+<?= $html->css('ui.datepicker') ?>
+<?= $javascript->link('ui.datepicker.js') ?>
+
+<?
+$menu_items = Array( Array( 'text' => 'Back to ' . $account['Account']['acctgrpid'],  
+			    'icon' => 'previous.gif', 
+			    'url'  => '/accounts/view/' . $account['Account']['acctgrpid']));
+?>
+
+<style type="text/css">
+#usage_pane {
+   margin: auto;
+   padding-bottom: 20px;
+   border: 1px solid #ccc;
+   padding: 10px 20px;
+}
+
+#usage th, #usage td {
+  padding: 3px 5px;
+  text-align: left;
+}
+
+tr.even td {
+  background: #EFF7FF;
+}
+
+span.current {
+  color: #FF9C2A;
+  font-weight: bold;
+}
+</style>
+
+<? $pagination->setPaging($paging) ?>
+
+<div id="usage_pane">
+  
+  <?= $this->renderElement('toolbar', Array('items' => $menu_items)) ?>
+
+  <?= $this->renderElement('title', aa('title', 'Usage for ' . $account['Account']['acctgrpid'], 'target', 'usage_account' )) ?>
+
+  <form method="get" style="margin-top: 1em; margin-bottom: 1em">
+    <div>
+      <label class="right" for="ReportStart" style="width: 50px"><strong>Start:</strong></label>
+      <input type="text" id="start" name="start" value="<?= @$_GET['start'] ?>" />
+      
+      <label class="right" for="ReportEndDate" style="margin-left:10px;width: 50px"><strong>End:</strong></label>
+      <input type="text" id="end" name="end" value="<?= @$_GET['end'] ?>" />
+      
+      <button type="submit">
+	<?= $html->image('search.gif', aa('class', 'valign')) ?> Search
+      </button>
+    </div>
+  </form>
+
+  <p style="float: right">
+    <a href="<?= '?'.http_build_query(Array('export' => 1, 'start' => @$_GET['start'], 'end' => @$_GET['end'])) ?>">
+      <img src="/img/excel.gif">	
+      <strong>Export to Excel</strong>
+    </a>
+  </p>
+
+  <table id="usage" style="width: 100%; margin-top: 1em">
+    <thead>
+      <tr>
+	<th><?= $pagination->sortBy('accountid', 'Confirmation Number') ?></th>
+	<th><?= $pagination->sortBy('starttime_t', 'Date') ?></th>
+	<th>Time (GMT)</th>
+	<th><?= $pagination->sortBy('calltype_text', 'Call Type') ?></th>
+	<th><?= $pagination->sortBy('invoicenum', 'Invoice') ?></th>
+	<th><?= $pagination->sortBy('billingcode', 'Billing Code') ?></th>
+	<th><?= $pagination->sortBy('participant_type', 'Caller Type') ?></th>
+	<th><?= $pagination->sortBy('minutes') ?></th>
+	<th><?= $pagination->sortBy('dnis', 'Dialed Number') ?></th>
+	<th><?= $pagination->sortBy('ani', 'Incoming Number') ?></th>
+	<th><?= $pagination->sortBy('username', 'User Name') ?></th>
+      </tr>   				 
+    </thead>
+    <tbody>
+      <? for($i=0; $i<count($data); $i++): ?> 
+      <tr class="<?= $i%2 ? 'odd' : 'even'?>">
+	<td><?= $html->link($data[$i]['Usage']['accountid'], sprintf('/usage/room/%s?%s', $data[$i]['Usage']['accountid'], http_build_query(Array('start' => @$_GET['start'], 'end' => @$_GET['end'])))) ?></td>
+	<td><?= date('m/d/Y', $data[$i]['Usage']['starttime_t']) ?></td>
+	<td><?= date('h:i:s', $data[$i]['Usage']['starttime_t']) ?></td>
+	<td><?= $data[$i]['Usage']['calltype_text'] ?></td>
+	<td><?= $html->link($data[$i]['Usage']['invoicenum'], sprintf('/accounts/invoice/%s/%s.pdf', $account['Account']['acctgrpid'], $data[$i]['Usage']['invoicenum'])) ?></td>
+	<td><?= $data[$i]['Usage']['billingcode'] ?></td>
+	<td><?= $data[$i]['Usage']['participant_type'] ?></td>
+	<td><?= $data[$i]['Usage']['minutes'] ?></td>
+	<td><?= format_phone($data[$i]['Usage']['dnis']) ?></td>
+	<td><?= format_phone($data[$i]['Usage']['ani']) ?></td>
+	<td><?= $data[$i]['Usage']['username'] ?></td>
+      </tr>
+      <? endfor; ?>
+    </tbody>
+  </table>
+
+  <?= $this->renderElement('pagination') ?>
+</div>
+
+<script type="text/javascript">
+$(document).ready( function() {
+  $('#start,#end').datepicker();
+});
+</script>

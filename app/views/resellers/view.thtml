@@ -1,0 +1,105 @@
+<style type="text/css">
+#reseller_profile {
+   margin: auto;
+   padding-bottom: 20px;
+   border: 1px solid #ccc;
+   padding: 10px 20px;
+}
+
+#reseller_profile th,td {
+  padding: 3px 5px;
+}
+
+#reseller_profile td {
+  text-align: left;
+}
+
+#profile th {
+  text-align: right;
+}
+</style>
+
+<div id="reseller_profile">
+
+  <? if(!empty($reseller['Reseller']['logo'])): ?>
+  <div class="center">
+    <?= $html->link($html->image($reseller['Reseller']['logo'], aa('style', sprintf('width:%dpx,height%dpx', $reseller['Reseller']['logowidth'], $reseller['Reseller']['logoheight']))), 
+        $reseller['Reseller']['logoref'], null, null, false) ?>
+  </div>
+  <? endif; ?>
+  
+  <h1>Reseller Profile: <?= $reseller['Reseller']['agent'] ? $reseller['Reseller']['rdesc'] : $reseller['Reseller']['name'] ?></h1>
+
+  <p class="smaller" style="margin-top: 1em">
+    <a href="/resellers/edit/<?= $reseller['Reseller']['resellerid'] ?>"><?= $html->image('edit.gif', aa('class', 'valign')) ?> Edit</a>
+  </p>
+
+  <table id="profile" style="margin-top: 1em">
+    <tr>
+      <th>ID:</th><td><?= $reseller['Reseller']['resellerid'] ?></td>
+    <tr>
+    <tr>
+      <th>Name:</th><td><?= $reseller['Reseller']['name'] ?></td>
+    <tr>
+    <tr>
+      <th>Prefix:</th><td><?= $reseller['Reseller']['racctprefix'] ?></td>
+    <tr>
+    <? if(!empty($reseller['Reseller']['rdesc'])): ?>
+    <tr>
+      <th>Description:</th><td><?= $reseller['Reseller']['rdesc'] ?></td>
+    <tr>
+    <? endif; ?>
+    <tr>
+      <th>Contact:</th><td><?= $reseller['Reseller']['contact'] ?></td>
+    <tr>
+    <tr>
+      <th>Address:</th><td><?= $reseller['Reseller']['raddress1'] ?></td>
+    <tr>
+      <? if(!empty($reseller['Reseller']['raddress2'])): ?>
+    <tr>
+      <th></th><td><?= $reseller['Reseller']['raddress2'] ?></td>
+    <tr>
+      <? endif; ?>
+    <tr>
+      <th>City:</th><td><?= $reseller['Reseller']['rcity'] ?></td>
+    <tr>
+    <tr>
+      <th>State:</th><td><?= $reseller['Reseller']['rstate'] ?></td>
+    <tr>
+    <tr>
+      <th>Zip:</th><td><?= $reseller['Reseller']['rzip'] ?></td>
+    <tr>
+    <? if(!empty($reseller['Reseller']['rphone'])): ?>
+    <tr>
+      <th>Phone:</th><td><?= $reseller['Reseller']['rphone'] ?></td>
+    <tr>
+    <? endif; ?> 
+    <? if(!empty($reseller['Reseller']['rfax'])): ?>
+    <tr>
+      <th>Fax:</th><td><?= $reseller['Reseller']['rfax'] ?></td>
+    <tr>
+    <? endif; ?>
+    <? if(!empty($reseller['Reseller']['remail'])): ?>
+    <tr>
+      <th>Email:</th>
+      <td>
+	<? foreach(explode(',', $reseller['Reseller']['remail']) as $email): ?> 
+	<?= $html->link($email, 'mailto:' . $email) ?>,
+	<? endforeach; ?>
+      </td>
+    <tr>
+    <? endif; ?>
+    <tr>
+      <th>Active:</th><td><?= $html->image($reseller['Reseller']['active'] ? 'check.gif' : 'cross.gif') ?></td>
+    </tr>
+    <tr>
+      <th>Agent:</th><td><?= $html->image($reseller['Reseller']['agent'] ? 'check.gif' : 'cross.gif') ?></td>
+    </tr>
+    <tr>
+      <th>Service Rate:</th><td><?= $service_rate['ServiceRate']['name'] ?></td>
+    </tr>
+    <tr>
+      <th>Report Type:</th><td><?= $reseller['Reseller']['reporttype'] ?></td>
+    </tr>    
+  </table>
+</div>

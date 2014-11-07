@@ -1,0 +1,183 @@
+<? if(!$is_ajax): ?> 
+<?= $javascript->link('jquery.util.js') ?>
+
+<?= $javascript->link('jquery.blockUI.js') ?>
+
+<?= $javascript->link('jquery.thickbox.js') ?>
+<?= $html->css('jquery.thickbox') ?>
+
+<style type="text/css">
+#requests_pane {
+   margin: auto;
+   padding-bottom: 20px;
+}
+
+span.current {
+  color: #FF9C2A;
+  font-weight: bold;
+}
+
+fieldset {
+  margin-bottom: 0;
+}
+
+#queue {
+  border: 1px solid #CCDDEE;
+  width: 100%;
+  margin-top: 1em;
+}
+
+#queue td,#queue th {
+  padding: 3px 5px;
+  border: 1px solid #CCDDEE;
+  font-size: x-small;
+}
+
+#queue tbody tr.even td {
+  background: #EFF7FF;
+}
+
+#queue td {
+  text-align: left;
+}
+
+#queue td.center {
+  text-align: center;
+}
+
+#RequestViewType, #RequestViewStatus {
+  width: 100%;
+}
+
+#queue tbody tr.other td {
+  background: #eee;
+  font-style: italic;
+  color: #666;
+}
+
+#queue tbody tr.other td a {
+  color: #555;
+}
+
+#queue tbody tr.alert td {
+  background: #FFDFDF;
+  color: #900;
+}
+
+#queue tbody tr.alert td a {
+  color: #900;
+}
+</style>
+<? endif; ?> 
+
+<? $pagination->setPaging($paging); ?>
+
+<div id="requests_pane">
+
+  <?= $this->renderElement('title', aa('title', 'Request Queue')) ?>
+
+  <form id="queue_filter">
+    <table id="queue">
+      <tr>
+	<th class="center"><?= $pagination->sortBy('id', 'ID') ?></th>
+	<th>
+	  <div class="center"><?= $pagination->sortBy('type') ?></div>
+	  <div><?= $html->selectTag('RequestView/type', $types) ?></div>
+	</th>
+	<th>
+	  <div class="center"><?= $pagination->sortBy('status') ?></div>
+	  <div><?= $html->selectTag('RequestView/status', $statuses) ?></div>
+	</th>
+	<th>
+	  <div><?= $pagination->sortBy('acctgrpid', 'Account Group ID') ?></div>
+	  <? if($session->check('ic_employee')): ?>
+	  <div><?= $html->checkbox('RequestView/other_resellers') ?> <label for="RequestViewOtherResellers">Include Resellers</label></div>
+          <? endif; ?>
+	</th>
+	<th><?= $pagination->sortBy('accountid', 'Account ID') ?></th>
+	<th><?= $pagination->sortBy('creator') ?></th>
+	<th class="center"><?= $pagination->sortBy('effective_date', 'Effective On') ?></th>
+	<th class="center"><?= $pagination->sortBy('created') ?></th>
+      </tr>
+      <? for($i=0; $i<count($requests); $i++): ?>
+
+	 <tr class="<?= $i%2 ? 'odd' : 'even' ?> <?= $session->check('ic_employee') && $requests[$i]['RequestView']['resellerid'] != IC_RESELLERID ? 'other' : '' ?> 
+            <?= ($requests[$i]['RequestView']['type'] == REQTYPE_ROOM_STATUS_CHANGE || $requests[$i]['RequestView']['type'] == REQTYPE_ACCOUNT_STATUS_CHANGE) ? 'alert' : '' ?>" >
+
+	   <td class="center">
+	     <?= $html->link($requests[$i]['RequestView']['id'], '/requests/view/' . $requests[$i]['RequestView']['id'] . '?width=800&height=600', 
+	          aa('class', 'thickbox', 'id', 'request_' . $requests[$i]['RequestView']['id'])) ?>
+	   </td>
+
+	   <td><?= $requests[$i]['RequestView']['type_name'] ?></td>
+	   <td><?= $requests[$i]['RequestView']['status_name'] ?></td>
+	   <td><?= $requests[$i]['RequestView']['acctgrpid'] ? $html->link($requests[$i]['RequestView']['acctgrpid'], '/accounts/view/' . $requests[$i]['RequestView']['acctgrpid']) : '&mdash;' ?></td>
+	   <td><?= $requests[$i]['RequestView']['accountid'] ? $html->link($requests[$i]['RequestView']['accountid'], '/rooms/view/' . $requests[$i]['RequestView']['accountid']) : '&mdash;' ?></td>
+	   <td><?= $html->link(shorten($requests[$i]['RequestView']['creator_name']), '/users/view/' .  $requests[$i]['RequestView']['creator']) ?></td>
+
+	   <td class="center">
+	     <?= !empty($requests[$i]['RequestView']['effective_date']) ? date('m/d/y', strtotime($requests[$i]['RequestView']['effective_date'])) : '&mdash;' ?>
+	   </td>
+	   <td class="center"><?= date('m/d/y', strtotime($requests[$i]['RequestView']['created'])) ?></td>
+	 </tr>
+	 <? endfor; ?>
+    </table>
+
+    <?= $this->renderElement('pagination') ?>
+
+  </form>
+</div>
+
+<? if(!$is_ajax): ?> 
+<script type="text/javascript">
+  function attach_events() {
+      $('#requests_pane table th a,.pagination_pages a,.pagination_num a').click( function() {
+	  update_queue(this.href);
+	  return false;
+      });
+      
+      $('#RequestViewType,#RequestViewStatus').change( function() {
+          update_queue('/requests');
+      });
+      
+      $('#RequestViewOtherResellers').click( function() {
+          update_queue('/requests');
+      });
+  }
+
+  function update_queue(url) {      
+      $.ajax({
+	  'type'      : 'POST', 
+	  'url'       : url,
+	  'data'      : $('#queue_filter').serialize(),
+	  'dataType'  : 'html',
+	  'global'    : false,
+	  'beforeSend': function(xhr) {
+	      $('#requests_pane').block();		
+	  },
+	  'complete'  : function(xhr, status) {
+	      $('#requests_pane').unblock();
+	  },
+	  'success'   : function(data, status) {
+	      $('#requests_pane').replaceWith(data);
+	      attach_events();
+	      tb_init('a.thickbox');
+	  },
+	  'error'     : function(xhr, status, err) {}
+      });
+  }
+</script>
+
+<script type="text/javascript">
+$(document).ready( function() {
+
+    attach_events();
+    
+    window.setTimeout(update_queue, 5 * 60 * 1000, '/requests');
+
+    <? if($id): ?>
+     $('#request_<?= $id ?>').click();
+    <? endif; ?>
+});
+</script>
+<? endif; ?>

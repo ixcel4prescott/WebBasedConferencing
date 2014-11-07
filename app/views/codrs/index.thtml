@@ -1,0 +1,114 @@
+<?= $html->css('ui.datepicker') ?>
+<?= $javascript->link('ui.datepicker.js') ?>
+
+<?
+  $menu_items = Array();
+  if(!empty($_GET['acctgrpid'])){
+    $menu_items[] = Array('text' => 'Back to '.$_GET['acctgrpid'],
+                          'icon' => 'previous.gif',
+                          'url'  => '/accounts/view/' . $_GET['acctgrpid']);
+  }
+  if(!empty($_GET['acctgrpid']) && !empty($_GET['startdate']) && $_GET['startdate'] === $_GET['enddate']){
+    $menu_items[] = Array('text' => 'View All CDR\'s for '.$_GET['startdate'],
+                          'icon' => 'arrow_divide.gif',
+                          'url'  => '/cdrs/index/?acctgrpid=' . $_GET['acctgrpid'].'&startdate='.$_GET['startdate'].'&enddate='.$_GET['enddate']);
+  }
+?>
+
+
+<style type="text/css">
+#accounts_pane {
+   margin: auto;
+   padding-bottom: 20px;
+   border: 1px solid #ccc;
+   padding: 10px 20px;
+}
+
+#codrs th, #codrs td {
+  padding: 3px 5px;
+  text-align: left;
+}
+
+tr.even td {
+  background: #EFF7FF;
+}
+#filters{
+    margin-bottom:15px;
+}
+#filters, #filters tr td {
+    border:none;
+}
+
+
+</style>
+
+<? $pagination->setPaging($paging) ?>
+
+<div id="accounts_pane">
+
+  <?= $this->renderElement('toolbar', Array('items' => $menu_items)) ?>
+
+  <h1>CODR Index</h1>
+  
+  <form method="get" style="margin-top: 1em; margin-bottom: 1em">
+
+    <table id="filters">
+        <tr>
+            <td><label for="account">Account:</label>
+                <input id="account" type="text" name="account" value="<?= $account ?>"/></td>
+            <td><label for="confirmation">Confirmation Number:</label>
+                <input id="confirmation" type="text" name="confirmation" value="<?= $confirmation ?>"/></td>
+        </tr>
+        <tr>
+            <td><label class="right" for="startdate" style="width: 50px">Date Range Start:</label>
+                <input type="text" id="startdate" name="startdate" value="<?= !empty($_GET['startdate'])?$_GET['startdate']:'' ?>" /></td>
+            <td><label class="right" for="enddate" style="width: 50px">Date Range End:</label>
+                <input type="text" id="enddate" name="enddate" value="<?= !empty($_GET['enddate'])?$_GET['enddate']:'' ?>" /></td>
+        </tr>
+    </table>
+
+    <button type="submit">
+        <?= $html->image('search.gif', aa('class', 'valign')) ?> Search
+    </button>
+    <p style="float: right;">
+        <a href="<?= '?'.http_build_query(Array('export' => 1, 'acctgrpid' => @$_GET['acctgrpid'], 'account' => @$_GET['account'], 'confirmation' => @$_GET['confirmation'], 'startdate' => @$_GET['startdate'], 'enddate' => @$_GET['enddate'],)) ?>">
+            <img src="/img/excel.gif">
+            <strong>Export to Excel</strong>
+        </a>
+    </p>
+  </form>
+
+  <table id="codrs" style="width: 100%; margin-top: 1em">
+    <tr>
+      <th><?= $pagination->sortBy('acctgrpid', 'Account') ?></th>
+      <th><?= $pagination->sortBy('accountid', 'Confirmation Number') ?></th>
+      <th><?= $pagination->sortBy('conference_name', 'Conferencing Name') ?></th>
+      <th><?= $pagination->sortBy('conference_start', 'Conference Start') ?></th>
+      <th><?= $pagination->sortBy('conference_end', 'Conference End') ?></th>
+      <th><?= $pagination->sortBy('billing_code', 'Billing Code') ?></th>
+      <th><?= $pagination->sortBy('id', 'Details') ?></th>
+    </tr>
+
+    <? for($i=0; $i<count($data); $i++): ?>
+       <tr class="<?= $i%2 ? 'odd' : 'even' ?>">
+       <td><?=$html->link($data[$i]['Codr']['acctgrpid'], "/codrs/index/?acctgrpid={$data[$i]['Codr']['acctgrpid']}") ?></td>
+       <td><?=$html->link($data[$i]['Codr']['accountid'], "/codrs/index/?accountid={$data[$i]['Codr']['accountid']}") ?></td>
+       <td><?= $data[$i]['Codr']['conference_name'] ?></td>
+       <td><?= $data[$i]['Codr']['conference_start'] ?></td>
+       <td><?= $data[$i]['Codr']['conference_end'] ?></td>
+       <td><?= $data[$i]['Codr']['billing_code'] ?></td>
+       <td style="text-align: center"><a href="/cdrs/index/?codr_id=<?= $data[$i]['Codr']['id'] ?>&acctgrpid=<?= $data[$i]['Codr']['acctgrpid']?>"><?= $html->image('arrow_divide.gif') ?></a></td>
+                                   
+    <? endfor; ?>
+    
+  </table>
+
+  <?= $this->renderElement('pagination') ?>
+
+</div>
+
+<script type="text/javascript">
+$(document).ready( function() {
+  $('#startdate,#enddate').datepicker();
+});
+</script>

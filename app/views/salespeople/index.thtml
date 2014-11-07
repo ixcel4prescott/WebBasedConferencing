@@ -1,0 +1,65 @@
+<style type="text/css">
+#salespeople_pane {
+   margin: auto;
+   padding-bottom: 20px;
+   border: 1px solid #ccc;
+   padding: 10px 20px;
+}
+
+#salespeople_pane th,#salespeople_pane td {
+  padding: 3px 5px;
+  text-align: left;
+}
+
+tr.even td {
+  background: #EFF7FF;
+}
+
+span.current {
+  color: #FF9C2A;
+  font-weight: bold;
+}
+</style>
+
+<? $pagination->setPaging($paging) ?>
+
+<div id="salespeople_pane">
+
+  <h1>Salespeople</h1>
+
+  <p class="smaller">
+    <?= $html->image('user_suit.gif', aa('class', 'valign')) ?> <a href="/salespeople/create">Create a Salesperson</a>
+  </p>
+
+  <form method="get" style="margin-top: 1em; margin-bottom: 1em">
+    <label for="query">Search:</label>
+    <input id="query" type="text" name="query" value="<?= $query ?>"/>
+    <button type="submit" id="submit">
+      <?= $html->image('search.gif', aa('class', 'valign')) ?> Search
+    </button>
+  </form>
+
+  <table style="width: 100%; margin-top: 1em">
+    <tr>
+      <th><?= $pagination->sortBy('name', 'Salesperson', 'Salesperson') ?></th>
+      <th><?= $pagination->sortBy('name', 'Reseller', 'Reseller') ?></th>
+      <th style="text-align:center">Edit</th>     
+    </tr>
+    
+    <? for($i=0; $i<count($data); $i++): ?>
+       <tr class="<?= $i%2 ? 'odd' : 'even' ?>">
+	 <td><?= $html->link($data[$i]['Salesperson']['name'], '/salespeople/view/' . $data[$i]['Salesperson']['salespid']) ?></td>
+	 <td>
+	   <? if($data[$i]['Reseller']['agent']): ?>
+	   <?= $html->link($data[$i]['Reseller']['rdesc'], '/resellers/view/' . $data[$i]['Reseller']['resellerid']) ?>
+	   <? else: ?>
+	   <?= $html->link($data[$i]['Reseller']['name'], '/resellers/view/' . $data[$i]['Reseller']['resellerid']) ?>
+	   <? endif; ?>
+	 </td>
+	 <td style="text-align:center"><a href="/salespeople/edit/<?= $data[$i]['Salesperson']['salespid'] ?>"><?= $html->image('edit.gif') ?></a></td>
+       </tr>
+    <? endfor; ?>
+  </table>
+
+  <?= $this->renderElement('pagination') ?>
+</div>

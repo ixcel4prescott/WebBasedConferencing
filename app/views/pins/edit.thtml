@@ -1,0 +1,49 @@
+<style type="text/css">
+#edit_pane {
+   margin: auto;
+   padding-bottom: 20px;
+   border: 1px solid #ccc;
+   padding: 10px 20px;
+}
+</style>
+
+<div id="edit_pane">
+
+  <?= $this->renderElement('title', aa('title', 'Edit PIN')) ?>
+
+  <form method="post">
+    
+    <?= $html->hidden('Pin/id') ?>
+    <?= $html->hidden('Pin/bridgeid') ?>
+    <?= $html->hidden('Pin/company') ?>
+    <?= $html->hidden('Pin/pin') ?>
+    <?= $html->hidden('Pin/external_id') ?>
+
+    <div class="input">
+      <label class="right required" for="PinFirstName">First Name:</label>
+      <?= $html->input('Pin/first_name') ?>
+      <?= $html->tagErrorMsg('Pin/first_name', 'Please enter a first name') ?>   
+    </div>
+
+    <div class="input">
+      <label class="right required" for="PinLastName">Last Name:</label>
+      <?= $html->input('Pin/last_name') ?>
+      <?= $html->tagErrorMsg('Pin/last_name', 'Please enter a last name') ?>   
+    </div>
+    
+    <div class="submit">
+      <button class="cancel" type="button">
+	<?= $html->image('cross.gif') ?> Cancel
+      </button>
+      <button class="submit" type="submit">
+	<?= $html->image('check.gif') ?> Update
+      </button>
+    </div>
+      
+  </form>
+</div>
+<script type="text/javascript">
+$(document).ready( function() {
+  $('button.cancel').back('/pins/index/<?= $acctgrpid ?>');
+});
+</script>

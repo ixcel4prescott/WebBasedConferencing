@@ -1,0 +1,99 @@
+<?
+if(isset($acctgrpid))
+  $menu_items = Array( Array( 'text' => 'Back to ' . $acctgrpid,  
+			      'icon' => 'previous.gif', 
+			      'url'  => '/accounts/view/' . $acctgrpid), 
+
+		       Array( 'text' => 'Create a new PIN', 
+			      'icon' => 'key.gif',
+			      'url'  => '/pins/create/' . $acctgrpid), 
+		       
+		       Array( 'text' => 'Import PINs', 
+			      'icon' => 'key_add.gif',
+			      'url'  => '/pins/import/' . $acctgrpid));
+?>
+
+<style type="text/css">
+#pins_pane {
+   margin: auto;
+   padding-bottom: 20px;
+   border: 1px solid #ccc;
+   padding: 10px 20px;
+}
+
+#pins_pane th,#pins_pane td {
+  padding: 3px 5px;
+  text-align: left;
+}
+
+#pins_pane tr.even td {
+  background: #EFF7FF;
+}
+
+span.current {
+  color: #FF9C2A;
+  font-weight: bold;
+}
+</style>
+
+<? $pagination->setPaging($paging) ?>
+
+<div id="pins_pane">
+
+  <? if(isset($acctgrpid)): ?>
+  <?= $this->renderElement('toolbar', Array('items' => $menu_items)) ?>
+
+  <?= $this->renderElement('title', aa('title', 'PINs for Account: ' . $acctgrpid, 'target', 'pin_index')) ?>
+  <? else: ?>
+  <?= $this->renderElement('title', aa('title', 'PINs Index', 'target', 'pin_index')) ?>
+  <? endif; ?>
+
+  <form method="get" style="margin-top: 1em; margin-bottom: 1em">
+      <label for="query">Search:</label>
+      <input id="query" type="text" name="query" value="<?= $query ?>"/>
+      <button type="submit" id="submit">
+	<?= $html->image('search.gif', aa('class', 'valign')) ?> Search
+      </button>
+  </form>
+  
+    <p style="float: right">
+    <a href="?<?= http_build_query(Array('export' => 1, 'query' => @$_GET['query'], 'active_only' => @$_GET['active_only'])) ?>">
+      <img src="/img/excel.gif">	
+      <strong>Export to Excel</strong>
+    </a>
+  </p>
+
+  <table style="width: 100%">
+    <tr>
+      <th><?= $pagination->sortBy('pin', 'PIN') ?></th>
+      <th><?= $pagination->sortBy('bridgeid', 'Bridge') ?></th>
+      <th><?= $pagination->sortBy('first_name', 'First Name') ?></th>
+      <th><?= $pagination->sortBy('last_name', 'Last Name') ?></th>
+
+      <? if(!isset($acctgrpid)): ?>
+      <th><?= $pagination->sortBy('company') ?></th>      
+      <? endif; ?>
+
+      <th style="text-align:center">Edit</th>
+      <th style="text-align:center">Delete</th>
+    </tr>
+    
+    <? for($i=0; $i<count($data); $i++): ?>
+       <tr class="<?= $i%2 ? 'odd' : 'even' ?>">
+         <td><?= $html->link($data[$i]['Pin']['pin'], '/pins/view/' . $data[$i]['Pin']['id']) ?></td>
+	 <td><?= $bridges[$data[$i]['Pin']['bridgeid']] ?></td>
+	 <td><?= $data[$i]['Pin']['first_name'] ?></td>
+	 <td><?= $data[$i]['Pin']['last_name'] ?></td>
+
+	 <? if(!isset($acctgrpid)): ?>
+	 <td><?= $data[$i]['Pin']['company'] ?></td>	 
+	 <? endif; ?>
+
+	 <td style="text-align:center"><a href="/pins/edit/<?= $data[$i]['Pin']['id']?>"><?= $html->image('edit.gif') ?></a></td>
+	 <td style="text-align:center"><a href="/pins/delete/<?= $data[$i]['Pin']['id']?>"><?= $html->image('cross.gif') ?></a></td>
+       </tr>
+    <? endfor; ?>
+  </table>
+
+  <?= $this->renderElement('pagination') ?>
+</div>

@@ -1,0 +1,200 @@
+<?= $html->css('ui.datepicker') ?>
+<?= $javascript->link('ui.datepicker.js') ?>
+
+<?= $javascript->link('jquery.spinner') ?>
+<?= $javascript->link('jquery.blockUI.js') ?>
+
+<?= $html->css('jquery.spinner') ?>
+
+<style type="text/css">
+#rate_pane {
+   margin: auto;
+}
+
+#rooms th,#rooms td {
+  padding: 3px 5px;
+}
+
+#rooms td {
+  text-align: left;
+}
+
+tr.even td {
+  background: #EFF7FF;
+}
+
+#rooms {
+  border-collapse: separate;
+  border: 1px solid #CCDDEE;
+}
+
+#rooms td, #rooms th {
+  border: 1px solid #CCDDEE;
+}
+
+#confirm_box {
+  padding: 1em;
+}
+
+#confirm_box button {
+  vertical-align: middle;
+  width: 10em;
+}
+
+#confirm_box button img {
+  vertical-align: middle;
+}
+</style>
+
+<div id="rate_pane">
+
+  <?= $this->renderElement('title', aa('title', 'Change Room Rates')) ?>
+
+  <p>
+    Confirm rooms that will have thier rate updated.  Then select the appropriate rate from the service rate drop-down box.  
+    You can filter the service rate options by entering a value for the individual rates.  If no such rate exists, a custom rate will be created.
+    You can also choose to update the default rate for the account group by checking <strong>Update Account Default Service Rate</strong>.
+  </p>
+
+  <form method="post" id="rate_form" style="margin-top: 1em">
+
+    <?= $html->hidden('Room/acctgrpid') ?>
+    <input type="hidden" name="data[Room][accountid][]" value=""/>
+
+    <div id="room_selector">
+
+      <fieldset>
+        <legend>Confirm Rooms</legend>
+
+	<table id="rooms" style="margin-top: 1em; width: 100%">
+	  <thead>
+	    <tr>
+	      <th class="small center"><a href="" id="all">All</a><br/><a href="" id="none">None</a></th>
+	      <th>Confirmation #</th>
+	      <th>Contact</th>
+	      <th>CEC</th>
+	      <th>Rate</th>
+	    </tr>
+	  </thead>
+	  <tbody>
+	  <? for($i=0; $i<count($account['Room']); $i++): ?>
+	     <tr class="<?= $i%2 ? 'odd' : 'even' ?>">
+	       <td style="text-align:center"><input type="checkbox" name="data[Room][accountid][]" value="<?= $account['Room'][$i]['accountid'] ?>" 
+					 <?= in_array($account['Room'][$i]['accountid'], $this->data['Room']['accountid']) ? 'checked="checked"' : '' ?>/></td>
+	       <td><?= $account['Room'][$i]['accountid'] ?>&nbsp;</td>
+	       <td><?= $account['Room'][$i]['contact']  ?>&nbsp;</td>
+	       <td><?= $account['Room'][$i]['cec'] ?>&nbsp;</td>
+	       <td><?= isset($service_rates[$account['Room'][$i]['servicerate']]) ? $service_rates[$account['Room'][$i]['servicerate']] : '<span class="italic">Unknown</span>'?></td>
+	     </tr>   
+	   <? endfor; ?>
+	   </tbody>
+	</table>        
+      </fieldset>
+
+    </div>
+
+    <div id="rate_selector">
+
+      <fieldset>
+        <legend>Select a Rate</legend>
+
+	<?= $this->renderElement('service_rates', aa('mode', 'room', 'id', 'RoomServicerate', 'name', 'Room/servicerate', 'initial_ajax', true)) ?>
+
+	<div class="checkbox" style="margin-bottom:2em">
+	   <label class="right" for="AccountDefaultServicerate">Update Account Default Service Rate:</label>
+	   <?= $html->checkbox('Account/new_default_servicerate') ?>
+	</div>
+
+	<div class="input">
+          <label class="right" for="RoomCanada">Canadian Rate:</label>
+          <?= $html->input('Room/canada', aa('class', 'spinner')) ?>
+          <?= $html->tagErrorMsg('Room/canada', 'Please select a Canadian rate') ?>
+	</div>
+
+	<div class="checkbox" style="margin-bottom:2em">
+	   <label class="right" for="AccountDefaultCanada">Update Account Default Canadian Rate:</label>
+	   <?= $html->checkbox('Account/new_default_canada') ?>
+	</div>
+
+	<div class="input">
+	  <label class="right required" for="RoomEffectiveDate">Effective Date:</label>
+	  <?= $html->input('Room/effective_date') ?>
+	  <?= $html->tagErrorMsg('Room/effective_date', 'Please specify a date this rate change becomes effective') ?>   
+	</div>
+
+	<div class="submit">
+	  <button class="cancel" type="button">
+	    <?= $html->image('cross.gif') ?> Cancel
+	  </button>
+	  <button class="submit" type="button" id="pseudo_submit">
+	    <?= $html->image('check.gif') ?> Update
+	  </button>
+	</div>
+
+    </div>
+  </form>
+</div>
+
+<div id="confirm_box" style="display:none">
+  <h1>Do you also want to set the account's default rate to this rate?</h1>
+
+  <div class="center" style="padding:2em 0">
+    <button id="confirm_cancel">
+      <?= $html->image('cross.gif') ?> Cancel
+    </button>
+    <button class="confirm" name="yes">
+      <?= $html->image('approve.gif') ?> Yes
+    </button>
+    <button class="confirm" name="no">
+      <?= $html->image('disapprove.gif') ?> No
+    </button>
+  </div>
+
+</div>
+
+<script type="text/javascript">
+$(document).ready( function() {
+
+  $('button.cancel').back('/accounts/view/<?= $account['Account']['acctgrpid'] ?>');
+
+  $('#all').click( function() {
+   $('#rooms :checkbox').attr('checked', 'checked');
+   return false; 
+  });
+
+  $('#none').click( function() {
+   $('#rooms :checkbox').attr('checked', '');
+   return false; 
+  });
+
+  $('#RoomCanada').spinner();
+
+  $('button.confirm').click(function() {
+
+    var checked = '';
+    if(this.name == 'yes')
+      checked = 'checked';
+
+    $('#AccountNewDefaultServicerate').attr('checked', checked); 
+
+    $('#rate_form').submit();
+  });
+
+  $('#confirm_cancel').click( function() {
+    $.unblockUI();
+  });
+ 
+  $('#pseudo_submit').click(function() {
+    if(!$('#AccountNewDefaultServicerate').attr('checked'))
+      $.blockUI({ message: $('#confirm_box'), 
+                  css: { width: '60%', 
+                         left:  '20%' }});
+    else 
+      $('#rate_form').submit();
+
+  });
+
+  $('#RoomEffectiveDate').datepicker();
+
+});
+</script>

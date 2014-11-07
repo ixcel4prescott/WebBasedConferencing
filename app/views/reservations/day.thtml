@@ -1,0 +1,87 @@
+<? 
+$hours = Array('00', '01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', '23');
+
+function highlight($lines)
+{
+  if($lines>100)
+    $rv = 'high';
+  elseif($lines>50)
+    $rv = 'medium';
+  else
+    $rv = '';
+  
+  return $rv;
+}
+
+function clean_topic($topic, $max_len=80) 
+{
+   return strlen($topic)>$max_len ? substr($topic, 0, $max_len) . '...' : $topic;
+}
+?>
+
+<style type="text/css">
+#schedule {
+  width: 100%;
+}
+
+#schedule th {
+  
+}
+
+#schedule td {
+  text-align: left;
+  white-space: normal;
+}
+
+#schedule .time {
+  text-align: right;
+}
+
+#schedule .top_of_hour td {
+  background: #eee;
+}
+
+#schedule tr.high td {
+  background: #FFDFDF;
+}
+
+#schedule tr.medium td {
+  background: #FFECBF;
+}
+</style>
+
+<table id="schedule">
+  <tr>
+    <th>Time</th>
+    <th>Company</th>
+    <th>Topic</th>
+    <th>Operator</th>
+    <th>Role</th>
+    <th>Lines</th>
+  </tr>
+
+  <? foreach($hours as $hour): ?>
+  <tr class="top_of_hour">
+    <td class="bold time"><?= date('ga', strtotime($hour.':00')) ?></td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+  </tr>
+
+  <? if(isset($reservations[$hour])): ?>
+  <? foreach($reservations[$hour] as $r): ?>
+  <tr class="<?= $hour%2 ? 'odd' : 'even' ?> <?= highlight($r['LinesReserved']) ?>">
+    <td class="time"><?= date('i', strtotime($r['fConferenceTime'])) ?></td>
+    <td><?= $html->link($r['CompanyName'], '/accounts/view/' . $r['AccountNumber']) ?></td>
+    <td><?= $html->link(clean_topic($r['Topic']), '/reservations/view/' . $r['ReservationID']) ?></td>
+    <td><?= $r['OperatorName'] ?></td>
+    <td><?= $r['Role'] ?></td>
+    <td><?= $r['LinesReserved'] ?></td>
+  </tr>
+  <? endforeach; ?>
+  <? endif; ?>
+
+  <? endforeach; ?>
+</table>

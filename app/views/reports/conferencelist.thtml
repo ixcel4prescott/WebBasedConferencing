@@ -1,0 +1,120 @@
+<?
+function color_weekday($date)
+{
+   $day_num = date('N', strtotime($date));
+ 
+   if($day_num > 5)
+     $rv = 'weekend';
+   elseif($day_num == 2 || $day_num == 4) 
+     $rv = 'even';
+   else
+     $rv = 'odd';
+
+   return $rv;
+}
+?>
+
+<style type="text/css">
+#report {
+  margin: 1em auto; 
+  width: 100%;
+}
+
+#report th,#report td {
+  padding: 3px 5px;
+  text-align: right;
+  font-size: xx-small;
+}
+
+tr.odd td {
+  background: #def;
+}
+
+.highlight {
+  color: #d22;
+}
+
+.weekend {
+  background: #eee;
+  color: #bbb;
+}
+</style>
+
+<?php
+	$monthname = date('F',strtotime("$myYear-$myMonth-01"));
+?>
+
+<h1>Conference Listing Report</h1>
+
+<div id="breadcrumbs" style="margin-bottom:10px; font-size:10pt">
+  <?= $html->link('Home', "/reports/usage") ?> &raquo; <?= $html->link($myYear, "/reports/usage/$myYear") ?> &raquo; <?= $html->link($monthname, "/reports/usage/$myYear/$myMonth") ?> &raquo; <?= $html->link($myDay, "/reports/usage/$myYear/$myMonth/$myDay") ?> &raquo; <?= $html->link($myAccount, "/accounts/view/$myAccount/$myYear/$myMonth"); ?>
+</div>
+
+<p style="float: right">
+  <a href="<?= '?'.http_build_query(Array('export' => 1, 'query' => @$_GET['query'])) ?>">
+    <img src="/img/excel.gif">	
+    <strong>Export to Excel</strong>
+  </a>
+</p>
+
+<table id="report">
+  <tr>
+    <th>Confirm Num</th>
+    <th>Calltype</th>
+    <th>DNIS</th>
+    <th>Conflegs</th>
+    <th>Billing Code</th>
+    <th>ANI</th>
+    <th>Username</th>
+    <th>Entry Time</th>
+    <th>Minutes</th>
+    <th>PPM</th>
+    <th>Cost</th>
+  </tr>
+
+  <? 
+     $minutes = 0;
+     $cost = 0;
+     $last_confid = 0;
+     $odd = false;
+  ?>
+
+  <? for($i=0; $i<count($dates); $i++): ?>
+     <?
+	if($last_confid != $dates[$i][0]['confid'] && $last_confid>0)
+          $odd = !$odd;
+
+	$last_confid = $dates[$i][0]['confid'];
+	$minutes += $dates[$i][0]['minutes'];
+	$cost += $dates[$i][0]['callcost'];
+     ?>
+  <tr class="<?= $odd ? 'odd' : 'even' ?>">
+    <td><?= $html->link($dates[$i][0]['accountid'], '/rooms/view/' . $dates[$i][0]['accountid']) ?></td>
+    <td><?= $dates[$i][0]['calltype_text'] ?></td>
+    <td><?= $dates[$i][0]['dnis'] ?></td>
+    <td><?= $dates[$i][0]['conflegs'] ?></td>
+    <td><?= $dates[$i][0]['billingcode'] ?></td>
+    <td><?= $dates[$i][0]['ani'] ?></td>
+    <td><?= $dates[$i][0]['username'] ?></td>
+    <td><?= date('H:i', strtotime($dates[$i][0]['starttime'])) ?></td>
+    <td><?= $dates[$i][0]['minutes'] ?></td>
+    <td>$<?= $dates[$i][0]['ppm'] ?></td>
+    <td>$<?= $dates[$i][0]['callcost'] ?></td>
+  </tr>
+  <? endfor; ?>
+</table>
+
+<table style="margin-top: 1em">
+  <tr>
+    <th class="left">Company</th>
+    <th>Total Minutes</th>
+    <th>Total Cost</th>
+    <th>Avg PPM</th>
+  </tr>
+  <tr style="background:#def">
+    <td class="left"><?= $myAccount ?></td>
+    <td><?= $minutes ?></td>
+    <td>$<?= number_format($cost,2,'.',',') ?></td>
+    <td><?= $minutes>0 ? round($cost/$minutes,3) : 0?></td>
+  </tr>
+</table>

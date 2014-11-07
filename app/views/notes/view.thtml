@@ -1,0 +1,34 @@
+<style type="text/css">
+#note_pane {
+   margin: auto;
+   border: 1px solid #ccc;
+}
+
+.header {
+  background: #eee;
+  padding: 5px 20px;
+}
+
+.details {
+  font-size: smaller;
+  font-style: italic;
+}
+
+.body {
+   padding: 10px 20px;
+}
+</style>
+
+<div id="note_pane">
+  <div class="header">
+    <h1>Note for <?= $note['Note']['entity'] ?> <?= $note['Note']['object_id'] ?>: <?= $note['Note']['title'] ?></h1>
+
+    <div class="details">
+      <?= $time->niceShort($note['Note']['created']) ?> by <?= $note['User']['name'] ?>
+    </div>
+  </div>
+
+  <div class="body">
+    <?= $note['Note']['body'] ?>
+  </div>
+</div>

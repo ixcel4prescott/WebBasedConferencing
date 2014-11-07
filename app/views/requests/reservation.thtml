@@ -1,0 +1,166 @@
+<h2 style="margin-top: 1em">Conference Details</h2>
+
+<table>
+  <tr>
+    <th>Company:</th>
+    <td><?= $reservation['company'] ?></td>
+  </tr>
+  <tr>
+    <th>Contact:</th>
+    <td><?= $reservation['contact'] ?></td>
+  </tr>
+  <tr>
+    <th>Phone:</th>
+    <td><?= $reservation['phone'] ?></td>
+  </tr>
+  <tr>
+    <th>Email:</th>
+    <td><?= $reservation['email'] ?></td>
+  </tr>
+  <tr>
+    <th>Chairperson(s):</th>
+    <td><?= $reservation['chairpersons'] ?></td>
+  </tr>
+  <tr>
+    <th>Topic:</th>
+    <td><?= $reservation['topic'] ?></td>
+  </tr>
+  <th></th>
+  <tr>
+    <th>Conference Date:</th>
+    <td><?= $reservation['date'] ?></td>
+  </tr>
+  <tr>
+    <th>Conference Time:</th>
+    <td><?= $reservation['time'] ?></td>
+  </tr>
+  <tr>
+    <th>Lines Reserved:</th>
+    <td><?= $reservation['lines'] ?></td>
+  </tr>
+  <tr>
+    <th>Conference Type:</th>
+    <td>
+      <? if($reservation['event_type'] == 'op_assist_in'): ?>
+      Attendee Dial-In (operator greeting)
+      <? elseif($reservation['event_type'] == 'op_assist_out'): ?>
+      Attendee Dial-Out
+      <? elseif($reservation['event_type'] == 'automated'): ?>
+      Automated
+      <? endif; ?>
+    </td>
+  </tr>
+</table>
+
+<h2 style="margin-top: 1em">Conference Features</h2>
+<table>
+  <tr>
+    <th>Presentation Mode:</th>
+    <td><?= !empty($reservation['presentation']) ? 'Yes' : 'No' ?></td>
+  </tr>
+  <tr>
+    <th>Operator Monitoring:</th>
+    <td><?= !empty($reservation['op_monitoring']) ? 'Yes' : 'No' ?></td>
+  </tr>
+  <tr>
+    <th>Question & Answer:</th>
+    <td><?= !empty($reservation['q_and_a']) ? 'Yes' : 'No' ?></td>
+  </tr>
+  <tr>
+    <th>Roll Call:</th>
+    <td><?= !empty($reservation['roll_call']) ? 'Yes' : 'No' ?></td>
+  </tr>
+  <tr>
+    <th>Communications Lines:</th>
+    <td><?= !empty($reservation['communications']) ? 'Yes' : 'No' ?></td>
+  </tr>
+  <tr>
+    <th>Password Protection:</th>
+    <td><?= !empty($reservation['password_protect']) ? 'Yes' : 'No' ?></td>
+  </tr>
+  <tr>
+    <th>Polling:</th>
+    <td><?= !empty($reservation['polling']) ? 'Yes' : 'No' ?></td>
+  </tr>
+  <tr>
+    <th>Sub-Conferencing:</th>
+    <td><?= !empty($reservation['sub_conferencing']) ? 'Yes' : 'No' ?></td>
+  </tr>
+  <tr>
+    <th>Conference Security:</th>
+    <td><?= !empty($reservation['lock']) ? 'Yes' : 'No' ?></td>
+  </tr>
+  <tr>
+    <th>Entry/Exit Tones:</th>
+    <td><?= !empty($reservation['tones']) ? 'Yes' : 'No' ?></td>
+  </tr>
+  <tr>
+    <th>Music-on-Hold:</th>
+    <td><?= !empty($reservation['music']) ? 'Yes' : 'No' ?></td>
+  </tr>
+</table>
+
+<h2 style="margin-top: 1em">Enchanced Services</h2>
+<table>
+  <tr>
+    <th>Live Call Particiaption Report:</th>
+    <td><?= !empty($reservation['live_report']) ? 'Yes' : 'No' ?></td>
+  </tr>
+  <tr>
+    <th>Transcription:</th>
+    <td><?= !empty($reservation['transcription']) ? 'Yes' : 'No' ?></td>
+  </tr>
+  <tr>
+    <th>Downloadable Audio Recording:</th>
+    <td><?= !empty($reservation['wav_file']) ? 'Yes' : 'No' ?></td>
+  </tr>
+  <tr>
+    <th>Digital Replay Participation Report:</th>
+    <td><?= !empty($reservation['digital_report']) ? 'Yes' : 'No' ?></td>
+  </tr>
+  <tr>
+    <th>Web Recording:</th>
+    <td><?= !empty($reservation['web_recording']) ? 'Yes' : 'No' ?></td>
+  </tr>
+  <tr>
+    <th>CD or Tape:</th>
+    <td><?= !empty($reservation['cd']) ? 'Yes' : 'No' ?></td>
+  </tr>
+  <tr>
+    <th>Audio Stream:</th>
+    <td><?= !empty($reservation['streaming']) ? 'Yes' : 'No' ?></td>
+  </tr>
+  <tr>
+    <th>Digital Replay:</th>
+    <td><?= !empty($reservation['digital_replay']) ? 'Yes' : 'No' ?></td>
+  </tr>
+</table>
+
+<? if($participants): ?>
+<h2 style="margin-top: 1em">Participants</h2>
+
+<table>
+  <tr>
+    <th>Name</th>
+    <th>Telephone Number</th>
+    <th>Alternate Number</th>
+  </tr>
+
+  <? foreach($participants as $p): ?>
+    <? if(!empty($p['name']) || !empty($p['phone']) || !empty($p['alt_phone'])): ?>
+    <tr>
+      <td><?= $p['name'] ?></td>
+      <td><?= $p['phone'] ?></td>
+      <td><?= $p['alt_phone'] ?></td>
+    </tr>
+    <? endif; ?>
+  <? endforeach; ?>
+
+</table>
+<? endif; ?>
+
+<? if($reservation['comments']): ?>
+<h2 style="margin-top: 1em">Comments</h2>
+
+<pre><?= $reservation['comments'] ?></pre>
+<? endif; ?>

@@ -1,0 +1,23 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
+Project("{A0786B88-2ADB-4C21-ABE8-AA2D79766269}") = "MyCA", "MyCA.phpproj", "{23E2B339-A535-4E17-B1FB-89852041A643}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Local|PHP 5.2 = Local|PHP 5.2
+		Production|PHP 5.2 = Production|PHP 5.2
+		Staging|PHP 5.2 = Staging|PHP 5.2
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{23E2B339-A535-4E17-B1FB-89852041A643}.Local|PHP 5.2.ActiveCfg = Local|PHP 5.2
+		{23E2B339-A535-4E17-B1FB-89852041A643}.Local|PHP 5.2.Deploy.0 = Local|PHP 5.2
+		{23E2B339-A535-4E17-B1FB-89852041A643}.Production|PHP 5.2.ActiveCfg = Production|PHP 5.2
+		{23E2B339-A535-4E17-B1FB-89852041A643}.Production|PHP 5.2.Deploy.0 = Production|PHP 5.2
+		{23E2B339-A535-4E17-B1FB-89852041A643}.Staging|PHP 5.2.ActiveCfg = Staging|PHP 5.2
+		{23E2B339-A535-4E17-B1FB-89852041A643}.Staging|PHP 5.2.Deploy.0 = Staging|PHP 5.2
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

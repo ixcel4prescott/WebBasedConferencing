@@ -1,0 +1,75 @@
+<style type="text/css">
+#others {
+  border-collapse: separate;
+  border: 1px solid #CCDDEE;
+}
+
+#others td, #others th {
+  border: 1px solid #CCDDEE;
+}
+
+#others td {
+  text-align: left;
+}
+
+#others th {
+  text-align: center;
+}
+
+</style>
+
+<div style="margin-top: 1em">
+  <? if($room): ?>
+  <strong><?= $html->link($room['RoomView']['company'], '/accounts/view/' .  $room['RoomView']['acctgrpid']) ?>(<?= $html->link($room['RoomView']['acctgrpid'], '/accounts/view/' .  $room['RoomView']['acctgrpid']) ?>)</strong> 
+  requested a rate change for room <strong><?= $html->link($room['RoomView']['contact'], '/rooms/view/' . $room['RoomView']['accountid'] ) ?>(<?= $html->link($room['RoomView']['accountid'], '/rooms/view/' . $room['RoomView']['accountid'] ) ?>)</strong> to:
+  <? else: ?>
+
+  <strong><?= $html->link($request['Account']['bcompany'], '/accounts/view/' . $request['Account']['acctgrpid']) ?>(<?= $request['Account']['acctgrpid'] ?>)</strong> requested to change their default rate to:
+
+  <? endif; ?>
+</div>
+
+<style type="text/css">
+.servicerate td, .others td {
+  padding: 3px 5px;
+}
+</style>
+
+<h2 style="margin-top: 1em; margin-bottom: 0.25em"><?= $servicerate['ServiceRate']['name'] ?></h2>
+<table class="servicerate">
+  <tr>
+    <th class="right">Reservationless:</th>
+    <td>$<?= $servicerate['ServiceRate']['rsvless'] ?></td>
+  </tr>
+  <tr>
+    <th class="right">Reservationless Toll:</th>
+    <td>$<?= $servicerate['ServiceRate']['rsvlesstoll'] ?></td>
+  </tr>
+  <tr>
+    <th class="right">Operator Assisted</th>
+    <td>$<?= $servicerate['ServiceRate']['meetmetollfree'] ?></td>
+  </tr>
+  <tr>
+    <th class="right">Operator Assisted Toll:</th>
+    <td>$<?= $servicerate['ServiceRate']['meetmetoll'] ?></td>
+  </tr>
+  <tr>
+    <th class="right">Event:</th>
+    <td>$<?= $servicerate['ServiceRate']['eventmeetme'] ?></td>
+  </tr>
+  <tr>
+    <th class="right">Event Toll:</th>
+    <td>$<?= $servicerate['ServiceRate']['eventmeetmetoll'] ?></td>
+  </tr>
+  <? if($servicerate['ServiceRate']['webinterpointflat']): ?>
+  <tr>
+    <th class="right">WebInterpoint Flat:</th>
+    <td>$<?= $servicerate['ServiceRate']['webinterpointflat'] ?></td>
+  </tr>
+  <? else: ?>
+  <tr>
+    <th class="right">WebInterpoint:</th>
+    <td>$<?= $servicerate['ServiceRate']['webinterpointppm'] ?></td>
+  </tr>
+  <? endif; ?>
+</table>

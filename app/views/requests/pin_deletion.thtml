@@ -1,0 +1,32 @@
+<style type="text/css">
+  #pin {
+    margin-top: 1em;
+  } 
+
+  #pin th {
+    text-align: right;
+  }
+
+  #pin td {
+    text-align: left;
+  }
+</style>
+
+<table id="pin">
+  <tr>
+    <th>Bridge:</th>
+    <td><?= $bridges[$pin['Pin']['bridgeid']] ?></td>
+  </tr>
+  <tr>
+    <th>PIN:</th>
+    <td><?= $pin['Pin']['pin'] ?></td>
+  </tr>
+  <tr>
+    <th>Name:</th>
+    <td><?= $pin['Pin']['first_name'] ?> <?= $pin['Pin']['last_name'] ?></td>
+  </tr>
+  <tr>
+    <th>Company:</th>
+    <td><?= $pin['Pin']['company'] ?></td>
+  </tr>
+</table>

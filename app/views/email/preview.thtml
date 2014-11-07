@@ -1,0 +1,79 @@
+<?= $javascript->link('jquery.scrollabletable.js') ?>
+<?= $javascript->link('jquery.thickbox.js') ?>
+<?= $html->css('jquery.thickbox') ?>
+
+<style type="text/css">
+#preview_pane {
+   margin: auto;
+}
+
+#rooms th,#rooms td {
+  padding: 3px 5px;
+}
+
+#rooms td, #results td {
+  text-align: left;
+}
+
+#results th {
+    text-align: center;
+}
+
+tr.even td {
+  background: #EFF7FF;
+}
+
+#rooms {
+  border-collapse: separate;
+  border: 1px solid #CCDDEE;
+}
+
+#rooms td, #rooms th {
+  border: 1px solid #CCDDEE;
+}
+</style>
+
+<div id="preview_pane">
+  <?= $this->renderElement('title', aa('title', 'Preview Emails')) ?>
+
+  <p>Click on the room's confirmation number to preview the email before being sent.</p>
+
+  <table id="rooms" style="margin-top: 1em; width: 100%">	  
+    <thead>
+      <tr>
+	<th>Confirmation #</th>
+	<th>Contact</th>
+	<th>CEC</th>
+      </tr>
+    </thead>
+    <tbody>	    
+      <? for($i=0; $i<count($rooms); $i++): ?>
+	 <tr class="<?= $i%2 ? 'odd' : 'even' ?>">
+	   <td><a class="thickbox" href="/email/view/<?= $token ?>/<?= $rooms[$i]['RoomView']['accountid'] ?>?TB_iframe=true&width=800&height=600"><?= $rooms[$i]['RoomView']['accountid'] ?></a></td>
+	   <td><?= $rooms[$i]['RoomView']['contact']  ?></td>
+	   <td><?= $rooms[$i]['RoomView']['cec']  ?></td>
+         </tr>   
+       <? endfor; ?>
+      </tbody>
+    </table>        
+
+  <div class="submit">
+    <form method="post">
+      <input type="hidden" name="data[WelcomeEmail][go]" value="1"/>
+
+      <button class="cancel"  type="button">
+	<?= $html->image('cross.gif') ?> Cancel
+      </button>
+      <button class="submit" type="submit">
+	Next <?= $html->image('next.gif') ?>
+      </button>
+    </form>
+  </div>
+
+</div>
+
+<script type="text/javascript">
+$(document).ready( function() {
+    $('button.cancel').back('/accounts/view/<?= $account['Account']['acctgrpid'] ?>');
+});
+</script>

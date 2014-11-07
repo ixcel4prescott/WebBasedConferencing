@@ -1,0 +1,158 @@
+<? 
+   $data = json_decode($diff['DiffLog']['diff'], true);
+   $old = $data['old'];
+   $new = $data['new'];
+   
+   $keys = array_keys(array_merge($old, $new));
+   sort($keys);
+?>
+
+<style type="text/css">
+#audit_pane {
+   margin: auto;
+   padding-bottom: 20px;
+   border: 1px solid #ccc;
+   padding: 10px 20px;
+}
+
+#audit_header {
+}
+
+#audit_header th {
+  text-align: right;
+}
+
+th,td {
+  padding: 3px 5px;
+  text-align: left;
+}
+
+tr.even td {
+  background: #EFF7FF;
+}
+
+td.new, td.old {
+  width: 40em;
+}
+
+td.new {
+  border-left: 1px dashed #CCDDEE;
+}
+
+#diffs {
+}
+
+#others {
+}
+</style>
+
+<div id="audit_pane">
+  <h1>Audit Log for <?= $diff['DiffLog']['entity'] ?> ID: <?= $diff['DiffLog']['object_id'] ?></h1>
+
+  <table id="audit_header">
+    <tr>
+      <th>Entity:</th>
+      <td><?= $diff['DiffLog']['entity'] ?></td>
+    </tr>
+    <tr>
+      <th>Object ID:</th>
+      <td><?= $diff['DiffLog']['object_id'] ?></td>
+    </tr>  
+    <tr>
+      <th>Operation:</th>
+      <td><?= $op_map[$diff['DiffLog']['op']] ?></td>
+    </tr>
+    <tr>
+      <th>User:</th>
+      <td><?= $html->link($diff['User']['name'], '/users/view/' . $diff['User']['id']) ?></td>
+    </tr>
+    <tr>
+      <th>Host:</th>
+      <td><?= $diff['DiffLog']['host'] ?></td>
+    </tr>
+    <tr>
+      <th>Client IP Address:</th>
+      <td><?= $diff['DiffLog']['ip_addr'] ?></td>
+    </tr>
+    <tr>
+      <th>Created:</th>
+      <td><?= $time->nice($diff['DiffLog']['created']) ?></td>
+    </tr>  
+  </table>
+
+  <h1>Record Difference</h1>
+  <table id="diffs">
+    <tr>
+      <th></th>
+      <th class="center">Old</th>
+      <th class="center">New</th>
+    </tr>
+
+    <? foreach($keys as $k): ?>
+    <tr>
+      <th class="right"><?= $k ?></th>
+      <td class="old"><?= isset($old[$k]) ? $old[$k] : '&mdash;'  ?></td>
+      <td class="new"><?= isset($new[$k]) ? $new[$k] : '&mdash;' ?></td>
+    </tr>
+    <? endforeach; ?>
+    <tfoot>
+      <tr>
+	<th colspan="3">
+
+	  <? if($prev): ?>
+	  <a href="/audit/view/<?= $prev['DiffLog']['entity'] ?>/<?= $prev['DiffLog']['object_id'] ?>/<?= $prev['DiffLog']['id'] ?>" style="float:left">&laquo; Previous</a>
+	  <? endif; ?>
+
+
+	  <? if($next): ?>
+	  <a href="/audit/view/<?= $next['DiffLog']['entity'] ?>/<?= $next['DiffLog']['object_id'] ?>/<?= $next['DiffLog']['id'] ?>" style="float:right">Next &raquo;</a>
+	  <? endif; ?>
+
+	  <? if($diff['DiffLog']['op'] == DIFFLOG_OP_UPDATE): ?>
+	  <form id="rollback_form" method="post" class="center" action="/audit/rollback">
+	    <?= $html->hidden('DiffLog/id', aa('value', $diff['DiffLog']['id'])) ?> 
+	    <button type="submit">
+	      <?= $html->image('rollback.gif') ?> Rollback
+	    </button>
+	  </form>
+	  <? endif; ?>
+
+	</th>
+      </tr>
+    </tfoot>
+  </table>
+
+  <h1 style="margin-top:1em">Other Modifications of this Object</h1>
+  <table id="others">
+    <tr>
+      <th>Date</th>
+      <th>Owner</th>
+    </tr>
+
+    <? foreach($others as $o): ?>
+    <tr>
+      <td>
+	<a href="/audit/view/<?= $o['DiffLog']['entity'] ?>/<?= $o['DiffLog']['object_id'] ?>/<?= $o['DiffLog']['id'] ?>"><?= $time->nice($o['DiffLog']['created'] )?></a>
+      </td>
+      <td>
+	<?= $html->link($o['User']['name'], '/users/view/' . $o['User']['id']) ?>
+      </td>
+    </tr>
+    <? endforeach; ?>
+  </table>
+
+  <p style="margin-top: 1em">
+    <?= $html->link('&laquo; Back', '/audit', aa('id', 'back'), null, false)  ?>
+  </p>
+</div>
+
+<script type="text/javascript">
+$(document).ready( function() {
+  $('#back').back(document.referrer);
+
+  $('#rollback_form').submit( function() {
+    return window.confirm('Are you sure you want to roll back this record?');
+  });
+
+});
+</script>

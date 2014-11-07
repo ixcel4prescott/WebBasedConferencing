@@ -1,0 +1,199 @@
+<?= $html->css('ui.datepicker') ?>
+<?= $javascript->link('ui.datepicker.js') ?>
+
+<?= $javascript->link('jquery.spinner') ?>
+<?= $html->css('jquery.spinner') ?>
+
+<style type="text/css">
+#move_pane {
+   margin: auto;
+}
+
+#rooms th,#rooms td {
+  padding: 3px 5px;
+}
+
+#rooms td, #results td {
+  text-align: left;
+}
+
+#results th {
+    text-align: center;
+}
+
+tr.even td {
+  background: #EFF7FF;
+}
+
+#rooms {
+  border-collapse: separate;
+  border: 1px solid #CCDDEE;
+}
+
+#rooms td, #rooms th {
+  border: 1px solid #CCDDEE;
+}
+
+#results {
+    margin-left: 215px;
+    margin-bottom: 1em;
+}
+</style>
+
+<div id="move_pane">
+
+  <?= $this->renderElement('title', aa('title', 'Move Rooms to a New Account')) ?>
+
+  <p>
+    Confirm rooms to be moved.  Then using the <strong>Search Accounts</strong> button search for the destination account number.  
+    The moved rooms will default to the destination account's default service rate unless otherwise specified.
+  </p>
+
+  <form method="post" style="margin-top: 1em">
+    <?= $html->hidden('Account/src', aa('value', $account['Account']['acctgrpid'])) ?>
+    <?= $html->hidden('Page/state') ?>
+
+    <input type="hidden" name="data[Room][accountid][]" value=""/>
+
+    <div id="room_selector">
+
+      <fieldset>
+        <legend>Confirm Rooms</legend>
+
+	<table id="rooms" style="margin-top: 1em; width: 100%">
+	  <thead>
+	    <tr>
+	      <th class="small center"><a href="" id="all">All</a><br/><a href="" id="none">None</a></th>
+	      <th>Confirmation #</th>
+	      <th>Contact</th>
+	      <th>CEC</th>
+	    </tr>
+	  </thead>
+	  <tbody>
+	  <? for($i=0; $i<count($account['Room']); $i++): ?>
+	     <tr class="<?= $i%2 ? 'odd' : 'even' ?>">
+	       <td style="text-align:center"><input type="checkbox" name="data[Room][accountid][]" value="<?= $account['Room'][$i]['accountid'] ?>" 
+					 <?= in_array($account['Room'][$i]['accountid'], $this->data['Room']['accountid']) ? 'checked="checked"' : '' ?>/></td>
+	       <td><?= $account['Room'][$i]['accountid'] ?>&nbsp;</td>
+	       <td><?= $account['Room'][$i]['contact']  ?>&nbsp;</td>
+	       <td><?= $account['Room'][$i]['cec'] ?>&nbsp;</td>
+	     </tr>   
+	   <? endfor; ?>
+	   </tbody>
+	</table>        
+      </fieldset>
+
+    </div>
+
+    <div id="account_selector">
+
+      <fieldset>
+        <legend>Select a Destination Account</legend>
+
+	<div class="input">
+	   <label class="right required" for="RoomAcctgrpid">Destination Account:</label>
+	   <?= $html->input('Room/acctgrpid') ?>
+	   <button id="search">
+	     <?= $html->image('search.gif', aa('class', 'valign')) ?> Search Accounts
+	   </button>
+
+	   <a href="" id="cancel" style="display:none">
+	     <?= $html->image('cancel.gif', aa('class', 'valign', '')) ?>
+	   </a>
+
+	   <?= $html->tagErrorMsg('Room/acctgrpid', 'Please enter a valid destination account number') ?>
+	</div>
+
+	<div id="results">
+	</div>
+
+	<div id="rates" style="display:none">
+          <?= $this->renderElement('service_rates', aa('mode', 'room', 'id', 'RoomServicerate', 'name', 'Room/servicerate')) ?>
+
+	  <div class="input">
+	    <label class="right required" for="RoomEffectiveDate">Effective Date:</label>
+	    <?= $html->input('Room/effective_date') ?>
+	    <?= $html->tagErrorMsg('Room/effective_date', 'Please specify a date this rate change becomes effective') ?>   
+	  </div>
+	</div>
+
+	<div class="submit">
+	  <button class="cancel"  type="button">
+	    <?= $html->image('cross.gif') ?> Cancel
+	  </button>
+	  <button class="submit" type="submit" disabled="disabled">
+	    <?= $html->image('check.gif') ?> Update
+	  </button>
+	</div>
+    </div>
+  </form>
+</div>
+
+<script type="text/javascript">
+$(document).ready( function() {
+
+    $('button.cancel').back('/accounts/view/<?= $account['Account']['acctgrpid'] ?>');
+
+    $('#all').click( function() {
+	$('#rooms :checkbox').attr('checked', 'checked');
+	return false; 
+    });
+
+    $('#none').click( function() {
+	$('#rooms :checkbox').attr('checked', '');
+	return false; 
+    });
+
+    $('#search').click( function() {
+	$('#results').load('/rooms/search', 
+			   {'data[Account][src]': $('#AccountSrc').val(), 'data[Room][acctgrpid]': $('#RoomAcctgrpid').val()}, 
+			   function() {
+			       $('#results a').click( function() {
+				   $('#RoomAcctgrpid').val($(this).html()).attr('readonly', 'readonly');
+				   $('#results').html('');				   
+				   $('#search').hide();
+				   $('#cancel').show();
+                                   $('#rate_find_button').click();
+                                   $('#rates').show();
+				   
+                                   $('button.submit').attr('disabled', '');
+                                   $('#PageState').val(1);
+				   return false;
+			       });
+			   });
+
+	return false;
+    });
+
+    $('#cancel').click( function() {
+	$('#search').show();
+	$('#cancel').hide()
+        $('#rates').hide();
+	$('#RoomAcctgrpid').attr('readonly', '').val('').keyup();
+        $('button.submit').attr('disabled', 'disabled')
+        $('div.rates input.spinner').val('0.0000');
+        $('#PageState').val(0);
+	return false;
+    });
+
+    $('#RoomAcctgrpid').keyup( function() {
+          var disabled = 'disabled';
+
+          if(this.value != '')
+            disabled = '';
+				 
+          $('#search').attr('disabled', disabled);
+    }).keyup();
+
+    if($('#PageState').val()) {
+      $('#rates').show();
+      $('button.submit').attr('disabled', '');
+      $('#ServiceRateRsvless').change();
+      $('#RoomAcctgrpid').attr('readonly', 'readonly');
+      $('#search').hide();
+      $('#cancel').show();
+    }
+
+    $('#RoomEffectiveDate').datepicker();
+});
+</script>

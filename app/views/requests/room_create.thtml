@@ -1,0 +1,283 @@
+<style type="text/css">
+table.room {
+  margin-top: 1em;
+}
+
+table.room th {
+  text-align: right;
+}
+
+table.room th, table.room td {
+  padding: 3px 5px;
+}
+
+table.service_rates, table.dialin_number {
+  border: none;
+  width: 100%;
+  margin: auto;
+}
+
+table.service_rates th, table.dialin_number th {
+  background: none;
+  border: none;
+}
+
+table.service_rates td, table.dialin_number td {
+  border: none;
+}
+</style>
+
+<div style="margin-top: 1em">
+  <strong><?= $html->link(ucfirst($request['Account']['bcompany']), '/accounts/view/' . $request['Account']['acctgrpid']) ?>(<?= $html->link($request['Account']['acctgrpid'], '/accounts/view/' . $request['Account']['acctgrpid']) ?>)</strong> requested to create a room.
+</div>
+
+<table class="room">
+
+  <? if(isset($request['RequestData']['reason'])): ?>
+  <tr>
+    <th>Failure Message:</th>
+    <td><?= $request['RequestData']['reason'] ?></td>
+  </tr>
+  <? endif; ?>
+
+  <? if(isset($request['RequestData']['number'])): ?>
+  <tr>
+    <th>Number:</th>
+    <td><?= $request['RequestData']['number'] ?></td>
+  </tr>
+  <? endif; ?>
+
+  <? if(isset($request['RequestData']['backup'])): ?>
+  <tr>
+    <th>Backup:</th>
+    <td>This room is a backup room</td>
+  </tr>
+  <? endif; ?>
+
+  <tr>
+    <th>Type:</th>
+    <td>
+      <? if($request['RequestData']['type'] == 'rsvless'): ?>
+      Reservationless
+      <? elseif($request['RequestData']['type'] == 'opassist'): ?>
+      Operator Assisted
+      <? elseif($request['RequestData']['type'] == 'event'): ?>
+      Event
+      <? endif; ?>
+    </td>
+  </tr>
+
+  <? if($request['RequestData']['type'] == 'opassist' || $request['RequestData']['type'] == 'event'): ?>
+  <tr>
+    <th>Start Date:</th>
+    <td><?= $request['RequestData']['startdate'] ?></td>
+  </tr>
+  <tr>
+    <th>Duration:</th>
+    <td><?= $request['RequestData']['duration'] ?> minutes</td>
+  </tr>
+  <? endif; ?>
+
+  <tr>
+    <th>Contact:</th>
+    <td><?= $request['RequestData']['contact'] ?></td>
+  </tr>
+  <tr>
+    <th>Company:</th>
+    <td><?= $request['RequestData']['company'] ?></td>
+  </tr>
+  <tr>
+    <th>Email:</th>
+    <td><?= $html->link($request['RequestData']['email'], 'mailto:' . $request['RequestData']['email']) ?></td>
+  </tr>
+  <tr>
+    <th>Conference Name:</th>
+    <td><?= $request['RequestData']['confname'] ?></td>
+  </tr>
+   <tr>
+    <th>Bridge:</th>
+    <td><?= $bridges[$request['RequestData']['bridgeid']] ?></td>
+  </tr>
+  <tr>
+    <th>Dialin Number:</th>
+    <td>
+      <table class="dialin_number">
+        <tr>
+          <th>Name:</th>
+	  <td><?= $dialin_number['DialinNumber']['description'] ?></td>
+        </tr>
+        <tr>
+          <th>Toll Free Number:</th>
+          <td><?= $dialin_number['DialinNumber']['tollfreeno'] ?></td>
+        </tr>
+        <tr>
+          <th>Toll Number:</th>
+          <td><?= $dialin_number['DialinNumber']['tollno'] ?></td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+  <tr>
+    <th>Chair Code:</th>
+    <td><?= $request['RequestData']['cec'] ?></td>
+  </tr>
+  <tr>
+    <th>Participant Code:</th>
+    <td><?= $request['RequestData']['pec'] ?></td>
+  </tr>
+  <tr>
+    <th>Presenter Code:</th>
+    <td><?= $request['RequestData']['prec'] ?></td>
+  </tr>
+  <tr>
+    <th>Email Usage Report:</th>
+    <td><?= $request['RequestData']['emailrpt'] ? $html->image('check.gif') : $html->image('cross.gif') ?></td>
+  </tr>
+  <tr>
+    <th>Maximum Connections:</th>
+    <td><?= $request['RequestData']['maximumconnections'] ?></td>
+  </tr>
+  <tr>
+    <th>Language:</th>
+    <td><?= $languages[$request['RequestData']['lang']] ?></td>
+  </tr>
+  <tr>
+    <th>Schedule Type:</th>
+    <td><?= $schedule_types[$request['RequestData']['scheduletype']] ?></td>
+  </tr>
+  <tr>
+    <th>Security Type:</th>
+    <td><?= $security_types[$request['RequestData']['securitytype']] ?></td>
+  </tr>
+  <tr>
+    <th>Start Mode:</th>
+    <td><?= $start_modes[$request['RequestData']['startmode']] ?></td>
+  </tr>
+  <tr>
+    <th>Name Recording:</th>
+    <td><?= $request['RequestData']['namerecording'] ? $html->image('check.gif') : $html->image('cross.gif') ?></td>
+  </tr>
+  <tr>
+    <th>End on Chair Hangup:</th>
+    <td><?= $request['RequestData']['endonchairhangup'] ? $html->image('check.gif') : $html->image('cross.gif') ?></td>
+  </tr>
+  <tr>
+    <th>Allow Dial Out:</th>
+    <td><?= $request['RequestData']['dialout'] ? $html->image('check.gif') : $html->image('cross.gif') ?></td>
+  </tr>
+  <tr>
+    <th>Enable Record/Playback:</th>
+    <td><?= $request['RequestData']['record_playback'] ? $html->image('check.gif') : $html->image('cross.gif') ?></td>
+  </tr>
+  <tr>
+    <th>Entry Announcement:</th>
+    <td><?= $announcements[$request['RequestData']['entryannouncement']] ?></td>
+  </tr>
+  <tr>
+    <th>Exit Announcement:</th>
+    <td><?= $announcements[$request['RequestData']['exitannouncement']] ?></td>
+  </tr>
+  <tr>
+    <th>Ending Signal:</th>
+    <td><?= $ending_signals[$request['RequestData']['endingsignal']] ?></td>
+  </tr>
+  <tr>
+    <th>DTMF Signal:</th>
+    <td><?= $dtmf_signals[$request['RequestData']['dtmfsignal']] ?></td>
+  </tr>
+  <tr>
+    <th>Recording Signal:</th>
+    <td><?= $recording_signals[$request['RequestData']['recordingsignal']] ?></td>
+  </tr>
+  <tr>
+    <th>Digit Entry 1:</th>
+    <td><?= $digit_entries[$request['RequestData']['digitentry1']] ?></td>
+  </tr>
+  <tr>
+    <th>Confirm Digit Entry 1:</th>
+    <td><?= $request['RequestData']['confirmdigitentry1'] ? $html->image('check.gif') : $html->image('cross.gif') ?></td>
+  </tr>
+  <tr>
+    <th>Digit Entry 2:</th>
+    <td><?= $digit_entries[$request['RequestData']['digitentry2']] ?></td>
+  </tr>
+  <tr>
+    <th>Confirm Digit Entry 2:</th>
+    <td><?= $request['RequestData']['confirmdigitentry2'] ? $html->image('check.gif') : $html->image('cross.gif') ?></td>
+  </tr>
+  <tr>
+    <th>Mute All During Playback:</th>
+    <td><?= $request['RequestData']['muteallduringplayback'] ? $html->image('check.gif') : $html->image('cross.gif') ?></td>
+  </tr>
+
+  <tr>
+    <th>Service Rate:</th>
+    <td>
+      
+      <table class="service_rates">
+        <tr>
+          <th>Name:</th>
+          <td><?= $service_rate['ServiceRate']['name'] ?></td>
+        </tr>
+        <tr>
+          <th>Reservationless:</th>
+          <td>$<?= $service_rate['ServiceRate']['rsvless'] ?></td>
+        </tr>
+        <tr>
+          <th>Reservationless Toll:</th>
+          <td>$<?= $service_rate['ServiceRate']['rsvlesstoll'] ?></td>
+        </tr>
+        <tr>
+          <th>Operator Assisted:</th>
+          <td>$<?= $service_rate['ServiceRate']['meetmetollfree'] ?></td>
+        </tr>
+        <tr>
+          <th>Operator Assisted Toll:</th>
+          <td>$<?= $service_rate['ServiceRate']['meetmetoll'] ?></td>
+        </tr>
+        <tr>
+          <th>Event:</th>
+          <td>$<?= $service_rate['ServiceRate']['eventmeetme'] ?></td>
+        </tr>
+        <tr>
+          <th>Event Toll:</th>
+          <td>$<?= $service_rate['ServiceRate']['eventmeetmetoll'] ?></td>
+        </tr>
+        <tr>
+          <th>WebInterpoint:</th>
+          <td>$<?= $service_rate['ServiceRate']['webinterpointppm'] ?></td>
+        </tr>
+
+      </table>
+
+    </td>
+  </tr>
+  <tr>
+    <th>Canadian Rate:</th>
+    <td>$<?= sprintf('%.04f', (float)$request['RequestData']['canada']/10000.0) ?></td>
+  </tr>
+  <tr>
+    <th>Billing Code:</th>
+    <td><?= $request['RequestData']['billingcode'] ?></td>
+  </tr>
+  <tr>
+    <th>Reservation Comments:</th>
+    <td><pre><?= $request['RequestData']['reservationcomments'] ?></pre></td>
+  </tr>
+  <tr>
+    <th>Notes 1:</th>
+    <td><pre><?= isset($request['RequestData']['note1']) ? $request['RequestData']['note1'] : '' ?></pre></td>
+  </tr>
+  <tr>
+    <th>Notes 2:</th>
+    <td><pre><?= isset($request['RequestData']['note2']) ? $request['RequestData']['note2'] : '' ?></pre></td>
+  </tr>
+  <tr>
+    <th>Notes 3:</th>
+    <td><pre><?= isset($request['RequestData']['note3']) ? $request['RequestData']['note3'] : '' ?></pre></td>
+  </tr>
+  <tr>
+    <th>Notes 4:</th>
+    <td><pre><?= isset($request['RequestData']['note4']) ? $request['RequestData']['note4'] : ''?></pre></td>
+  </tr>
+</table>

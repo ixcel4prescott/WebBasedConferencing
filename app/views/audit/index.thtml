@@ -1,0 +1,124 @@
+<?= $html->css('ui.datepicker') ?>
+<?= $javascript->link('ui.datepicker.js') ?>
+
+<style type="text/css">
+#audit_pane {
+   margin: auto;
+   padding-bottom: 20px;
+   border: 1px solid #ccc;
+   padding: 10px 20px;
+}
+
+#audit_pane th,td {
+  padding: 3px 5px;
+  text-align: left;
+}
+
+tr.even td {
+  background: #EFF7FF;
+}
+
+.datepicker td, .datepicker th {
+  padding: inherit;
+  text-align: center;
+}
+
+span.current {
+  color: #FF9C2A;
+  font-weight: bold;
+}
+
+#audit_pane select, #audit_pane input {
+  width: 7em;
+}
+
+</style>
+
+<? $pagination->setPaging($paging) ?>
+
+<div id="audit_pane">
+  <h1>Audit Logs</h1>
+
+  <form method="get">
+
+    <div>
+      <?= $html->submit('Update Filter') ?>
+    </div>
+
+    <table id="logs_table"  style="width: 100%; margin-top: 1em">
+      <tr>
+	<th>
+	  <?= $pagination->sortBy('id') ?>
+	</th>
+	<th>
+	  <?= $pagination->sortBy('created') ?><br />
+	  <input type="text" name="created" id="created" value="<?= !empty($_GET['created']) ? $_GET['created'] : '' ?>"/>
+	</th>
+	<th>
+	  <?= $pagination->sortBy('host') ?><br/>
+ 	  <select name="host">
+	    <option></option>
+	    <? foreach($hosts as $k => $v): ?>
+	    <option value="<?= $k ?>" <?= !empty($_GET['host']) && $_GET['host'] == $k ? 'selected="selected"' : '' ?>><?= $v ?></option>
+	    <? endforeach; ?>
+	  </select>	  
+	</th>
+	<th>
+	  <?= $pagination->sortBy('op', 'Operation') ?><br/>
+ 	  <select name="op">
+	    <option></option>
+	    <? foreach($op_map as $k => $v): ?>
+	    <option value="<?= $k ?>" <?= isset($_GET['op']) && $_GET['op'] !== '' && $_GET['op'] == $k ? 'selected="selected"' : '' ?>><?= $v ?></option>
+	    <? endforeach; ?>
+	  </select>	  
+	</th>
+	<th>
+	  <?= $pagination->sortBy('entity') ?><br/>
+ 	  <select name="entity">
+	    <option></option>
+	    <? foreach($entities as $k => $v): ?>
+	    <option value="<?= $k ?>" <?= !empty($_GET['entity']) && $_GET['entity'] == $k ? 'selected="selected"' : '' ?>><?= $v ?></option>
+	    <? endforeach; ?>
+	  </select>	  
+	</th>
+	<th>
+	  <?= $pagination->sortBy('object_id', 'Object ID') ?><br/>
+	</th>
+	<th>
+	  User<br/>
+ 	  <select name="userid">
+	    <option></option>
+	    <? foreach($users as $k => $v): ?>
+	    <option value="<?= $k ?>" <?= !empty($_GET['userid']) && $_GET['userid'] == $k ? 'selected="selected"' : '' ?>><?= $v ?></option>
+	    <? endforeach; ?>
+	  </select>
+	</th>
+	<th>
+	  <?= $pagination->sortBy('ip_addr', 'IP') ?><br />
+	  <input type="text" name="ip_addr"  value="<?= !empty($_GET['ip_addr']) ? $_GET['ip_addr'] : '' ?>"/>
+	</th>      
+      </tr>
+
+      <? for($i=0; $i<count($data); $i++): ?>
+	 <tr class="<?= $i%2 ? 'odd' : 'even' ?>">
+	   <td><?= $html->link($data[$i]['DiffLog']['id'], '/audit/view/' . $data[$i]['DiffLog']['entity'] . '/' . $data[$i]['DiffLog']['object_id'] . '/' .  $data[$i]['DiffLog']['id'])  ?></td>
+	   <td><?= $data[$i]['DiffLog']['created'] ?></td>
+	   <td><?= htmlspecialchars($data[$i]['DiffLog']['host']) ?></td>
+	   <td><?= $op_map[$data[$i]['DiffLog']['op']] ?></td>
+	   <td><?= $data[$i]['DiffLog']['entity']  ?></td>
+	   <td><?= $data[$i]['DiffLog']['object_id'] ?></td>
+	   <td><?= $data[$i]['User']['name'] ?></td>
+	   <td><?= $data[$i]['DiffLog']['ip_addr'] ?></td>
+	 </tr>
+	 <? endfor; ?>
+    </table>
+  </form>
+
+  <?= $this->renderElement('pagination') ?>
+</div>
+
+<script type="text/javascript">
+$(document).ready( function() {
+  $('#created').datepicker();
+});
+</script>

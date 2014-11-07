@@ -1,0 +1,21 @@
+<? if($too_many): ?>
+<div style="margin-bottom:1em">
+  <strong>Too many results returned. Please refine your query.</strong>
+</div>
+<? endif; ?>
+
+<table id="accounts">
+  <tr>
+    <th>Account #</th>
+    <th>Company</th>
+    <th>Contact</th>
+  </tr>
+
+  <? foreach($accounts as $a): ?>
+  <tr>
+    <td><?=  $html->link($a['AccountView']['acctgrpid'], $a['AccountView']['acctgrpid']) ?></td>
+    <td><?=  $a['AccountView']['company'] ?></td>
+    <td><?=  $a['AccountView']['contact'] ?></td>
+  </tr>
+  <? endforeach; ?>
+</table>

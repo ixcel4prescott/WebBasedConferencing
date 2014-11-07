@@ -1,0 +1,5 @@
+<? if($rv): ?>
+<span class="italic">Creation pending...</span>
+<? else: ?>
+<span class="bold">Creation request failed...</span>
+<? endif; ?>

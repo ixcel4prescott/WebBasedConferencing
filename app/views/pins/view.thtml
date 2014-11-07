@@ -1,0 +1,80 @@
+<?
+$menu_items = Array( Array( 'text' => 'Edit Pin', 
+			    'icon' => 'edit.gif',
+			    'url'  => '/pins/edit/' . $pin['Pin']['id']), 
+		     
+		     Array( 'text' => 'Delete Pin', 
+			    'icon' => 'cross.gif',
+			    'url'  => '/pins/delete/' . $pin['Pin']['id']));
+
+
+?>
+
+<style type="text/css">
+#pins_pane {
+   margin: auto;
+   padding-bottom: 20px;
+   border: 1px solid #ccc;
+   padding: 10px 20px;
+}
+
+#pins_pane th,#pins_pane td {
+  padding: 3px 5px;
+  text-align: left;
+}
+
+#pins_pane th {
+  text-align: right
+}
+
+#pins_pane tr.even td {
+  background: #EFF7FF;
+}
+</style>
+
+<div id="pins_pane">
+  <?= $this->renderElement('toolbar', Array('items' => $menu_items)) ?>
+
+  <h1>PIN Details</h1>
+
+  <table style="margin-top: 1em">
+    <tr>
+      <th>ID:</th>
+      <td><?= $pin['Pin']['id'] ?></td>
+    </tr>
+    <tr>
+      <th>PIN:</th>
+      <td><?= $pin['Pin']['pin'] ?></td>
+    </tr>
+    <tr>
+      <th>Bridge:</th>
+      <td><?= $bridges[$pin['Pin']['bridgeid']] ?></td>
+    </tr>
+    <tr>
+      <th>First Name:</th>
+      <td><?= $pin['Pin']['first_name'] ?></td>
+    </tr>
+    <tr>
+      <th>Last Name:</th>
+      <td><?= $pin['Pin']['last_name'] ?></td>
+    </tr>
+    <tr>
+      <th>Company:</th>
+      <td><?= $pin['Pin']['company'] ?></td>
+    </tr>
+    <tr>
+      <th>PIN ID on Bridge:</th>
+      <td><?= $pin['Pin']['external_id'] ?></td>
+    </tr>
+    <tr>
+      <th>Active:</th>
+      <td>
+	<? if($pin['Pin']['active']): ?>
+	<?= $html->image('check.gif') ?>
+	<? else: ?>
+	<?= $html->image('cross.gif') ?>
+	<? endif; ?>
+      </td>
+    </tr>
+  </table>
+</div>

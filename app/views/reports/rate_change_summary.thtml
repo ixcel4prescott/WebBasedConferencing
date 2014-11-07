@@ -1,0 +1,71 @@
+<? $pagination->setPaging($paging) ?>
+
+<style type="text/css">
+#requests {
+  width: 100%;
+  margin-top: 1em;
+}
+
+#requests td {
+  text-align: left;
+}
+
+#requests th,#requests td {
+  padding: 3px 5px;
+  text-align: left;
+}
+
+tr.even td {
+  background: #EFF7FF;
+}
+
+#rate_change_pane {
+   margin: auto;
+   padding-bottom: 20px;
+   border: 1px solid #ccc;
+   padding: 10px 20px;
+}
+
+span.current {
+  color: #FF9C2A;
+  font-weight: bold;
+}
+
+</style>
+
+<div id="rate_change_pane">
+  <h1>Summary of Completed Rate Changes for <?= $month ?>/<?= $year ?></h1>
+
+  <div class="center">
+    <?= $html->image('previous.gif') ?> <a href="/reports/rate_change_summary/<?= $prev ?>"><?= $prev ?></a>
+
+    <? if($next): ?>
+    <a href="/reports/rate_change_summary/<?= $next ?>"><?= $next ?></a> <?= $html->image('next.gif') ?>
+    <? endif; ?>
+  </div>
+
+  <table id="requests">
+    <tr>
+      <th><?= $pagination->sortBy('acctgrpid', 'Account') ?></th>
+      <th><?= $pagination->sortBy('company') ?></th>
+      <th><?= $pagination->sortBy('old_servicerate', 'Old Service Rate') ?></th>
+      <th></th>
+      <th><?= $pagination->sortBy('new_servicerate', 'New Service Rate') ?></th>
+      <th><?= $pagination->sortBy('affected_rooms', 'Rooms<br/>Affected') ?></th>
+      <th><?= $pagination->sortBy('entered_on', 'Entered') ?></th>
+    </tr>
+    <? for($i=0; $i<count($data); $i++): ?>
+    <tr class="<?= $i%2 ? 'odd' : 'even' ?>">
+      <td><?= $html->link($data[$i]['RateChangeSummary']['acctgrpid'], '/accounts/view/' . $data[$i]['RateChangeSummary']['acctgrpid']) ?></td>
+      <td><?= shorten($data[$i]['RateChangeSummary']['company']) ?></td>
+      <td class="small"><?= $data[$i]['RateChangeSummary']['old_servicerate'] ?></td>
+      <td>&raquo;</td>
+      <td class="small"><?= $data[$i]['RateChangeSummary']['new_servicerate'] ?></td>
+      <td><?= $data[$i]['RateChangeSummary']['affected_rooms'] ?></td>
+      <td><?= strftime('%m/%d/%y', strtotime($data[$i]['RateChangeSummary']['entered_on'])) ?></td>
+    </tr>
+    <? endfor; ?>
+  </table>
+
+  <?= $this->renderElement('pagination') ?>
+</div>

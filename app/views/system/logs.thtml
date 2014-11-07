@@ -1,0 +1,130 @@
+<?= $html->css('ui.datepicker') ?>
+<?= $javascript->link('ui.datepicker.js') ?>
+
+<style type="text/css">
+#logs_pane {
+   margin: auto;
+   padding-bottom: 20px;
+   border: 1px solid #ccc;
+   padding: 10px 20px;
+}
+
+#logs_pane th,td {
+  padding: 3px 5px;
+  text-align: left;
+}
+
+tr.even td {
+  background: #EFF7FF;
+}
+
+.datepicker td, .datepicker th {
+  padding: inherit;
+  text-align: center;
+}
+
+span.current {
+  color: #FF9C2A;
+  font-weight: bold;
+}
+
+#logs_pane select, #logs_pane input {
+  width: 6em;
+}
+</style>
+
+<? $pagination->setPaging($paging) ?>
+
+<div id="logs_pane">
+  <h1>MyCA Logs</h1>
+
+  <form method="get">
+
+    <div>
+      <?= $html->submit('Update Filter') ?>
+    </div>
+
+    <table id="logs_table" style="margin-top: 1em; width: 100%">
+      <tr>
+	<th>
+	  <?= $pagination->sortBy('created') ?><br />
+	  <input type="text" name="created" id="created" value="<?= !empty($_GET['created']) ? $_GET['created'] : '' ?>"/>
+	</th>
+	<th>
+	  <?= $pagination->sortBy('host') ?><br/>
+ 	  <select name="host">
+	    <option></option>
+	    <? foreach($hosts as $k => $v): ?>
+	    <option value="<?= $k ?>" <?= !empty($_GET['host']) && $_GET['host'] == $k ? 'selected="selected"' : '' ?>><?= $v ?></option>
+	    <? endforeach; ?>
+	  </select>	  
+	</th>
+	<th>
+	  User<br/>
+ 	  <select name="userid">
+	    <option></option>
+	    <? foreach($users as $k => $v): ?>
+	    <option value="<?= $k ?>" <?= !empty($_GET['userid']) && $_GET['userid'] == $k ? 'selected="selected"' : '' ?>><?= $v ?></option>
+	    <? endforeach; ?>
+	  </select>
+	</th>
+	<th>
+	  <?= $pagination->sortBy('ip_addr', 'IP') ?><br />
+	  <input type="text" name="ip_addr"  value="<?= !empty($_GET['ip_addr']) ? $_GET['ip_addr'] : '' ?>"/>
+	</th>      
+	<th>
+	  <?= $pagination->sortBy('controller') ?><br/>
+ 	  <select name="controller">
+	    <option></option>
+	    <? foreach($controllers as $k => $v): ?>
+	    <option value="<?= $k ?>" <?= !empty($_GET['controller']) && $_GET['controller'] == $k ? 'selected="selected"' : '' ?>><?= $v ?></option>
+	    <? endforeach; ?>
+	  </select>
+	</th>
+	<th>
+	  <?= $pagination->sortBy('action') ?><br/>
+ 	  <select name="action">
+	    <option></option>
+	    <? foreach($actions as $k => $v): ?>
+	    <option value="<?= $k ?>" <?= !empty($_GET['action']) && $_GET['action'] == $k ? 'selected="selected"' : '' ?>><?= $v ?></option>
+	    <? endforeach; ?>
+	  </select>
+	</th>
+	<th>
+	  <?= $pagination->sortBy('category') ?><br />
+ 	  <select name="category">
+	    <option></option>
+	    <? foreach($categories as $k => $v): ?>
+	    <option value="<?= $k ?>" <?= !empty($_GET['category']) && $_GET['category'] == $k ? 'selected="selected"' : '' ?>><?= $v ?></option>
+	    <? endforeach; ?>
+	  </select>
+	</th>
+	<th>
+	  <?= $pagination->sortBy('comments') ?><br />
+	  <input type="text" name="comments"  value="<?= !empty($_GET['comments']) ? $_GET['comments'] : '' ?>"/>
+	</th>
+      </tr>
+      
+      <? for($i=0; $i<count($data); $i++): ?>
+	 <tr class="<?= $i%2 ? 'odd' : 'even' ?>">
+	   <td><?= $data[$i]['System']['created'] ?></td>
+	   <td><?= $data[$i]['System']['host']  ?></td>
+	   <td><?= $data[$i]['User']['name'] ?></td>
+	   <td><?= $data[$i]['System']['ip_addr'] ?></td>
+	   <td><?= $data[$i]['System']['controller'] ?></td>
+	   <td><?= $data[$i]['System']['action'] ?></td>
+	   <td><?= $data[$i]['System']['category'] ?></td>
+	   <td><?= $data[$i]['System']['comments'] ?></td>
+	 </tr>
+	 <? endfor; ?>
+    </table>
+  </form>
+
+  <?= $this->renderElement('pagination') ?>
+</div>
+
+<script type="text/javascript">
+$(document).ready( function() {
+  $('#created').datepicker();
+});
+</script>

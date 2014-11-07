@@ -1,0 +1,416 @@
+<style type="text/css">
+#reservation_profile {
+   margin: auto;
+}
+
+span.highlight {
+  color: #3E606F;
+}
+
+div#left_column, div#right_column {
+  margin-auto;
+  margin-top: 1em;
+  float: right; 
+  width: 50%;
+}
+
+div.box {
+  margin-bottom: 10px;
+  margin-right: 10px;
+}
+
+.headline {
+  font-weight: bold;
+  border-bottom: 1px solid #ccc;
+  margin-bottom: 10px;
+}
+
+div.box table {
+  width: 100%;
+}
+
+div.box table th, div.box table td {
+  padding: 3px 5px;
+  white-space: normal; 
+}
+
+div.box table th {
+  text-align: right;
+  width: 15em;
+}
+
+div.box table td {
+  text-align: left;
+}
+
+#right_column div.box td {
+  text-align: right;
+}
+
+.comments {
+  text-align: justify;
+  background: #eee;
+  padding: 0.5em 1em;
+}
+
+</style>
+
+<div id="reservation_profile">
+  
+  <h1>
+    Reservation for
+    <span class="highlight">
+      <?= $reservation['Reservation']['CompanyName'] ?>
+      (<?= $reservation['Reservation']['AccountNumber'] ?>)
+    </span>
+    on 
+    <span class="highlight">
+      <?= date('F d, Y', strtotime($reservation['Reservation']['ConferenceDate'])) ?>
+    </span>
+    <span class="highlight">   
+      at
+      <?= date('g:i a', strtotime($reservation['Reservation']['ConferenceTime'])) ?>
+    </span>
+  </h1>
+  
+  <div id="right_column">
+
+    <div class="box">
+      <div class="headline">
+	Call Type
+      </div>    
+      <table>	
+	<tr>
+	  <th>Operator Assisted Dial-In:</th>
+	  <td><?= $html->image($reservation['Reservation']['OpAssistIn'] ? 'check.gif' : 'cross.gif') ?></td>
+	</tr>
+	<tr>
+	  <th>Operator Assisted Dial-Out:</th>
+	  <td><?= $html->image($reservation['Reservation']['OpAssistOut'] ? 'check.gif' : 'cross.gif') ?></td>
+	</tr>
+	<tr>
+	  <th>Enhanced Service:</th>
+	  <td><?= $html->image($reservation['Reservation']['Enhanced'] ? 'check.gif' : 'cross.gif') ?></td>
+	</tr>
+ 	<tr>
+	  <th>Event:</th>
+	  <td><?= $html->image($reservation['Reservation']['Event'] ? 'check.gif' : 'cross.gif') ?></td>
+	</tr>
+	<tr>
+	  <th>Auto-Event:</th>
+	  <td><?= $html->image($reservation['Reservation']['AutoEvent'] ? 'check.gif' : 'cross.gif') ?></td>
+	</tr>
+	<tr>
+	  <th>Automated:</th>
+	  <td><?= $html->image($reservation['Reservation']['Automated'] ? 'check.gif' : 'cross.gif') ?></td>
+	</tr>
+	<tr>
+	  <th>Merge:</th>
+	  <td><?= $html->image($reservation['Reservation']['Merge'] ? 'check.gif' : 'cross.gif') ?></td>
+	</tr>
+	<tr>
+	  <th>Playback:</th>
+	  <td><?= $html->image($reservation['Reservation']['Playback'] ? 'check.gif' : 'cross.gif') ?></td>
+	</tr>
+	<tr>
+	  <th>Link Line:</th>
+	  <td><?= $html->image($reservation['Reservation']['LinkLine'] ? 'check.gif' : 'cross.gif') ?></td>
+	</tr>
+      </table>
+    </div>
+
+    <div class="box">
+      <div class="headline">
+	Features
+      </div>    
+      <table>	
+	<tr>
+	  <th>Presentation:</th>
+	  <td><?= $html->image($reservation['Reservation']['Presentation'] ? 'check.gif' : 'cross.gif') ?></td>
+	</tr>
+	<tr>
+	  <th>Q & A:</th>
+	  <td><?= $html->image($reservation['Reservation']['QandA'] ? 'check.gif' : 'cross.gif') ?></td>
+	</tr>
+	<tr>
+	  <th>Polling:</th>
+	  <td><?= $html->image($reservation['Reservation']['Polling'] ? 'check.gif' : 'cross.gif') ?></td>
+	</tr>
+	<tr>
+	  <th>Security/Conference Lock:</th>
+	  <td><?= $html->image($reservation['Reservation']['Lock'] ? 'check.gif' : 'cross.gif') ?></td>
+	</tr>
+	<tr>
+	  <th>Operator Monitoring:</th>
+	  <td><?= $html->image($reservation['Reservation']['OpMonitoring'] ? 'check.gif' : 'cross.gif') ?></td>
+	</tr>
+	<tr>
+	  <th>Communications Line:</th>
+	  <td><?= $html->image($reservation['Reservation']['Communications'] ? 'check.gif' : 'cross.gif') ?></td>
+	</tr>
+	<tr>
+	  <th>Sub-Conference:</th>
+	  <td><?= $html->image($reservation['Reservation']['SubConference'] ? 'check.gif' : 'cross.gif') ?></td>
+	</tr>
+	<tr>
+	  <th>Music-on-Hold:</th>
+	  <td><?= $html->image($reservation['Reservation']['Music'] ? 'check.gif' : 'cross.gif') ?></td>
+	</tr>
+	<tr>
+	  <th>Roll Call:</th>
+	  <td><?= $html->image($reservation['Reservation']['RollCall'] ? 'check.gif' : 'cross.gif') ?></td>
+	</tr>
+	<tr>
+	  <th>Entry & Exit Tones:</th>
+	  <td><?= $html->image($reservation['Reservation']['Tones'] ? 'check.gif' : 'cross.gif') ?></td>
+	</tr>
+	<tr>
+	  <th>Password Protection:</th>
+	  <td><?= $html->image($reservation['Reservation']['PasswordProtect'] ? 'check.gif' : 'cross.gif') ?></td>
+	</tr>
+	<tr>
+	  <th>Digital Replay:</th>
+	  <td><?= $html->image($reservation['Reservation']['DigitalReplay'] ? 'check.gif' : 'cross.gif') ?></td>
+	</tr>
+      </table>
+    </div>
+    <div class="box">
+      <div class="headline">
+	Enhanced Services
+      </div>    
+      <table>	
+	<tr>
+	  <th>Paricipation Report:</th>
+	  <td><?= $html->image($reservation['Reservation']['LiveReport'] ? 'check.gif' : 'cross.gif') ?></td>
+	</tr>
+	<tr>
+	  <th>Transcription:</th>
+	  <td><?= $html->image($reservation['Reservation']['Transcription'] ? 'check.gif' : 'cross.gif') ?></td>
+	</tr>
+	<tr>
+	  <th>Wav File:</th>
+	  <td><?= $html->image($reservation['Reservation']['WavFile'] ? 'check.gif' : 'cross.gif') ?></td>
+	</tr>
+	<tr>
+	  <th>Web Recording:</th>
+	  <td><?= $html->image($reservation['Reservation']['WebRecording'] ? 'check.gif' : 'cross.gif') ?></td>
+	</tr>
+	<tr>
+	  <th>Audio Editing:</th>
+	  <td><?= $html->image($reservation['Reservation']['AudioEditing'] ? 'check.gif' : 'cross.gif') ?></td>
+	</tr>
+	<tr>
+	  <th>Branded Dial-In:</th>
+	  <td><?= $html->image($reservation['Reservation']['BrandedDialIn'] ? 'check.gif' : 'cross.gif') ?></td>
+	</tr>
+	<tr>
+	  <th>Tape:</th>
+	  <td><?= $html->image($reservation['Reservation']['MakeTape'] ? 'check.gif' : 'cross.gif') ?></td>
+	</tr>
+	<tr>
+	  <th>CD:</th>
+	  <td><?= $html->image($reservation['Reservation']['CD'] ? 'check.gif' : 'cross.gif') ?></td>
+	</tr>
+	<tr>
+	  <th>MP3:</th>
+	  <td><?= $html->image($reservation['Reservation']['MP3'] ? 'check.gif' : 'cross.gif') ?></td>
+	</tr>
+	<tr>
+	  <th>Web Recording Editing:</th>
+	  <td><?= $html->image($reservation['Reservation']['WebRecordingEditing'] ? 'check.gif' : 'cross.gif') ?></td>
+	</tr>
+ 	<tr>
+	  <th>Set-Up Fee:</th>
+	  <td><?= $html->image($reservation['Reservation']['SetupFee'] ? 'check.gif' : 'cross.gif') ?></td>
+	</tr>
+ 	<tr>
+	  <th>Branded Log-in Page:</th>
+	  <td><?= $html->image($reservation['Reservation']['BrandedLogin'] ? 'check.gif' : 'cross.gif') ?></td>
+	</tr>
+ 	<tr>
+	  <th>Web Cast:</th>
+	  <td><?= $html->image($reservation['Reservation']['WebCast'] ? 'check.gif' : 'cross.gif') ?></td>
+	</tr>
+      </table>
+    </div>
+    <div class="box">
+      <div class="headline">
+	Event Management Services
+      </div>    
+      <table>
+ 	<tr>
+	  <th>Registration Package:</th>
+	  <td><?= $html->image($reservation['Reservation']['EMSRegistration'] ? 'check.gif' : 'cross.gif') ?></td>
+	</tr>
+ 	<tr>
+	  <th>Reminder E-Mail:</th>
+	  <td><?= $html->image($reservation['Reservation']['EMSReminder'] ? 'check.gif' : 'cross.gif') ?></td>
+	</tr>
+ 	<tr>
+	  <th>Credit Card Processing:</th>
+	  <td><?= $html->image($reservation['Reservation']['EMSCreditCardProcessing'] ? 'check.gif' : 'cross.gif') ?></td>
+	</tr>
+ 	<tr>
+	  <th>HTML & E-Mail:</th>
+	  <td><?= $html->image($reservation['Reservation']['EMSHTML'] ? 'check.gif' : 'cross.gif') ?></td>
+	</tr>
+ 	<tr>
+	  <th>Registrant Processing:</th>
+	  <td><?= $html->image($reservation['Reservation']['EMSRegistrantProcessing'] ? 'check.gif' : 'cross.gif') ?></td>
+	</tr>
+ 	<tr>
+	  <th>Post-Conference Survey:</th>
+	  <td><?= $html->image($reservation['Reservation']['EMSPostConferenceSurvey'] ? 'check.gif' : 'cross.gif') ?></td>
+	</tr>
+ 	<tr>
+	  <th>Blast E-Mail:</th>
+	  <td><?= $html->image($reservation['Reservation']['EMSBlastEmail'] ? 'check.gif' : 'cross.gif') ?></td>
+	</tr>
+ 	<tr>
+	  <th>Content Editing:</th>
+	  <td><?= $html->image($reservation['Reservation']['EMSContentEditing'] ? 'check.gif' : 'cross.gif') ?></td>
+	</tr>
+      </table>
+    </div>
+  </div>
+  <div id="left_column">
+
+    <div class="box">
+      <div class="headline">
+        Reservation Information
+      </div>
+      <table>
+	<tr>
+	  <th>Account:</th>
+	  <td>
+	    <?= $html->link(sprintf('%s(%s)', $reservation['Reservation']['CompanyName'], $reservation['Reservation']['AccountNumber']),
+	                    '/accounts/view/' . $reservation['Reservation']['AccountNumber']) ?>
+	  </td>
+	</tr>
+	<tr>
+	  <th>Account Manager:</th>
+	  <td><?= $reservation['Reservation']['AccountManager'] ?></td>
+	</tr>
+	<tr>
+	  <th>Topic:</th>
+	  <td><?= $reservation['Reservation']['Topic'] ?></td>
+	</tr>
+	<tr>
+	  <th>Chair Persons:</th>
+	  <td><?= $reservation['Reservation']['ChairPersons'] ?></td>
+	</tr>
+	<tr>
+	  <th>Lines Reserved:</th>
+	  <td><?= $reservation['Reservation']['LinesReserved'] ?></td>
+	</tr>
+	<tr>
+	  <th>Status:</th>
+	  <td><?= $reservation['Reservation']['ReservationStatus'] ?></td>
+	</tr>
+	<tr>
+	  <th>Contact:</th>
+	  <td><?= $reservation['Reservation']['ContactName'] ?></td>
+	</tr>
+	<tr>
+	  <th>Contact Phone:</th>
+	  <td><?= $reservation['Reservation']['ContactPhone'] ?></td>
+	</tr>
+	<tr>
+	  <th>Contact Email:</th>
+	  <td>
+	    <? foreach(explode(',', $reservation['Reservation']['ContactEmail']) as $e): ?>
+	    <?= $html->link($e, 'mailto:'.$e) ?>
+	    <? endforeach; ?>
+	  </td>
+	</tr>
+	<tr>
+	  <th>Reserved By:</th>
+	  <td><?= $html->link($reservation['Reservation']['ReservedBy'], 'mailto:'.$reservation['Reservation']['ReservedEmail']) ?></td>
+	</tr>
+	<tr>
+	  <th>Date Scheduled:</th>
+	  <td><?= date('m/d/Y', strtotime($reservation['Reservation']['DateScheduled'])) ?></td>
+	</tr>
+      </table>    
+    </div>
+
+    <? if(!empty($operators)): ?>
+    <div class="box">
+      <div class="headline">
+        Assigned Operators
+      </div>
+      <table>
+	<? foreach($operators as $o): ?>
+        <tr>
+          <th><?= $o['ReservationOperator']['Role'] ?></th>
+          <td><?= $o['ReservationOperator']['OperatorName'] ?></td>
+        </tr>
+	<? endforeach; ?>
+      </table>
+    </div>
+    <? endif; ?>
+
+    <? if(!empty($room)): ?>
+    <div class="box">
+      <div class="headline">
+        Room Information
+      </div>
+      <table>
+        <tr>
+          <th>Confirmation Number:</th>
+          <td>
+	    <?= $html->link($room['Room']['accountid'], 
+	                    '/rooms/view/'.$room['Room']['accountid']) ?>
+	  </td>
+        </tr>
+
+	<? if(!empty($room['Room']['cec'])): ?>
+	<tr>
+	  <th>Chair Code:</th>
+	  <td><?= $room['Room']['cec'] ?></td>
+	</tr>
+	<? endif; ?>
+	<? if(!empty($room['Room']['pec'])): ?>
+	<tr>
+	  <th>Participant Code:</th>
+	  <td><?= $room['Room']['pec'] ?></td>
+	</tr>
+	<? endif; ?>
+
+	<tr>
+	  <th>Toll-Free Number:</th>
+	  <td><?= $room['DialinNumber']['tollfreeno'] ?></td>
+	</tr>
+	<tr>
+	  <th>Toll Number:</th>
+	  <td><?= $room['DialinNumber']['tollno'] ?></td>
+	</tr>
+      </table>
+    </div>
+    <? endif; ?>
+
+    <? if(!empty($reservation['Reservation']['Comments'])): ?>
+    <div class="box">
+      <div class="headline">
+        Comments
+      </div>
+      <div class="comments">
+	<?= $text->autoLink(nl2br($reservation['Reservation']['Comments'])) ?>
+      </div>
+    </div>
+    <? endif; ?>
+
+
+    <? if(!empty($reservation['Reservation']['InternalNotes'])): ?>
+    <div class="box">
+      <div class="headline">
+        Internal Notes
+      </div>
+      <div class="comments">
+	<?= $text->autoLink(nl2br($reservation['Reservation']['InternalNotes'])) ?>
+      </div>
+    </div>
+    <? endif; ?>
+
+  </div>
+</div>

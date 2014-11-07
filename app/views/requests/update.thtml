@@ -1,0 +1,46 @@
+<? 
+   $pagination->setPaging($paging);
+   $pagination->url = '/requests/update';  // Hacked so that sorting links point to right place
+?>
+
+<table id="queue">
+  <thead>
+    <tr>
+      <th><?= $pagination->sortBy('id', 'ID') ?></th>
+      <th>
+	<div class="center"><?= $pagination->sortBy('type') ?></div>
+	<div><?= $html->selectTag('RequestView/type', $types) ?></div>
+      </th>
+      <th>
+	<div class="center"><?= $pagination->sortBy('status') ?></div>
+	<div><?= $html->selectTag('RequestView/status', $statuses) ?></div>
+      </th>
+      <th>
+	<div><?= $pagination->sortBy('acctgrpid', 'Account Group ID') ?></div>
+	<? if($session->check('ic_employee')): ?>
+	<div><?= $html->checkbox('RequestView/other_resellers') ?> <label for="RequestViewOtherResellers">Include Reseller Requests</label></div>
+        <? endif; ?>
+      </th>
+      <th><?= $pagination->sortBy('accountid', 'Account ID') ?></th>
+      <th><?= $pagination->sortBy('creator') ?></th>
+      <th><?= $pagination->sortBy('created') ?></th>
+    </tr>
+  </thead>      
+
+  <tbody>
+    <? for($i=0; $i<count($requests); $i++): ?>
+     <tr class="<?= $i%2 ? 'odd' : 'even' ?>  <?= $session->check('ic_employee') && $requests[$i]['RequestView']['resellerid'] != IC_RESELLERID ? 'other' : '' ?>" 
+	 id="request<?= $requests[$i]['RequestView']['id'] ?>">
+     <td>
+	 <?= $html->link($requests[$i]['RequestView']['id'], '/requests/view/' . $requests[$i]['RequestView']['id'], aa('class', 'id')) ?>
+       </td>       
+       <td><?= $requests[$i]['RequestView']['type_name'] ?></td>
+       <td><?= $requests[$i]['RequestView']['status_name'] ?></td>
+       <td><?= $requests[$i]['RequestView']['acctgrpid'] ? $html->link($requests[$i]['RequestView']['acctgrpid'], '/accounts/view/' . $requests[$i]['RequestView']['acctgrpid']) : '&mdash;' ?></td>
+       <td><?= $requests[$i]['RequestView']['accountid'] ? $html->link($requests[$i]['RequestView']['accountid'], '/rooms/view/' . $requests[$i]['RequestView']['accountid']) : '&mdash;' ?></td>
+       <td><?= $html->link($requests[$i]['RequestView']['creator_name'], 'mailto:' .  $requests[$i]['RequestView']['creator_email']) ?></td>
+       <td><?= $time->niceShort($requests[$i]['RequestView']['created']) ?></td>
+     </tr>
+    <? endfor; ?>
+  </tbody>
+</table>

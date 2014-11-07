@@ -1,0 +1,203 @@
+<? if(!$is_ajax): ?> 
+<?= $javascript->link('jquery.util.js') ?>
+
+<style type="text/css">
+#rooms_pane {
+   margin: auto;
+   padding-bottom: 20px;
+   border: 1px solid #ccc;
+   padding: 10px 20px;
+}
+
+#rooms_pane th, #rooms_pane td {
+  padding: 3px 5px;
+  text-align: left;
+}
+
+tr.even td {
+  background: #EFF7FF;
+}
+
+span.current {
+  color: #FF9C2A;
+  font-weight: bold;
+}
+
+fieldset {
+  padding: 0px 10px 10px 5px;
+}
+
+#rooms_pane tr.other td {
+  background: #eee;
+  font-style: italic;
+  color: #666;
+}
+
+#rooms_pane tr.other td a {
+  color: #555;
+}
+
+#rooms_select_all, #rooms_select_none {
+  font-size: x-small;
+}
+
+#selected_rooms {
+  font-style: italic;
+}
+
+div.notice {
+  background: #FFECBF;
+  border: 1px solid #EEAA00;
+  padding: 1em;
+  margin: 1em 0;
+}
+</style>
+<? endif; ?> 
+
+<? $pagination->setPaging($paging) ?>
+
+<div id="rooms_pane">
+
+  <?= $this->renderElement('title', aa('title', 'Select Rooms')) ?>
+    
+  <div class="notice">
+    Please select rooms you wish to work with.  Your selections will be confirmed before any actions take place.
+  </div>
+
+  <form method="get" style="margin-top: 1em; margin-bottom: 1em">
+    <label for="query">Search Rooms:</label>
+    <input id="query" type="text" name="query" value="<?= $query ?>"/>
+    <button type="submit">
+      <?= $html->image('search.gif', aa('class', 'valign')) ?> Search
+    </button>
+  </form>
+    
+  <div id="selected_rooms">
+    <? if($selected): ?>
+    <?= $selected ?> selected
+    <? endif; ?>
+  </div>
+    
+  <table style="width: 100%; margin-top: 1em">
+    <tr>
+      <th style="text-align: center">
+	<a href="#rooms_pane" id="rooms_select_all">Select All</a><br/>
+	<a href="#rooms_pane" id="rooms_select_none">Select None</a>
+      </th>
+      <th><?= $pagination->sortBy('accountid', 'Confirmation Number') ?></th>
+      <th><?= $pagination->sortBy('contact') ?></th>
+
+      <th><?= $pagination->sortBy('cec', 'CEC') ?></th>
+      <th><?= $pagination->sortBy('pec', 'PEC') ?></th>
+    </tr>
+
+    <? for($i=0; $i<count($data); $i++): ?>
+    <tr class="<?= $i%2 ? 'odd' : 'even' ?>">
+      <td style="text-align: center">
+	<input type="checkbox" class="selection_check" name="accountid" value="<?= $data[$i]['RoomView']['accountid']?>" 
+	  <?= in_array($data[$i]['RoomView']['accountid'], $selections) ? 'checked="checked"' : '' ?> />
+      </td>
+
+      <td><?= $html->link($data[$i]['RoomView']['accountid'], '/rooms/view/' . $data[$i]['RoomView']['accountid']) ?></td>
+      <td><?= $data[$i]['RoomView']['contact'] ?></td>
+
+      <td><?= format_passcode($data[$i]['RoomView']['cec']) ?></td>
+      <td><?= format_passcode($data[$i]['RoomView']['pec']) ?></td>
+    </tr>
+    <? endfor; ?>
+  </table>
+
+  <?= $this->renderElement('pagination') ?>
+  
+  <form method="post">
+    <div class="submit">
+      <button class="cancel" type="button">
+	<?= $html->image('cross.gif') ?> Cancel
+      </button>
+      <button class="submit" type="submit">
+	Next <?= $html->image('next.gif') ?>
+      </button>
+    </div>
+  </form>
+</div>
+
+<? if(!$is_ajax): ?>
+<script type="text/javascript">
+$(document).ready( function() {
+    function select() {
+	var _this = this;
+
+	$.ajax({
+	    'type'      : 'POST',
+	    'url'       : '/rooms/select/<?= $account['Account']['acctgrpid'] ?>/<?= $mode ?>',
+	    'data'      : { 'accountid': this.value, 'value': this.checked ? 1 : 0},
+	    'dataType'  : 'html',
+
+	    'beforeSend': function(xhr) {
+	      $('#rooms_pane button,#rooms_pane .selection_check:checkbox').attr('disabled', 'disabled');
+	    }, 
+
+	    'complete'  : function(xhr) {
+	      $('#rooms_pane button,#rooms_pane .selection_check:checkbox').attr('disabled', '');
+	    }, 
+
+	    'success'   : function(data, status) {
+		if(_this.checked)
+  		    $(_this).parents('tr').addClass('highlight');
+		else
+  		    $(_this).parents('tr').removeClass('highlight');	
+
+		$('#selected_rooms').html(data);
+	    }, 
+
+	    'error'     : function(xhr, status, err) {
+		window.alert('An error occurred selecting room: ' + _this.value);
+	    }
+	});
+    }
+
+    function connect_selection_checks(ele) {
+      $(ele).find('.selection_check:checkbox').click(select);
+      $('button.cancel').back('/accounts/view/<?= $account['Account']['acctgrpid'] ?>');
+
+      $('#rooms_select_all,#rooms_select_none').click( function() {
+         var value = this.id == 'rooms_select_all' ? 'all' : 'none';
+
+	 $.ajax({
+		  'type'      : 'POST',
+		  'url'       : '/rooms/select/<?= $account['Account']['acctgrpid'] ?>/<?= $mode ?>',
+		  'data'      : { 'accountid': value },
+		  'dataType'  : 'html',
+		  
+		  'beforeSend': function(xhr) {
+		    $('#rooms_pane button,#rooms_pane .selection_check:checkbox').attr('disabled', 'disabled');
+		  }, 
+		  
+		  'complete'  : function(xhr) {
+		    $('#rooms_pane button,#rooms_pane .selection_check:checkbox').attr('disabled', '');
+		  }, 
+
+		  'success'   : function(data, status) {
+		    if(value == 'all')
+  		      $('#rooms_pane .selection_check:checkbox').attr('checked', 'checked').parents('tr').addClass('highlight');
+		    else
+  		      $('#rooms_pane .selection_check:checkbox').attr('checked', '').parents('tr').removeClass('highlight');	
+		    
+		    $('#selected_rooms').html(data);
+		  }, 
+		  
+		  'error'     : function(xhr, status, err) {
+		    window.alert('An error occurred selecting room: ' + _this.value);
+		  }
+		});
+	
+	return false;
+      });
+    }
+
+  $('#rooms_pane').paginate(connect_selection_checks);
+  connect_selection_checks($('#rooms_pane'));
+
+});
+</script>
+<? endif; ?>

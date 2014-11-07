@@ -1,0 +1,124 @@
+<style type="text/css">
+table.report {
+  margin-top: 1em;
+  width: 100%;
+}
+
+table.report th,table.report td {
+  padding: 5px 3px;
+  text-align: right;
+  border-left: 1px solid #cde;
+  border-right: 1px solid #cde;
+}
+
+tr.odd td {
+  background: #def;
+}
+
+.highlight {
+  color: #d22;
+}
+</style>
+
+<h1>Resellers Report</h1>
+
+<div id="breadcrumbs" style="margin-bottom:10px;font-size:10pt">
+
+  <?= $html->link('Home',  '/reports/resellers') ?> &raquo;
+
+  <? if(empty($myMonth)): ?>
+    <select id="year">
+      <? $focusYear = (int)date(Y);
+      while ($focusYear >= 2007): ?>
+        <option value="<?= $focusYear ?>" <?= $myYear == $focusYear ? 'selected="selected"' : '' ?> ><?= $focusYear ?></option>
+        <? $focusYear--;
+      endwhile ?>
+    </select>
+
+  <? else: ?>
+    <?= $html->link($myYear, "/reports/resellers/" . $myYear) ?>
+    &raquo; <?= $html->link($myMonth, "/reports/resellers/" . $myYear . '/' . $myMonth) ?>
+  <? endif; ?>
+
+  <? if($myReseller): ?>
+    &raquo; <?= $html->link($dates[0]['Reseller']['name'],  "/reports/resellers/$myYear/$myMonth/$myReseller") ?>
+  <? endif; ?>
+  
+</div>
+
+<p style="float: right">
+  <a href="<?= '?'.http_build_query(Array('export' => 1, 'query' => @$_GET['query'])) ?>">
+    <img src="/img/excel.gif">
+    <strong>Export to Excel</strong>
+  </a>
+</p>
+
+<table class="report">
+  <tr>
+    <th>Date</th>
+
+    <? if ($myMonth): ?>
+    <th>Reseller</th>
+    <? endif; ?>
+
+    <th>RL Mins</th>
+    <th>OA Mins</th>
+    <th>WB Mins</th>
+    <th>Total Mins</th>
+    <th>RL Cost</th>
+    <th>OA Cost</th>
+    <th>WB Cost</th>
+    <th>Flat Cost</th>
+    <th>Enhncd Svcs</th>
+    <th>Other Costs</th>
+    <th>Grand Total</th>
+  </tr>
+	
+  <? for($i=0; $i<count($dates); $i++): ?>
+
+     <?
+	$minutes = $dates[$i][$model]['reservationless_minutes'] + $dates[$i][$model]['operator_assisted_minutes'] + $dates[$i][$model]['web_minutes'];
+	$dollars = $dates[$i][$model]['reservationless_cost'] + $dates[$i][$model]['operator_assisted_cost'] + $dates[$i][$model]['web_cost'];
+	$year = date('Y',strtotime($dates[$i][$model]['date']));
+	$month = date('m',strtotime($dates[$i][$model]['date']));
+     ?>
+
+  <tr class="<?= $i%2 ? 'odd' : 'even' ?>">
+
+    <td><?= $html->link(date('m/Y', strtotime($dates[$i][$model]['date'])),"/reports/resellers/$year/$month"); ?></td>
+
+    <? if ($myMonth): ?>
+    <td>
+      <? if($dates[$i][$model]['resellerid'] == 1 || $dates[$i]['Reseller']['name'] != 'Infinite Conferencing' ): ?>
+      <?= $html->link($dates[$i]['Reseller']['name'], "/reports/resellers/$year/$myMonth/".$dates[$i][$model]['resellerid']) ?>
+      <? else: ?>
+      <?= $html->link($dates[$i]['Reseller']['rdesc'], "/reports/resellers/$year/$myMonth/".$dates[$i][$model]['resellerid']) ?>
+      <? endif; ?>
+    </td>
+    <? endif; ?>
+
+    <td><?= number_format($dates[$i][$model]['reservationless_minutes'],0,'.',',') ?></td>
+    <td><?= number_format($dates[$i][$model]['operator_assisted_minutes'],0,'.',',') ?></td>
+    <td><?= number_format($dates[$i][$model]['web_minutes'],0,'.',',') ?></td>
+    <td class="highlight"><?= number_format($dates[$i][$model]['total_minutes'],0,'.',',') ?></td>
+    
+    <td>$<?= number_format($dates[$i][$model]['reservationless_cost'],2,'.',',') ?></td>
+    <td>$<?= number_format($dates[$i][$model]['operator_assisted_cost'],2,'.',',') ?></td>
+    <td>$<?= number_format($dates[$i][$model]['web_cost'],2,'.',',') ?></td>
+    
+    <td>$<?= number_format($dates[$i][$model]['flat_cost'],2,'.',',') ?></td>
+    <td>$<?= number_format($dates[$i][$model]['enhanced_service_cost'],2,'.',',') ?></td>
+    <td>$<?= number_format($dates[$i][$model]['other_cost'],2,'.',',') ?></td>
+    <td class="highlight">$<?= number_format($dates[$i][$model]['total_cost'],2,'.',',') ?></td>
+    
+  </tr>
+  <? endfor; ?>
+</table>
+
+<script type="text/javascript">
+$(document).ready( function() {
+  $('#year').change( function() {
+    window.location = '/reports/resellers/' + this.value;
+  });
+});
+</script>

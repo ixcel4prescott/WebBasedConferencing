@@ -1,0 +1,5 @@
+<div class="select">
+  <label class="right required" for="<?= $type ?>TimeZone">Time Zone:</label>
+  <?= $html->selectTag($type.'/time_zone', $time_zones) ?>
+  <?= $html->tagErrorMsg($type.'/time_zone', 'Please select a time zone') ?>
+</div>

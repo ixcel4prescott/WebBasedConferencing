@@ -1,0 +1,43 @@
+<style type="text/css">
+#forgot_pane {
+   margin: auto;
+   padding-bottom: 20px;
+   width: 500px;
+   border: 1px solid #ccc;
+   padding: 10px 20px;
+}
+</style>
+
+<div id="forgot_pane">
+
+  <h1>Forgot Your Password</h1>
+
+  <p>
+    Please enter your email address and we will retrieve your password.
+  </p>
+
+  <form method="post" style="margin-top: 1em">
+    
+    <div class="input">
+      <label class="right required" for="UserEmail">Email:</label>
+      <?= $html->input('User/email') ?>
+      <?=$html->tagErrorMsg('User/email', 'Please specify your email')?>
+    </div>
+
+    <div class="submit">
+      <button class="cancel" type="button">
+	<?= $html->image('cross.gif') ?> Cancel
+      </button>
+      <button class="submit" type="submit">
+	<?= $html->image('check.gif') ?> OK
+      </button>
+    </div>
+
+  </form>
+</div>
+
+<script type="text/javascript">
+$(document).ready( function() {
+  $('button.cancel').back('/users/login');
+});
+</script>

@@ -1,0 +1,189 @@
+<? if(!$is_ajax): ?> 
+<?= $javascript->link('jquery.util.js') ?>
+
+<style type="text/css">
+#clients_pane {
+   margin: auto;
+   padding-bottom: 20px;
+   border: 1px solid #ccc;
+   padding: 10px 20px;
+}
+
+#clients {
+    width: 100%;
+}
+
+#clients_pane th, #clients_pane td {
+  padding: 3px 5px;
+  text-align: left;
+}
+
+tr.even td {
+  background: #EFF7FF;
+}
+
+#reservations_select_all, #reservations_select_none {
+  font-size: x-small;
+}
+
+#selected_reservations {
+  font-style: italic;
+}
+
+
+span.current {
+  color: #FF9C2A;
+  font-weight: bold;
+}
+
+fieldset {
+  padding: 0px 10px 10px 5px;
+}
+</style>
+<? endif; ?>
+
+<? $pagination->setPaging($paging) ?>
+
+<div id="clients_pane">
+
+  <?= $this->renderElement('title', aa('title', $client['SpectelClient']['ClientName'], 'target', 'spectel_client_view')) ?>
+
+  <form method="get" style="margin-top: 1em; margin-bottom: 1em">
+      <label for="query">Search:</label>
+      <input id="query" type="text" name="query" value="<?= $query ?>"/>
+      <button type="submit" id="submit">
+	<?= $html->image('search.gif', aa('class', 'valign')) ?> Search
+      </button>
+  </form>
+
+  <div id="selected_reservations">
+    <? if($selections): ?>
+    <?= count($selections) ?> selected
+    <? endif; ?>
+  </div>
+
+  <table id="clients">
+    <tr>
+      <th style="text-align: center">
+	<a href="#clients_pane" id="reservations_select_all">Select All</a><br/>
+	<a href="#clients_pane" id="reservations_select_none">Select None</a>
+      </th>
+      <th>Account ID</th>
+      <th>Reservation Ref</th>
+      <th>Name</th>
+      <th>CEC</th>
+      <th>PEC</th>
+    </tr>
+    
+    <? for($i=0; $i<count($data); $i++): ?>
+    <tr class="<?= $i%2 ? 'odd' : 'even' ?>">
+       <td style="text-align: center">
+	 <input type="checkbox" class="selection_check" name="reservation_ref" value="<?= $data[$i]['ReservationRef']?>" 
+	   <?= in_array($data[$i]['ReservationRef'], $selections) ? 'checked="checked"' : '' ?> />
+       </td>
+
+       <td><?= $html->link($data[$i]['accountid'], '/rooms/view/' . $data[$i]['accountid'] ) ?></td>
+       <td><?= $data[$i]['ReservationRef'] ?></td>
+       <td><?= $data[$i]['ConferenceName'] ?></td>
+       <td><?= $data[$i]['UsesMPIN'] ?></td>
+       <td><?= $data[$i]['UsesCPIN'] ?></td>
+    </tr>
+    <? endfor; ?>
+  </table>
+
+  <?= $this->renderElement('pagination') ?>
+
+  <form method="post">
+    <div class="submit">
+      <button class="cancel" type="button">
+	<?= $html->image('cross.gif') ?> Cancel
+      </button>
+      <button class="submit" type="submit">
+	Next <?= $html->image('next.gif') ?>
+      </button>
+    </div>
+  </form>
+
+</div>
+
+<? if(!$is_ajax): ?>
+<script type="text/javascript">
+$(document).ready( function() {
+
+    function select() {
+	var _this = this;
+
+	$.ajax({
+	    'type'      : 'POST',
+	    'url'       : '/spectel/select/<?= $client['SpectelClient']['ClientRef'] ?>',
+	    'data'      : { 'reservation_ref': this.value, 'value': this.checked ? 1 : 0},
+	    'dataType'  : 'html',
+
+	    'beforeSend': function(xhr) {
+	      $('#clients_pane button,#clients_pane .selection_check:checkbox').attr('disabled', 'disabled');
+	    }, 
+
+	    'complete'  : function(xhr) {
+	      $('#clients_pane button,#clients_pane .selection_check:checkbox').attr('disabled', '');
+	    }, 
+
+	    'success'   : function(data, status) {
+		if(_this.checked)
+  		    $(_this).parents('tr').addClass('highlight');
+		else
+  		    $(_this).parents('tr').removeClass('highlight');	
+
+		$('#selected_reservations').html(data);
+	    }, 
+
+	    'error'     : function(xhr, status, err) {
+		window.alert('An error occurred selecting room: ' + _this.value);
+	    }
+	});
+    }
+
+    function connect_selection_checks(ele) {
+      $(ele).find('.selection_check:checkbox').click(select);
+      $('button.cancel').back('/spectel');
+
+      $('#reservations_select_all,#reservations_select_none').click( function() {
+         var value = this.id == 'reservations_select_all' ? 'all' : 'none';
+
+	 $.ajax({
+		  'type'      : 'POST',
+		  'url'       : '/spectel/select/<?= $client['SpectelClient']['ClientRef'] ?>',
+		  'data'      : { 'reservation_ref': value },
+		  'dataType'  : 'html',
+		  
+		  'beforeSend': function(xhr) {
+		    $('#clients_pane button,#clients_pane .selection_check:checkbox').attr('disabled', 'disabled');
+		  }, 
+		  
+		  'complete'  : function(xhr) {
+		    $('#clients_pane button,#clients_pane .selection_check:checkbox').attr('disabled', '');
+		  }, 
+
+		  'success'   : function(data, status) {
+		    if(value == 'all')
+  		      $('#clients_pane .selection_check:checkbox').attr('checked', 'checked').parents('tr').addClass('highlight');
+		    else
+  		      $('#clients_pane .selection_check:checkbox').attr('checked', '').parents('tr').removeClass('highlight');	
+		    
+		    $('#selected_reservations').html(data);
+		  }, 
+		  
+		  'error'     : function(xhr, status, err) {
+		    window.alert('An error occurred selecting room: ' + _this.value);
+		  }
+		});
+	
+	return false;
+      });
+    }
+
+  $('#clients_pane').paginate(connect_selection_checks);
+  connect_selection_checks($('#clients_pane'));
+
+});
+</script>
+<? endif; ?>

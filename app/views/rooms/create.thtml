@@ -1,0 +1,647 @@
+<?= $javascript->link('jquery.spinner') ?>
+<?= $html->css('jquery.spinner') ?>
+
+<?= $html->css('ui.datepicker') ?>
+<?= $javascript->link('ui.datepicker.js') ?>
+
+<style class="text/css">
+div#room_frame {
+   margin: auto;
+   border: 1px solid #ccc;
+   padding: 10px 20px;
+}
+
+.highlight {
+  background: #FFF391;
+  border: 2px solid #EED821;
+}
+
+td {
+  padding: inherit;
+  text-align: inherit;
+}
+
+#dialin_numbers {
+   margin-left: 210px;
+   margin-top: 10px;
+   border: 1px solid #ccc;
+}
+
+#dialin_numbers th, #dialin_numbers td {
+   border-top: 1px solid #ccc;
+   padding: 3px 5px;
+}
+
+#dialin_numbers th {
+   background: #eee;
+   text-align: right;
+}
+
+#start_time {
+   font-size: smaller;
+}
+
+#room_frame textarea {
+  width: 200px;
+}
+
+div.selectSetting{
+    vertical-align: text-top;
+    margin-bottom:10px;
+    margin-left: 5px;
+    margin-right: 5px;
+}
+
+div.selectSetting label {
+    display: inline;
+    float:left;
+    width: 200px;
+    margin-right: 10px;
+}
+
+div.selectSetting select{
+    width: 205px;
+}
+div.selectSetting p{
+    margin-left: 210px;
+}
+
+</style>
+
+<div id="room_frame">
+
+  <?= $this->renderElement('title', aa('title', 'Create a Room for ' . $full_name, 'target', 'room_create')) ?>
+
+  <form method="post" id="room_form">
+
+    <?= $html->hidden('Page/switch_bridge', aa('value', '0')) ?>
+    <?= $html->hidden('Room/acctgrpid') ?>
+    <?= $html->hidden('Room/contact_id') ?>
+
+    <fieldset>
+      <legend>Conference Room</legend>
+      <? if($bridge == OCI_BRIDGEID || $bridge == SPECTEL_BRIDGEID || $bridge == SPECTELATL_BRIDGEID || $bridge == SPECTELFR_BRIDGEID): ?>
+        <div class="input">
+          <label class="right" for="RoomConfname">Conference Name:</label>
+          <?= $html->input('Room/confname') ?> <span class="smaller">(Name on Bridge)</span>
+          <?= $html->tagErrorMsg('Room/confname', 'Please enter a conference name, ampersands (&) are not permitted') ?>
+        </div>
+      <? endif; ?>
+
+      <div class="select">
+        <label class="right required" for="RoomBridgeid">Bridge:</label>
+        <?= $html->selectTag('Room/bridgeid', $bridges, null, null, null, false) ?>
+        <?= $html->tagErrorMsg('Room/bridgeid', 'Please select a bridge') ?>
+
+        <? if($bridge_error == 'no_default'): ?>
+          <div class="error_message">
+            No default bridge selected, <strong><?= $html->link('Update', '/accounts/edit/' .  $account['Account']['acctgrpid']) ?></strong>
+          </div>
+        <? elseif($bridge_error == 'not_default'): ?>
+          <div class="error_message">
+            Bridge selected is not the account's default bridge, <strong><?= $html->link('Update', '/accounts/edit/' .  $account['Account']['acctgrpid']) ?></strong>
+          </div>
+        <? endif; ?>
+      </div>
+
+      <div class="select">
+        <label class="right required" for="Roomproductid">Product:</label>
+        <?= $html->selectTag('Room/productid', $products, null, null, null, false) ?>
+        <?= $html->tagErrorMsg('Room/productid', 'Please select a product') ?>
+      </div>
+
+      <div class="select">
+        <label class="right" for="RoomDialinNoid">Dialin Number:</label>
+        <?= $html->selectTag('Room/dialinNoid', $dialin_numbers, $default_dialin) ?>
+
+        <? if(is_null($bridge_error) && $dialin_number_error): ?>
+          <div class="error_message">
+            Dialin numbers are not aligned to this reseller, please notify IT
+          </div>
+        <? endif; ?>
+        <?= $html->tagErrorMsg('Room/dialinNoid', 'Please select a dialin number') ?>
+        <table id="dialin_numbers" style="display:none">
+          <tr>
+            <th>Toll-Free Number:</th><td id="toll_free"></td>
+          </tr>
+          <tr>
+            <th>Toll Number:</th><td id="toll"></td>
+          </tr>
+        </table>
+      </div>
+
+      <div class="input">
+        <label class="right required" for="RoomContact">Name:</label>
+        <?= $html->input('Room/contact') ?>
+        <span class="smaller">(Name on Invoice)</span>
+        <?= $html->tagErrorMsg('Room/contact', 'Please enter a contact') ?>
+      </div>
+
+      <div class="input">
+        <label class="right required" for="RoomEmail">Email:</label>
+        <?= $html->input('Room/email') ?>
+        <?= $html->tagErrorMsg('Room/email', 'Please enter a valid email address') ?>
+      </div>
+
+      <div class="input">
+        <label class="right required" for="RoomCompany">Company:</label>
+        <?= $html->input('Room/company') ?>
+        <?= $html->tagErrorMsg('Room/company', 'Please enter a valid company address') ?>
+      </div>
+
+      <div class="checkbox">
+        <label class="right required" for="RoomAutogenerateCec">Auto-Generate CEC:</label>
+        <?= $html->checkbox('Room/autogenerate_cec') ?>
+      </div>
+
+      <div class="input"  <?= $this->data['Room']['autogenerate_cec'] ? 'style="display:none"' : ''  ?>>
+        <label class="right required" for="RoomCec">Chair Code:</label>
+        <?= $html->input('Room/cec') ?>
+        <?= $html->tagErrorMsg('Room/cec', 'Please enter an unused chair code (min 6 digits, avoid duplicate and consecutive digits)') ?>
+      </div>
+
+      <div class="checkbox">
+        <label class="right required" for="RoomAutogeneratePec">Auto-Generate PEC:</label>
+        <?= $html->checkbox('Room/autogenerate_pec') ?>
+      </div>
+
+      <div class="input" <?= $this->data['Room']['autogenerate_pec'] ? 'style="display:none"' : ''  ?>>
+        <label class="right required" for="RoomPec">Participant Code:</label>
+        <?= $html->input('Room/pec') ?>
+        <?= $html->tagErrorMsg('Room/pec', 'Please enter an unused participant code (min 6 digits, avoid duplicate and consecutive digits)') ?>
+      </div>
+
+      <? if($bridge == OCI_BRIDGEID): ?>
+        <div class="input">
+          <label class="right" for="RoomPrec">Presenter Code:</label>
+          <?= $html->input('Room/prec') ?>
+        </div>
+      <? endif; ?>
+      <? if($bridge == OCI_BRIDGEID || $bridge == SPECTEL_BRIDGEID || $bridge == SPECTELATL_BRIDGEID || $bridge == SPECTELFR_BRIDGEID): ?>
+        <div class="checkbox">
+          <label class="right" for="RoomEmailrpt">Email Usage Report:</label>
+          <?= $html->checkbox('Room/emailrpt') ?>
+        </div>
+      <? else: ?>
+        <?= $html->hidden('Room/emailrpt', Array('value'=>1)) ?>
+      <? endif ?>
+
+      <?= $html->tagErrorMsg('Room/emailrpt', 'Please specify an email address for the contact first') ?>
+
+    </fieldset>
+
+    <fieldset>
+      <legend>Schedule</legend>
+
+      <?= $html->hidden('Room/isopassist', aa('value', 0)) ?>
+      <?= $html->hidden('Room/isevent', aa('value', 0)) ?>
+
+      <div class="select">
+         <label class="right required" for="RoomType">Room Type:</label>
+         <?= $html->selectTag('Room/type', aa('rsvless', 'Reservationless', 'opassist', 'Operator Assisted', 'event', 'Event'), null, null, null, false) ?>
+      </div>
+
+      <? if($bridge == SPECTEL_BRIDGEID || $bridge == SPECTELATL_BRIDGEID || $bridge == SPECTELFR_BRIDGEID): ?>
+        <div class="input" style="display:none">
+          <label class="right required" for="RoomStartDate">Start Date:</label>
+          <?= $html->input('Room/startdate_date') ?>
+        </div>
+        <div class="input" style="display:none">
+          <label class="right required" for="RoomStartTime">Start Time:</label>
+          <?= $html->hourOptionTag('Room/startdate', null, false, null, aa('style', 'width:65px')) ?>:<?= $html->minuteOptionTag('Room/startdate', null, null, aa('style', 'width:65px')) ?>
+          <?= $html->meridianOptionTag('Room/startdate', null, null, aa('style', 'width:65px')) ?>
+          <button type="button" id="now">
+            Now
+          </button>
+          <span class="smaller">(<?= TZ ?> Timezone)</span>
+          <?= $html->tagErrorMsg('Room/startdate', 'Please select a start date and time in the future') ?>
+        </div>
+        <div class="input">
+          <label class="right required" for="RoomDuration">Duration:</label>
+          <?= $html->input('Room/duration') ?>
+          <?= $html->tagErrorMsg('Room/duration', 'Please enter the duration in minutes') ?>
+        </div>
+      <? endif; ?>
+
+      <div class="input">
+        <label class="right required" for="RoomMaximumconnections">Maximum Connections:</label>
+        <?= $html->input('Room/maximumconnections', aa('readonly', $can_set_maxconnections ? '' : 'readonly')) ?>
+        <?= $html->tagErrorMsg('Room/maximumconnections', 'Please enter a maximum number of connections') ?>
+        <? if(!$can_set_maxconnections): ?>
+          <span class="smaller">(Please contact Operations to alter this setting)</span>
+        <? endif; ?>
+      </div>
+
+      <? if(in_array('scheduletype', $activeBridgeSettings)): ?>
+        <div class="selectSetting">
+          <label class="right required" for="RoomScheduletype">Schedule Type:</label>
+          <?= $html->selectTag('Room/scheduletype', $schedule_types) ?>
+          <?= $html->tagErrorMsg('Room/scheduletype', 'Please select a schedule type') ?>
+          <p class="hint"></p>
+        </div>
+      <? endif; ?>
+      <? if(in_array ('securitytype', $activeBridgeSettings)): ?>
+        <div class="selectSetting">
+          <label class="right required" for="RoomSecuritytype">Security Type:</label>
+          <?= $html->selectTag('Room/securitytype', $security_types) ?>
+          <?= $html->tagErrorMsg('Room/securitytype', 'Please select a security type') ?>
+        </div>
+      <? endif; ?>
+
+    </fieldset>
+
+    <fieldset>
+      <legend>Conference Start</legend>
+      <? if(in_array('startmode', $activeBridgeSettings)): ?>
+        <div class="selectSetting">
+          <label class="right required" for="RoomStartmode">Start Mode:</label>
+          <?= $html->selectTag('Room/startmode', $start_modes) ?>
+          <?= $html->tagErrorMsg('Room/startmode', 'Please select a start mode') ?>
+        </div>
+      <? endif; ?>
+      <? if(in_array('namerecording', $activeBridgeSettings)): ?>
+        <div class="selectSetting">
+          <label class="right required" for="RoomNamerecording">Name Recording:</label>
+          <?= $html->selectTag('Room/namerecording', $namerecording) ?>
+          <?= $html->tagErrorMsg('Room/namerecording', 'Please select an option') ?>
+          <p class="hint"></p>
+        </div>
+      <? endif; ?>
+
+    </fieldset>
+
+    <fieldset>
+      <legend>Chair Functions</legend>
+
+      <? if(in_array('endonchairhangup', $activeBridgeSettings)): ?>
+        <div class="selectSetting">
+          <label class="right required" for="RoomEndonchairhangup">End on Chair Hangup:</label>
+          <?= $html->selectTag('Room/endonchairhangup', $endonchairhangup) ?>
+          <?= $html->tagErrorMsg('Room/endonchairhangup', 'Please select an option') ?>
+          <p class="hint"></p>
+      </div>
+      <? endif; ?>
+      <? if(in_array('dialout', $activeBridgeSettings)): ?>
+        <div class="selectSetting">
+          <label class="right required" for="RoomDialout">Allow Dial Out:</label>
+          <?= $html->selectTag('Room/dialout', $dialout) ?>
+          <?= $html->tagErrorMsg('Room/dialout', 'Please select an option') ?>
+          <p class="hint"></p>
+        </div>
+      <? endif; ?>
+      <? if(in_array('record_playback', $activeBridgeSettings)): ?>
+        <div class="selectSetting">
+          <label class="right required" for="RoomRecordPlayback">Enable Record/Playback</label>
+          <?= $html->selectTag('Room/record_playback', $dialout) ?>
+          <?= $html->tagErrorMsg('Room/record_playback', 'Please select an option') ?>
+          <p class="hint"></p>
+        </div>
+      <? endif; ?>
+    </fieldset>
+
+    <fieldset>
+      <legend>Activity Notifications</legend>
+      <? if(in_array('entryannouncement', $activeBridgeSettings)): ?>
+        <div class="selectSetting">
+          <label class="right required" for="RoomEntryannouncement">Entry Announcement:</label>
+          <?= $html->selectTag('Room/entryannouncement', $entryannouncement) ?>
+          <?= $html->tagErrorMsg('Room/entryannouncement', 'Please select an entry announcement') ?>
+          <p class="hint"></p>
+        </div>
+      <? endif; ?>
+      <? if(in_array('exitannouncement', $activeBridgeSettings)): ?>
+        <div class="selectSetting">
+          <label class="right required" for="RoomExitannouncement">Exit Announcement:</label>
+          <?= $html->selectTag('Room/exitannouncement', $exitannouncement) ?>
+          <?= $html->tagErrorMsg('Room/exitannouncement', 'Please select an exit announcement') ?>
+          <p class="hint"></p>
+        </div>
+      <? endif; ?>
+
+      <? if(in_array('endingsignal', $activeBridgeSettings)): ?>
+        <div class="selectSetting">
+          <label class="right required" for="RoomEndingsignal">Ending Signal:</label>
+          <?= $html->selectTag('Room/endingsignal', $endingsignal) ?>
+          <?= $html->tagErrorMsg('Room/endingsignal', 'Please select an ending signal') ?>
+          <p class="hint"></p>
+        </div>
+      <? endif; ?>
+      <? if(in_array('dtmfsignal', $activeBridgeSettings)): ?>
+        <div class="selectSetting">
+          <label class="right required" for="RoomDtmfsignal">DTMF Signal:</label>
+          <?= $html->selectTag('Room/dtmfsignal', $dtmfsignal) ?>
+          <?= $html->tagErrorMsg('Room/dtmfsignal', 'Please select a DTMF signal') ?>
+          <p class="hint"></p>
+        </div>
+      <? endif; ?>
+      <? if(in_array('recordingsignal', $activeBridgeSettings)): ?>
+        <div class="selectSetting">
+          <label class="right required" for="RoomRecordingsignal">Recording Signal:</label>
+          <?= $html->selectTag('Room/recordingsignal', $recordingsignal) ?>
+          <?= $html->tagErrorMsg('Room/recordingsignal', 'Please select a recording signal') ?>
+          <p class="hint"></p>
+        </div>
+      <? endif; ?>
+
+    </fieldset>
+
+    <fieldset>
+      <legend>Conference Behavior</legend>
+      <? if(in_array('digitentry1', $activeBridgeSettings)): ?>
+        <div class="selectSetting">
+          <label class="right required" for="RoomDigitentry1">Bill Code Prompt/Bill back:</label>
+          <?= $html->selectTag('Room/digitentry1', $digitentry1) ?>
+          <?= $html->tagErrorMsg('Room/digitentry1', 'Please select a digit entry') ?>
+          <p class="hint"></p>
+        </div>
+      <? endif; ?>
+      <? if(in_array('confirmdigitentry1', $activeBridgeSettings)): ?>
+        <div class="selectSetting">
+          <label class="right required" for="RoomDigitentry1">Confirm Digit Entry 1:</label>
+          <?= $html->selectTag('Room/confirmdigitentry1', $confirmdigitentry1) ?>
+          <?= $html->tagErrorMsg('Room/confirmdigitentry1', 'Please select an option') ?>
+          <p class="hint"></p>
+        </div>
+      <? endif; ?>
+      <? if(in_array('digitentry2', $activeBridgeSettings)): ?>
+        <div class="selectSetting">
+          <label class="right required" for="RoomDigitentry1">Digit Entry 2:</label>
+          <?= $html->selectTag('Room/digitentry2', $digitentry2) ?>
+          <?= $html->tagErrorMsg('Room/digitentry2', 'Please select a digit entry') ?>
+          <p class="hint"></p>
+        </div>
+      <? endif; ?>
+      <? if(in_array('confirmdigitentry2', $activeBridgeSettings)): ?>
+        <div class="selectSetting">
+          <label class="right required" for="RoomConfirmdigitentry2">Confirm Digit Entry 2:</label>
+          <?= $html->selectTag('Room/confirmdigitentry2', $confirmdigitentry2) ?>
+          <?= $html->tagErrorMsg('Room/confirmdigitentry2', 'Please select an option') ?>
+          <p class="hint"></p>
+        </div>
+      <? endif; ?>
+      <? if(in_array('muteallduringplayback', $activeBridgeSettings)): ?>
+        <div class="selectSetting">
+          <label class="right required" for="RoomMuteallduringplayback">Mute All During Playback:</label>
+          <?= $html->selectTag('Room/muteallduringplayback', $muteallduringplayback) ?>
+          <?= $html->tagErrorMsg('Room/muteallduringplayback', 'Please select an option') ?>
+          <p class="hint"></p>
+        </div>
+      <? endif; ?>
+      <? if(in_array('conference_viewer', $activeBridgeSettings)): ?>
+        <div class="selectSetting">
+          <label class="right required" for="RoomConferenceViewer">Conference Viewer:</label>
+          <?= $html->selectTag('Room/conference_viewer', $conference_viewer) ?>
+          <?//= $html->tagErrorMsg('Room/conference_viewer', 'Please select a digit entry') ?>
+          <p class="hint"></p>
+        </div>
+      <? endif; ?>
+      <? if(in_array('bill_code_prompt', $activeBridgeSettings)): ?>
+        <div class="selectSetting">
+          <label class="right required" for="RoomBillCodePrompt">Bill Code Prompt:</label>
+          <?= $html->selectTag('Room/bill_code_prompt', $bill_code_prompt) ?>
+          <?//= $html->tagErrorMsg('Room/conference_viewer', 'Please select a digit entry') ?>
+          <p class="hint"></p>
+        </div>
+      <? endif; ?>
+
+      <div class="select">
+        <label class="right" for="RoomLang">Language:</label>
+        <?= $html->selectTag('Room/lang', $languages) ?>
+        <?= $html->tagErrorMsg('Room/lang', 'Please select a language') ?>
+      </div>
+
+    </fieldset>
+
+    <fieldset>
+      <legend>Billing</legend>
+
+      <div class="select" id="bmethod">
+        <label class="right" for="RoomBillingMethodId">Billing Method:</label>
+        <?= $html->selectTag('Room/billing_method_id', $billingMethods) ?>
+        <?= $html->tagErrorMsg('Room/billing_method_id', 'Please select a billing method') ?>
+      </div>
+
+      <div class="input">
+        <label class="right" for="RoomBillingcode">Billing Code:</label>
+        <?= $html->input('Room/billingcode') ?>
+      </div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Notes</legend>
+
+      <div class="input">
+         <label class="right" for="RoomNote1">Note 1:</label>
+         <?= $html->textarea('Room/note1') ?>
+      </div>
+
+      <div class="input">
+        <label class="right" for="RoomNote2">Note 2:</label>
+        <?= $html->textarea('Room/note2') ?>
+      </div>
+
+      <div class="input">
+        <label class="right" for="RoomNote3">Note 3:</label>
+        <?= $html->textarea('Room/note3') ?>
+      </div>
+
+      <div class="input">
+        <label class="right" for="RoomNote4">Note 4:</label>
+        <?= $html->textarea('Room/note4') ?>
+      </div>
+    </fieldset>
+
+    <div class="submit">
+      <button class="cancel" type="button">
+        <?= $html->image('cross.gif') ?> Cancel
+      </button>
+      <button class="submit" type="submit" name="manual">
+        <?= $html->image('check.gif') ?> Create
+      </button>
+    </div>
+  </form>
+</div>
+
+<script type="text/javascript">
+  $(document).ready( function() {
+    $('#RoomBridgeid').change( function() {
+      $('#PageSwitchBridge').val(1);
+      this.form.submit();
+    });
+
+    $('button.cancel').back('/accounts/view/<?= $account['Account']['acctgrpid'] ?>');
+
+    $('#RoomAutogenerateCec,#RoomAutogeneratePec').click( function() {
+      if(this.checked) {
+        $(this).parent('div.checkbox').next('div.input').slideUp().find('input').val('').attr('readonly', 'readonly');
+      } else {
+        $(this).parent('div.checkbox').next('div.input').slideDown().find('input').attr('readonly', '');
+      }
+    });
+
+    $('#RoomCanada').spinner();
+
+    var dialin_map = <?= json_encode($dialin_map) ?>;
+
+    $('#RoomDialinNoid').change( function() {
+      if(this.value) {
+        $('#toll_free').html(dialin_map[this.value][0]);
+        $('#toll').html(dialin_map[this.value][1]);
+        $('#dialin_numbers').show();
+      } else {
+        $('#dialin_numbers').hide();
+      }
+    }).change();
+
+    $('#RoomType').change( function() {
+      var show = false;
+      if(this.value == 'opassist') {
+        $('#RoomIsopassist').val(1);
+        $('#RoomIsevent').val(0);
+        $('#RoomScheduletype').val($('#RoomBridgeid').val() == 4 ? 1 : 2);
+        show = true;
+      } else if(this.value == 'event') {
+        $('#RoomIsopassist').val(0);
+        $('#RoomIsevent').val(1);
+        $('#RoomScheduletype').val($('#RoomBridgeid').val() == 4 ? 1 : 2);
+        show = true;
+      } else {
+        $('#RoomIsopassist').val(0);
+        $('#RoomIsevent').val(0);
+        $('#RoomScheduletype').val($('#RoomBridgeid').val() == 4 ? 0 : 2);
+      }
+
+      if(show)
+        $('#RoomStartdateDate,#RoomStartdateHour,#RoomDuration').parent('div.input').slideDown();
+      else
+        $('#RoomStartdateDate,#RoomStartdateHour,#RoomDuration').parent('div.input').slideUp();
+
+    }).change();
+
+    $('#RoomStartdateDate').datepicker();
+
+    $('#now').click( function() {
+      var now = new Date();
+      var month = (now.getMonth()+1).toString();
+      if(month.length < 2)
+        month = '0' + month;
+
+      var date = now.getDate().toString();
+      if(date.length < 2)
+        date = '0' + date;
+
+      var year = now.getFullYear().toString();
+
+      var hour = now.getHours();
+      if(hour == 0)
+        hour = 12;
+      else if(hour > 12)
+        hour = hour - 12;
+
+      var min = now.getMinutes().toString();
+      if(min.length < 2)
+        min = '0' + min;
+
+      var meridian = 'am';
+      if(now.getHours() >= 12)
+        meridian = 'pm';
+
+      $('#RoomStartdateDate').val(month + '/' + date + '/' + year);
+      $('#RoomStartdateHour').val(hour.toString());
+      $('#RoomStartdateMin').val(min.toString());
+      $('#RoomStartdateMeridian').val(meridian.toString());
+    });
+
+  
+$('div.selectSetting select').change(function() {
+      if (this.value === ""){
+        $(this).parent().find('.hint').html("");
+      } else {
+        var regex=new RegExp(/data\[Room\]\[(\w+)\]/);
+        var match = regex.exec(this.name);
+        $(this).parent().find('.hint').html(Settings[match[1]][this.value]);
+    }}).change();
+
+  });
+
+  var Settings = <? echo json_encode($settingsDescription)?>
+  
+</script>
+
+
+<script type="text/javascript">
+  // Check if Flat Rate options need to be set when page loads.
+  $(document).ready( processFlatRateDivs);
+  
+  /*
+    If flat-rate selected, block room_form submission until billing frequency and amount have values.
+   */
+  $('#room_form').submit(function() 
+  {
+    if ($('#RoomBillingMethodId').val() == 3)
+    {
+      // Flat-rate.  Need to validate billing period and charge.
+      if ($('#billing_frequency').val() == '' || $('#flat_rate_charge').val() == '')
+      {
+        alert('You need to enter both a billing frequency and flat rate charge to create a flat rate room.');
+        // Focus on the first missing piece.
+        if ($('#billing_frequency').val() == '')
+        {
+          $('#billing_frequency').focus()
+        }
+        else
+        {
+          $('#flat_rate_charge').focus()
+        }
+        return false;
+      }
+			// Check for 0 value in Flat Rate.  If so, set to 0.000
+			if ($('#flat_rate_charge').val() == '0') {
+				$('#flat_rate_charge').val('0.000');
+			}
+    }
+    else
+    {
+      return true;
+    }
+  });
+    
+  /* 
+    Check the billing method onchange to see if we need to add flat-rate options or not.
+    Added id="bmethod" to billing_method div as well.
+   */
+  $('#RoomBillingMethodId').change(processFlatRateDivs);
+  
+  /*
+    Use jquery to add or remove flat rate billing and charge options to the page,
+    depending on whether they are needed or not.
+   */
+  function processFlatRateDivs()
+  {
+    if ($('#RoomBillingMethodId').val() == 3)
+    {
+      // Add flat-rate items if flat-rate.
+      var flatRateDivs = '<div class="select" id="bfrequency"><label class="right" for="billing_frequency">Billing Frequency:</label>  <select id="billing_frequency" name="data[Room][billing_frequency_id]">    <option value=""> </option><option selected="selected" value="1">Monthly</option><option value="2">Quarterly</option><option value="3">Semi-Annually</option><option value="4">Annually</option></select></div><div class="input" id="bfrc">  <label class="right" for="flat_rate_charge">Flat Rate Charge:</label><input id="flat_rate_charge" name="data[Room][flat_rate_charge]" type="text" /></div>';
+      $('#bmethod').after(flatRateDivs);
+      // Now bind our validator to the charge input.  numbers and decimal only.
+      $('#flat_rate_charge').bind('input propertychange', function () {
+        $(this).val($(this).val().replace(/[^0-9\.]/g, ''));
+      });
+    }
+    else
+    {
+      // Remove flat-rate items if exist.
+      if($('#bfrequency').length > 0) 
+      {
+        $('div').remove('#bfrequency');
+        $('div').remove('#bfrc');
+      }
+    } 
+  }
+  
+  //
+  function numOnly() 
+  {
+    $(this).val($(this).val().replace(/[^0-9]/g, ""));
+  }
+</script>

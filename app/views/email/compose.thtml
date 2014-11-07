@@ -1,0 +1,382 @@
+<!-- <?= $javascript->link('tiny_mce/tiny_mce.js') ?> -->
+
+<style type="text/css">
+#compose_pane {
+   margin: auto;
+}
+
+#add_recipients, #add_bccs {
+  border: none;
+}
+
+#add_recipients th, #add_bccs th {
+  font-size: 12px;
+  width: 195px;
+  border: none;
+  background: #fff;
+  text-align: right;
+  font-weight: normal;
+}
+
+#add_recipients td, #add_bccs td {
+  border: none;
+  padding: 0;
+  text-align: left;
+}
+
+#add_recipients td input, #add_bccs td input {
+  width: 200px;
+  margin-bottom: 0.25em;
+}
+
+div.radio_option {
+   margin-left: 215px;
+   margin-top: 0.25em;
+}
+
+td div.error_message {
+  margin-left: 1em;
+}
+
+table.details {
+  border: none;
+  font-size: 12px;
+}
+
+table.details th, table.details td {
+  margin-bottom: 5px;
+}
+
+table.details th {
+  background: #fff;
+  width: 205px;
+  text-align: right;
+  border: none;
+  padding: 0;
+  margin-right: 10px;
+}
+
+table.details td {
+  text-align: left;
+  border: none;
+  
+}
+</style>
+
+<div id="compose_pane">
+
+  <?= $this->renderElement('title', aa('title', 'Compose Email')) ?>
+
+  <p>
+    Select rooms to be sent emails.
+  </p>
+
+  <form method="post" style="margin-top: 1em">
+
+    <? if(isset($bridges['icbr2'])): ?>
+    <fieldset>
+      <legend>Email Template for Spectel Rooms</legend>
+      <div class="select">
+         <label class="right required" for="WelcomeEmailClassSpectel">Class:</label>
+         <?= $html->selectTag('WelcomeEmail/class_spectel', $bridges['icbr2']) ?>
+         <?= $html->tagErrorMsg('WelcomeEmail/class_spectel', 'Please select a class') ?>   
+      </div>
+
+      <div class="select">
+         <label class="right required" for="WelcomeEmailTemplateSpectel">Template:</label>
+         <?= $html->selectTag('WelcomeEmail/template_spectel', Array(), null, aa('disabled', 'disabled')) ?>
+         <?= $html->tagErrorMsg('WelcomeEmail/template_spectel', 'Please select a template') ?>   
+      </div>
+
+      <table class="details" style="display:none">
+        <tr>
+          <th>Subject:</th>
+ 	  <td class="subject"></td>
+        </tr>
+        <tr>
+          <th>Description:</th>
+          <td class="description"></td>
+        </tr>
+      </table>
+ 
+    </fieldset>
+    <? endif; ?>
+
+    <? if(isset($bridges['icbr1'])): ?>
+    <fieldset>
+      <legend>Email Template for OCI Rooms</legend>
+
+      <div class="select">
+        <label class="right required" for="WelcomeEmailClassOci">Class:</label>
+        <?= $html->selectTag('WelcomeEmail/class_oci', $bridges['icbr1']) ?>
+        <?= $html->tagErrorMsg('WelcomeEmail/class_oci', 'Please select a class') ?>   
+      </div>
+      
+      <div class="select">
+        <label class="right required" for="WelcomeEmailTemplateOci">Template:</label>
+	<?= $html->selectTag('WelcomeEmail/template_oci', Array(), null, aa('disabled', 'disabled')) ?>
+        <?= $html->tagErrorMsg('WelcomeEmail/template_oci', 'Please select a template') ?>   
+      </div>
+
+      <table class="details" style="display:none">
+        <tr>
+          <th>Subject:</th>
+ 	  <td class="subject"></td>
+        </tr>
+        <tr>
+          <th>Description:</th>
+          <td class="description"></td>
+        </tr>
+      </table>
+
+    </fieldset> 
+    <? endif; ?>
+
+    <? if(isset($bridges['osbr1'])): ?>
+    <fieldset>
+      <legend>Email Template for OSBR1 Rooms</legend>
+      <div class="select">
+         <label class="right required" for="WelcomeEmailClassOsbr1">Class:</label>
+         <?= $html->selectTag('WelcomeEmail/class_osbr1', $bridges['osbr1']) ?>
+         <?= $html->tagErrorMsg('WelcomeEmail/class_osbr1', 'Please select a class') ?>   
+      </div>
+
+      <div class="select">
+         <label class="right required" for="WelcomeEmailTemplateOsbr1">Template:</label>
+         <?= $html->selectTag('WelcomeEmail/template_osbr1', Array(), null, aa('disabled', 'disabled')) ?>
+         <?= $html->tagErrorMsg('WelcomeEmail/template_osbr1', 'Please select a template') ?>   
+      </div>
+
+      <table class="details" style="display:none">
+        <tr>
+          <th>Subject:</th>
+ 	  <td class="subject"></td>
+        </tr>
+        <tr>
+          <th>Description:</th>
+          <td class="description"></td>
+        </tr>
+      </table>
+ 
+    </fieldset>
+    <? endif; ?>
+
+    <? if(isset($bridges['osbr2'])): ?>
+    <fieldset>
+      <legend>Email Template for OSBR2 Rooms</legend>
+      <div class="select">
+         <label class="right required" for="WelcomeEmailClassOsbr2">Class:</label>
+         <?= $html->selectTag('WelcomeEmail/class_osbr2', $bridges['osbr2']) ?>
+         <?= $html->tagErrorMsg('WelcomeEmail/class_osbr2', 'Please select a class') ?>   
+      </div>
+
+      <div class="select">
+         <label class="right required" for="WelcomeEmailTemplateOsbr2">Template:</label>
+         <?= $html->selectTag('WelcomeEmail/template_osbr2', Array(), null, aa('disabled', 'disabled')) ?>
+         <?= $html->tagErrorMsg('WelcomeEmail/template_osbr2', 'Please select a template') ?>   
+      </div>
+
+      <table class="details" style="display:none">
+        <tr>
+          <th>Subject:</th>
+ 	  <td class="subject"></td>
+        </tr>
+        <tr>
+          <th>Description:</th>
+          <td class="description"></td>
+        </tr>
+      </table>
+ 
+    </fieldset>
+    <? endif; ?>
+
+    <fieldset>
+      <legend>Sender of Email</legend>
+      
+      <input type="hidden" name="data[WelcomeEmail][sender]" value=""/>
+      
+	<div class="radio_option">
+	  <?= $html->radio('WelcomeEmail/sender', 
+  	        Array('salesperson' => sprintf(' Salesperson: %s(%s)', $account['Salesperson']['accountmanager'], 
+	                                   $account['Salesperson']['email']), 
+	              'clientcare' => sprintf( ' ClientCare(%s)', CLIENTCARE_EMAIL), 
+                      'other' => ' Other'), '</div><div class="radio_option">') ?>
+
+          <?= $html->input('WelcomeEmail/other_sender', aa('disabled', !empty($this->data['WelcomeEmail']['sender']) && 
+  	        $this->data['WelcomeEmail']['sender'] == 'other' ? '' : 'disabled', 'style', 'margin-left:0.5em;width: 200px')) ?>
+	</div>
+
+        <?= $html->tagErrorMsg('WelcomeEmail/sender', 'Please specify a sender') ?>
+        <?= $html->tagErrorMsg('WelcomeEmail/other_sender', 'Please specify a sender') ?>
+      
+    </fieldset>
+
+    <fieldset>
+      <legend>Recipients</legend>
+
+      <div class="checkbox">
+        <label class="right" for="WelcomeEmailAccountAddress">Account's Email Address:</label>
+        <?= $html->checkbox('WelcomeEmail/account_address', aa('disabled', empty($account['Account']['email']) ? 'disabled': '')) ?>
+	<span><?= sprintf('%s(%s)', $account['Account']['bcontact'], $account['Account']['email']) ?></span>
+      </div>      
+
+      <div class="checkbox">
+         <label class="right" for="WelcomeEmailContactAddress">Contact's Email Address:</label>
+         <?= $html->checkbox('WelcomeEmail/contact_address') ?>
+      </div>
+
+      <table id="add_recipients">
+	<? for($i=0; $i<20; $i++): ?>
+	   <tr <?= $i>0 ? 'style="display:none"' : '' ?>>
+	     <th>
+	       <? if($i==0): ?>
+	       <label for="add_recipients">Additional Recipients:</label>
+	       <? endif; ?>
+	     </th>
+ 	     <td><input name="data[WelcomeEmail][add_recipients][]" value="<?= !empty($this->data['WelcomeEmail']['add_recipients'][$i]) ? $this->data['WelcomeEmail']['add_recipients'][$i] : ''?>"/></td>
+	     <td>
+	       <? if($i==0): ?>
+	       <?= $html->tagErrorMsg('WelcomeEmail/add_recipients', 'Please check to make sure these are valid email addresses') ?>
+	       <? endif; ?>
+	     </td>
+	   </tr>
+	<? endfor; ?>
+      </table>
+    </fieldset>
+   
+    <fieldset>
+      <legend>Additional Recipients(BCC)</legend>
+      
+      <div class="checkbox">
+         <label class="right" for="WelcomeEmailSalesperson">The Salesperson:</label>
+         <?= $html->checkbox('WelcomeEmail/salesperson') ?>
+      </div>
+
+      <div class="checkbox">
+         <label class="right" for="WelcomeEmailOperations">Operations:</label>
+         <?= $html->checkbox('WelcomeEmail/operations') ?>
+      </div>
+
+      <div class="checkbox">
+         <label class="right" for="WelcomeEmailClientcare">Clientcare:</label>
+         <?= $html->checkbox('WelcomeEmail/clientcare') ?>
+      </div>
+
+      <table id="add_bccs">
+	<? for($i=0; $i<20; $i++): ?>
+	   <tr <?= $i>0 ? 'style="display:none"' : '' ?>>
+	     <th>
+	       <? if($i==0): ?>
+	       <label for="add_bcc">Additional BCC's:</label>
+	       <? endif; ?>
+	     </th>
+	     <td><input name="data[WelcomeEmail][add_bccs][]" value="<?= !empty($this->data['WelcomeEmail']['add_bccs'][$i]) ? $this->data['WelcomeEmail']['add_bccs'][$i] : ''?>"/></td>
+	     <td>
+	       <? if($i==0): ?>
+	       <?= $html->tagErrorMsg('WelcomeEmail/add_bccs', 'Please check to make sure these are valid email addresses') ?>
+	       <? endif; ?>
+	     </td>
+           </tr>
+	<? endfor; ?>
+      </table>
+    </fieldset>
+
+    <!-- <fieldset> -->
+    <!--   <legend>Message</legend> -->
+      
+    <!--   <div class="input"> -->
+    <!--      <label class="right" for="WelcomeEmailMessage">&nbsp;</label> -->
+    <!--      <?= $html->textarea('WelcomeEmail/message', aa('style', 'width:575px;height:200px')) ?> -->
+    <!--   </div> -->
+      
+    <!-- </fieldset> -->
+
+    <div class="submit">
+      <button class="cancel" type="button">
+	<?= $html->image('previous.gif') ?> Previous
+      </button>
+      <button class="submit" type="submit">
+	Next <?= $html->image('next.gif') ?>
+      </button>
+    </div>
+
+  </form>
+</div>
+
+<!-- <script type="text/javascript"> -->
+<!--   tinyMCE.init({ -->
+<!--     mode: "textareas", -->
+<!--     theme: "simple" -->
+<!--   }); -->
+<!-- </script> -->
+
+<script type="text/javascript">
+$(document).ready( function() {
+
+  $('button.cancel').back('/email/index/<?= $account['Account']['acctgrpid'] ?>');
+
+  $('#add_recipients input,#add_bccs input').keyup( function() {
+    if(this.value != '') {
+      $(this).parents('tr').next('tr').show();
+    }
+  }).keyup();
+
+  var templates = <?= json_encode($templates) ?>;
+
+  function template_details() {
+    var table = $(this).parent('.select').next('.details');
+
+    if(this.value != '') {
+      table.find('.subject').html(templates[this.value].Template.subject);
+      table.find('.description').html(templates[this.value].Template.description);
+      table.slideDown();
+    } else {
+      table.slideUp();
+    }
+  }
+
+  $('#WelcomeEmailClassSpectel,#WelcomeEmailClassOci,#WelcomeEmailClassOsbr1,#WelcomeEmailClassOsbr2').change( function() {
+     var select = $(this);
+     var id     = select.attr('id');
+
+     var bridges = {'WelcomeEmailClassSpectel': 'spectel', 'WelcomeEmailClassOci': 'oci', 'WelcomeEmailClassOsbr1': 'osbr1', 'WelcomeEmailClassOsbr2': 'osbr2'};
+     var targets = {'WelcomeEmailClassSpectel': '#WelcomeEmailTemplateSpectel', 'WelcomeEmailClassOci': '#WelcomeEmailTemplateOci', 'WelcomeEmailClassOsbr1': '#WelcomeEmailTemplateOsbr1', 'WelcomeEmailClassOsbr2': '#WelcomeEmailTemplateOsbr2'};
+
+       $.ajax({
+         'type'      : 'POST', 
+         'url'       : '/email/templates/<?= $token ?>',
+         'data'      : {'data[Template][classid]': this.value, 'data[Template][bridge]': bridges[id]},
+         'dataType'  : 'html',
+         'beforeSend': function(xhr) {
+            select.attr('disabled', 'disabled');
+            $(targets[id]).attr('disabled', 'disabled');
+            select.parent('.select').nextAll('.details').slideUp();
+         },
+         'complete': function(xhr, status) {
+            select.attr('disabled', '');	     
+            $(targets[id]).attr('disabled', '');
+         },
+         'success': function(html, status) {
+            $(targets[id]).replaceWith(html);
+            $(targets[id]).change(template_details);
+         }, 
+         'error': function(xhr, status, err) {
+         }
+       });
+  }).change();
+
+  $('#sender_other').click( function() {
+    if(this.checked) {
+      $('#WelcomeEmailOtherSender').attr('disabled', '');
+    }
+  });
+
+  $('#sender_salesperson,#sender_clientcare').click( function() {
+    if(this.checked) {
+      $('#WelcomeEmailOtherSender').attr('disabled', 'disabled');
+    }
+  });
+
+
+});
+</script>

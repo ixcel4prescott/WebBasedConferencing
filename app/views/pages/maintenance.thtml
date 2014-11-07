@@ -1,0 +1,9 @@
+<style type="text/css">
+#main {
+  margin-left: 0;
+  margin-bottom: 20em;
+}
+</style>
+
+<h1 class="center">We are currently offline for maintenance.</h1>
+<div class="center">Please check back again later</div>

@@ -1,0 +1,4 @@
+<div style="margin-top: 1em">
+  <strong><?= $html->link(ucfirst($room['RoomView']['company']), '/accounts/view/' . $request['Account']['acctgrpid']) ?>(<?= $html->link($request['Account']['acctgrpid'], '/accounts/view/' . $request['Account']['acctgrpid']) ?>)</strong> 
+  requested to change the status of room <strong><?= $html->link($room['RoomView']['contact'], '/rooms/view/' .  $room['RoomView']['accountid']) ?>(<?= $html->link($room['RoomView']['accountid'], '/rooms/view/' .  $room['RoomView']['accountid']) ?>)</strong> to <strong><?= isset($request['RequestData']['roomstat']) ? $room_statuses[$request['RequestData']['roomstat']] : 'Close' ?></strong>
+</div>

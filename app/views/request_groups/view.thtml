@@ -1,0 +1,2 @@
+<label class="right required" for="NotifiedUserNotifiedUser">Members:</label>
+<?= $html->selectTag('NotifiedUser/NotifiedUser', $users, $selected, aa('id', 'users', 'multiple', 'multiple', 'style', 'display:none'), null, false) ?>

@@ -1,0 +1,43 @@
+<style type="text/css">
+body {
+  margin: 0;
+}
+
+table.header{
+  font-size: smaller;
+  background: #E8E8E8;
+  margin-bottom: 2em;
+  width: 100%;
+}
+
+table.header th {
+  width: 7em;
+  text-align: right;
+}
+</style>
+
+<table class="header">
+  <tr>
+    <th>Subject:</th>
+    <td><?= $template['Template']['subject'] ?></td>
+  </tr>
+
+  <tr>
+    <th>From:</th>
+    <td><?= $from ?></td>
+  </tr>
+
+  <tr>
+    <th>To:</th>
+    <td><?= $to ?></td>
+  </tr>
+
+  <? if($bcc): ?>
+  <tr>
+    <th>BCC:</th>
+    <td><?= $bcc ?></td>
+  </tr>
+  <? endif; ?>
+
+</table>
+<div class="body"><?= $template_data ?></div>

@@ -1,0 +1,146 @@
+<? if(!$is_ajax): ?> 
+<?= $javascript->link('jquery.util.js') ?>
+
+<style type="text/css">
+#accounts_pane {
+   margin: auto;
+   padding-bottom: 20px;
+   border: 1px solid #ccc;
+   padding: 10px 20px;
+}
+
+#accounts_pane th, #accounts_pane td {
+  padding: 3px 5px;
+  text-align: left;
+}
+
+#accounts_pane tr.other td {
+  background: #eee;
+  font-style: italic;
+  color: #666;
+}
+
+#accounts_pane tr.other td a {
+  color: #555;
+}
+
+.filter {
+  margin-bottom: 0.3em;
+}
+
+.filter label {
+   width: 10em;
+   display: inline;
+   float:left;
+   margin-right: 0.5em;
+   text-align: right;
+}
+
+.filter input, .filter select {
+  width: 15em;
+}
+
+tr.even td {
+  background: #EFF7FF;
+}
+
+span.current {
+  color: #FF9C2A;
+  font-weight: bold;
+}
+
+fieldset {
+  padding: 0px 10px 10px 5px;
+}
+
+span.small {
+  font-size: smaller;
+}
+</style>
+<? endif; ?> 
+
+<? $pagination->setPaging($paging) ?>
+
+<div id="accounts_pane">
+
+  <? if(empty($_GET['embed'])): ?>
+  <?= $this->renderElement('title', aa('title', 'Account Index')) ?>
+
+  <p class="smaller">
+    <?= $html->image('book.gif', aa('class', 'valign')) ?> <a href="/accounts/create">Create an Account</a>
+  </p>
+
+  <form method="get" style="margin-top: 1em; margin-bottom: 1em">
+    <div class="filter">
+      <label for="query">Search:</label>
+      <input id="query" type="text" name="query" value="<?= $query ?>"/>
+      <button type="submit">
+	<?= $html->image('search.gif', aa('class', 'valign')) ?> Search
+      </button>
+    </div>
+    <div class="filter">
+      <label for="salesperson">Salesperson:</label>
+      <select name="salesperson" id="salesperson">
+	<option></option>
+	<? foreach($salespeople as $s): ?>
+	<option value="<?= $s['name'] ?>" <?= $salesperson == $s['name'] ? 'selected="selected"' : '' ?> ><?= $s['name'] ?></option>
+	<? endforeach; ?>
+      </select>
+    </div>
+    <div style="margin-left: 10.5em">
+      <input type="hidden" name="active_only" value="0"/>
+      <input type="checkbox" id="active_only" name="active_only" value="1" <?= $active_only ? 'checked="checked"' : '' ?>/>
+      <label for="active_only">Active Accounts Only</label>
+    </div>
+  </form>
+
+  <p style="float: right">
+    <a href="?<?= http_build_query(Array('export' => 1, 'query' => @$_GET['query'], 'salesperson' => @$_GET['salesperson'], 'active_only' => @$_GET['active_only'])) ?>">
+      <img src="/img/excel.gif">	
+      <strong>Export to Excel</strong>
+    </a>
+  </p>
+  <? endif ?> 
+
+  <table style="width: 100%; margin-top: 1em">
+    <tr>
+      <th><?= $pagination->sortBy('acctgrpid', 'Account ID') ?></th>
+      <th><?= $pagination->sortBy('company') ?></th>
+      <th><?= $pagination->sortBy('salesperson_name', 'Salesperson') ?></th>
+      <th><?= $pagination->sortBy('dialinNo_description', 'Dialin Number') ?></th>
+      <th><?= $pagination->sortBy('default_bridge', 'Bridge') ?></th>
+      <th><?= $pagination->sortBy('acctstatus', 'Status') ?></th>
+      <th style="text-align:center">Edit</th>
+    </tr>
+    
+    <? for($i=0; $i<count($data); $i++): ?>
+       <tr class="<?= $i%2 ? 'odd' : 'even' ?>">
+	 <td><?= $html->link($data[$i]['AccountView']['acctgrpid'], "/accounts/view/{$data[$i]['AccountView']['acctgrpid']}") ?></td>
+	 <td><?= $data[$i]['AccountView']['company'] ?></td>
+	 <td><?= $data[$i]['AccountView']['salesperson_accountmanager'] ?></td>	 
+	 <td>
+	   <?= $data[$i]['AccountView']['dialinNo_description'] ?><br/>
+	   <span class="small"><strong>TF:</strong> <?= $data[$i]['AccountView']['dialinNo_tollfreeno'] ?></span><br/>
+	   <span class="small"><strong>T:</strong> <?= $data[$i]['AccountView']['dialinNo_tollno'] ?></span>
+	 </td>
+	 <td><?= $data[$i]['AccountView']['default_bridge'] ?></td>
+	 <td><?= $data[$i]['AccountView']['acctstatus'] ?></td>
+	 <td style="text-align:center"><a href="/accounts/edit/<?= $data[$i]['AccountView']['acctgrpid'] ?>"><?= $html->image('edit.gif') ?></a></td>
+       </tr>
+    <? endfor; ?>
+  </table>
+
+  <?= $this->renderElement('pagination') ?>
+
+</div>
+
+<? if(!$is_ajax): ?>
+<script type="text/javascript">
+$(document).ready( function() {
+  
+  $('#accounts_pane').paginate();
+  $('#salesperson').change(function() { this.form.submit(); });
+  $('#active_only').click( function() { this.form.submit(); });
+});
+</script>
+<? endif; ?>

@@ -1,0 +1,63 @@
+<style type="text/css">
+#edit_pane {
+   margin: auto;
+   padding-bottom: 20px;
+   border: 1px solid #ccc;
+   padding: 10px 20px;
+}
+
+div.notice {
+  background: #FFECBF;
+  border: 1px solid #EEAA00;
+  padding: 1em;
+  margin: 1em 0;
+}
+</style>
+
+<div id="edit_pane">
+  <?= $this->renderElement('title', aa('title', 'Create a PIN')) ?>
+
+  <form method="post">
+
+    <?= $html->hidden('Pin/company') ?>
+    
+      <div class="input">
+         <label class="right required" for="PinPin">PIN:</label>
+         <?= $html->input('Pin/pin') ?>
+         <?= $html->tagErrorMsg('Pin/pin', 'Please enter an unused pin') ?>   
+      </div>
+
+      <div class="select">
+         <label class="right required" for="PinBridgeid">Bridge:</label>
+	 <?= $html->selectTag('Pin/bridgeid', $bridges) ?>
+         <?= $html->tagErrorMsg('Pin/bridgeid', 'Please select a bridge') ?>   
+      </div>
+
+      <div class="input">
+	<label class="right required" for="PinFirstName">First Name:</label>
+	<?= $html->input('Pin/first_name') ?>
+	<?= $html->tagErrorMsg('Pin/first_name', 'Please enter a first name') ?>   
+      </div>
+
+      <div class="input">
+	<label class="right required" for="PinLastName">Last Name:</label>
+	<?= $html->input('Pin/last_name') ?>
+	<?= $html->tagErrorMsg('Pin/last_name', 'Please enter a last name') ?>   
+      </div>
+      
+      <div class="submit">
+	<button class="cancel" type="button">
+	  <?= $html->image('cross.gif') ?> Cancel
+	</button>
+	<button class="submit" type="submit">
+	  <?= $html->image('check.gif') ?> Create
+	</button>
+      </div>
+      
+  </form>
+</div>
+<script type="text/javascript">
+$(document).ready( function() {
+  $('button.cancel').back('/pins/index/<?= $acctgrpid ?>');
+});
+</script>

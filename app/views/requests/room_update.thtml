@@ -1,0 +1,131 @@
+<?
+// Ignore this since a rate change request was generated
+unset($request['RequestData']['servicerate']);
+unset($request['RequestData']['acctgrpid']);
+
+$fields = Array( 'acctgrpid'             => 'Account ID', 
+                 'bridgeid'              => 'Bridge', 
+		 'dialinNoid'            => 'Dialin Number',
+		 'contact'               => 'Contact', 
+		 'company'               => 'Company', 
+		 'email'                 => 'Email', 
+		 'cec'                   => 'Chair Code', 
+		 'pec'                   => 'Participant Code', 
+		 'prec'                  => 'Presenter Code', 
+		 'emailrpt'              => 'Email Usage Report', 
+		 'lang'                  => 'Language', 
+		 'maximumconnections'    => 'Maximum Connections', 
+		 'scheduletype'          => 'Schedule Type', 
+		 'securitytype'          => 'Security Type', 
+		 'startmode'             => 'Start Mode', 
+		 'namerecording'         => 'Name Recording', 
+		 'endonchairhangup'      => 'End on Chair Hangup', 
+		 'dialout'               => 'Allow Dial Out', 
+		 'record_playback'       => 'Enable Record/Playback', 
+		 'exitannouncement'      => 'Exit Announcement', 
+		 'entryannouncement'     => 'Entry Announcement', 
+		 'endingsignal'          => 'Ending Signal', 
+		 'dtmfsignal'            => 'DTMF Signal', 
+		 'recordingsignal'       => 'Recording Signal', 
+		 'digitentry1'           => 'Digit Entry 1', 
+		 'confirmdigitentry1'    => 'Confirm Digit Entry 1', 
+		 'digitentry2'           => 'Digit Entry 2', 
+		 'confirmdigitentry2'    => 'Confirm Digit Entry 2', 
+		 'muteallduringplayback' => 'Mute All During Playback', 
+		 'canada'                => 'Canadian Rate', 
+		 'isevent'               => 'Event', 
+		 'isopassist'            => 'Operator Assisted', 
+		 'reservationcomments'   => 'Reservation Comments', 
+		 'note1'                 => 'Note 1', 
+		 'note2'                 => 'Note 2', 
+		 'note3'                 => 'Note 3', 
+		 'note4'                 => 'Note 4', 
+                 'bill_code_prompt'      => 'Bill Code Prompt', 
+                 'conference_viewer'     => 'Conference Viewer',
+		 'billingcode'           => 'Billing Code' );
+
+$maps = Array( 'startmode'         => $start_modes,
+	       'lang'              => $languages,
+	       'entryannouncement' => $announcements,
+	       'exitannouncement'  => $announcements,
+	       'endingsignal'      => $ending_signals,
+	       'dtmfsignal'        => $dtmf_signals,
+	       'recordingsignal'   => $recording_signals,
+	       'digitentry1'       => $digit_entries,
+	       'digitentry2'       => $digit_entries,
+	       'scheduletype'      => $schedule_types,
+	       'securitytype'      => $security_types, 
+	       'dialinNoid'        => $dialin_numbers, 
+	       'bridgeid'          => $bridges );
+
+$checks = Array('emailrpt', 'namerecording', 'endonchairhangup', 'dialout', 'record_playback', 'confirmdigitentry1', 'confirmdigitentry2', 'muteallduringplayback', 'isevent', 'isopassist');
+?>
+
+<style type="text/css">
+table.room {
+  margin-top: 1em;
+}
+
+table.room th {
+  text-align: right;
+}
+
+table.room th, table.room td {
+  padding: 3px 5px;
+}
+
+table.service_rates, table.dialin_number {
+  border: none;
+  width: 100%;
+  margin: auto;
+}
+
+table.service_rates th, table.dialin_number th {
+  background: none;
+  border: none;
+}
+
+table.service_rates td, table.dialin_number td {
+  border: none;
+}
+</style>
+
+<div style="margin-top: 1em">
+  <strong><?= $html->link(ucfirst($room['Room']['company']), '/accounts/view/' . $request['Account']['acctgrpid']) ?>(<?= $html->link($request['Account']['acctgrpid'], '/accounts/view/' . $request['Account']['acctgrpid']) ?>)</strong> requested to update room <strong><?= $html->link($room['Room']['contact'], '/rooms/view/' . $request['Request']['accountid']) ?>(<?= $html->link($request['Request']['accountid'], '/rooms/view/' . $request['Request']['accountid']) ?>)</strong>.
+</div>
+
+<h3 style="margin-top: 1em">Summary of Changes</h3>
+<table class="room">
+  <tr>
+    <th>Field</th>
+    <th style="text-align: center">Old</th>
+    <th></th>
+    <th style="text-align: center">New</th>
+  </tr>
+
+  <? foreach($request['RequestData'] as $k => $v): ?>
+    <? if($request['RequestData'][$k] != $room['Room'][$k]): ?>
+    <tr>
+      <th><?= $fields[$k] ?>:</th>
+      <? if(isset($maps[$k])): ?>
+      <td><?= isset($maps[$k][$room['Room'][$k]]) ? $maps[$k][$room['Room'][$k]] : '<span class="italic">Unknown</span>'?></td>
+      <? elseif(in_array($k, $checks)): ?>
+      <td class="center"><?= $room['Room'][$k] ? $html->image('check.gif') : $html->image('cross.gif') ?></td>
+      <? else: ?>
+      <td><?= $room['Room'][$k] ?></td>
+      <? endif; ?>
+      </td>
+      <td class="bold" style="text-align: center; width: 5em">&raquo;</td>
+      <? if(isset($maps[$k])): ?>
+      <td><?= isset($maps[$k][$v]) ? $maps[$k][$v] : '<span class="italic">Unknown</span>'?></td>
+      <? elseif(in_array($k, $checks)): ?>
+      <td class="center"><?= $v ? $html->image('check.gif') : $html->image('cross.gif') ?></td>
+      <? else: ?>
+      <td><?= $v ?></td>
+      <? endif; ?>
+      </td>
+    </tr>
+    <? endif; ?>
+  <? endforeach; ?>
+
+</table>

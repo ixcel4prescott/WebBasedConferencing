@@ -1,0 +1,144 @@
+<? if(!$is_ajax): ?> 
+
+<?
+if(isset($account))
+   $menu_items = Array( Array( 'text' => 'Back to ' . $account['Account']['acctgrpid'],  
+			       'icon' => 'previous.gif', 
+			       'url'  => '/accounts/view/' . $account['Account']['acctgrpid']), 
+
+                        Array( 'text' => 'Create a Contact',  
+			       'icon' => 'room.gif', 
+			       'url'  => '/contacts/create/' . $account['Account']['acctgrpid']) );
+else
+  $menu_items = null;
+
+?>
+
+
+<?= $javascript->link('jquery.util.js') ?>
+
+<style type="text/css">
+#contacts_pane {
+   margin: auto;
+   padding-bottom: 20px;
+   border: 1px solid #ccc;
+   padding: 10px 20px;
+}
+
+#contacts_pane th, #contacts_pane td {
+  padding: 3px 5px;
+  text-align: left;
+}
+
+tr.even td {
+  background: #EFF7FF;
+}
+
+span.current {
+  color: #FF9C2A;
+  font-weight: bold;
+}
+
+fieldset {
+  padding: 0px 10px 10px 5px;
+}
+
+.filter {
+  margin-bottom: 0.3em;
+}
+
+.filter label {
+   width: 10em;
+   display: inline;
+   float:left;
+   margin-right: 0.5em;
+   text-align: right;
+}
+</style>
+<? endif; ?> 
+
+<? $pagination->setPaging($paging) ?>
+
+<div id="contacts_pane">
+  
+  <? if(empty($_GET['embed'])): ?>
+  <?= $this->renderElement('toolbar', Array('items' => $menu_items)) ?>
+
+  <?= $this->renderElement('title', aa('title', !empty($account) ? 'Contact Index for Account ' . $account['Account']['acctgrpid'] : 'Contact Index', 'target', 'contact_index' )) ?>
+  
+  <form method="get" style="margin-top: 1em; margin-bottom: 1em">
+    <div class="filter">
+      <label for="query">Search Contacts:</label>
+      <input id="query" type="text" name="query" value="<?= $query ?>"/>
+      <button type="submit">
+	<?= $html->image('search.gif', aa('class', 'valign')) ?> Search
+      </button>
+    </div>
+  </form>
+
+  <?if ($user['User']['level_type'] != SALESPERSON_LEVEL): ?>
+  <p style="float: right">
+    <a href="<?= '?'.http_build_query(Array('export' => 1, 'query' => @$_GET['query'])) ?>">
+      <img src="/img/excel.gif">	
+      <strong>Export to Excel</strong>
+    </a>
+  </p>
+  <? endif; ?>
+  <? endif; ?>
+
+  <table style="width: 100%; margin-top: 1em">
+    <tr>
+      <? if(!$account): ?>
+      <th><?= $pagination->sortBy('acctgrpid', 'Account') ?></th>     
+      <th><?= $pagination->sortBy('bcompany', 'Company', 'Account') ?></th>
+      <? endif; ?>
+ 
+      <th><?= $pagination->sortBy('first_name', 'First Name') ?></th>
+      <th><?= $pagination->sortBy('last_name', 'Last Name') ?></th>
+      <th><?= $pagination->sortBy('phone') ?></th>
+      <th><?= $pagination->sortBy('email') ?></th>
+      <th><?= $pagination->sortBy('city') ?></th>
+      <th><?= $pagination->sortBy('state') ?></th>
+      <th><?= $pagination->sortBy('zip') ?></th>     
+      <th><?= $pagination->sortBy('country') ?></th>
+      <th><?= $pagination->sortBy('status') ?></th>
+
+      <th style="text-align:center">Edit</th>
+      <th style="text-align:center">Add a Room</th>
+    </tr>
+    <? for($i=0; $i<count($data); $i++): ?>
+       <tr class="<?= $i%2 ? 'odd' : 'even' ?>">
+
+	 <? if(!$account): ?>
+	 <td><?= $html->link($data[$i]['Account']['acctgrpid'], '/accounts/view/' . $data[$i]['Account']['acctgrpid']) ?></td>
+	 <td><?= $data[$i]['ContactView']['company']?></td>
+	 <? endif; ?>
+
+	 <td><?= $html->link($data[$i]['ContactView']['first_name'], '/contacts/view/' . $data[$i]['ContactView']['id']) ?></td>
+	 <td><?= $html->link($data[$i]['ContactView']['last_name'], '/contacts/view/' . $data[$i]['ContactView']['id']) ?></td>
+	 <td><?= $data[$i]['ContactView']['phone'] ?></td>
+	 <td><?= $text->autoLinkEmails($data[$i]['ContactView']['email']) ?></td>
+	 <td><?= $data[$i]['ContactView']['city'] ?></td>
+	 <td><?= $data[$i]['ContactView']['state'] ?></td>
+	 <td><?= $data[$i]['ContactView']['zip'] ?></td>
+	 <td><?= $data[$i]['ContactView']['country'] ?></td>
+
+	 <td><?= $html->link($data[$i]['Status']['description'], '/contacts/status/' . $data[$i]['ContactView']['id']) ?></td>
+
+	 <td style="text-align:center"><a href="/contacts/edit/<?= $data[$i]['ContactView']['id'] ?>"><?= $html->image('edit.gif') ?></a></td>
+	 <td style="text-align:center"><a href="/rooms/create/<?= $data[$i]['ContactView']['id'] ?>"><?= $html->image('room.gif') ?></a></td>
+       </tr>
+       <? endfor; ?>
+  </table>
+
+  <?= $this->renderElement('pagination') ?>
+</div>
+
+<? if(!$is_ajax): ?>
+<script type="text/javascript">
+$(document).ready( function() {
+  $('#contacts_pane').paginate();
+  $('#active_only').click( function() { this.form.submit(); });
+});
+</script>
+<? endif; ?>

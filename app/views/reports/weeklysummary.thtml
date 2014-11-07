@@ -1,0 +1,59 @@
+<style type="text/css">
+th,td {
+  padding: 5px 10px;
+  text-align: right;
+}
+
+tr.odd td {
+  background: #def;
+}
+
+.highlight {
+  color: #d22;
+}
+</style>
+
+<h1>Weekly Summary Report</h1>
+
+<div id="breadcrumbs" style="margin-bottom:10px; font-size:10pt">
+  <?= $html->link('Home', "/reports/usageByWeek") ?> &raquo; <?= $html->link($myYear, "/reports/usageByWeek/$myYear") ?> &raquo; 
+  Week starting <?= date('m-d-Y', strtotime(date('Y-m-d',strtotime("$myYear-01-01 last sunday"))."+".($myWeek-1)." weeks")); ?>
+</div>
+
+<table style="margin: auto">
+  <tr>
+    <th class="left">Company</th>
+    <th>RL Mins</th>
+    <th>OA Mins</th>
+    <th>WB Mins</th>
+    <th>Total Mins</th>
+    <th>RL Cost</th>
+    <th>OA Cost</th>
+    <th>WB Cost</th>
+    <th>Total Cost</th>
+    <th>Enhncd Svcs</th>
+    <th>Grand Total</th>
+  </tr>
+  <? for($i=0; $i<count($dates); $i++): ?>
+    <?
+       $minutes = $dates[$i][0]['rl_minutes'] + $dates[$i][0]['oa_minutes'] + $dates[$i][0]['wb_minutes'];
+       $dollars = $dates[$i][0]['rl_cost'] + $dates[$i][0]['oa_cost'] + $dates[$i][0]['wb_cost'];
+    ?>
+  <tr class="<?= $i%2 ? 'odd' : 'even' ?>">
+    <td class="left"><?= $html->link($dates[$i][0]['company'], "/reports/usageByWeek/$myYear/$myWeek/".$dates[$i][0]['acctgrpid']); ?></td>
+    <td><?= number_format($dates[$i][0]['rl_minutes'],0,'.',','); ?></td>
+    <td><?= number_format($dates[$i][0]['oa_minutes'],0,'.',','); ?></td>
+    <td><?= number_format($dates[$i][0]['wb_minutes'],0,'.',','); ?></td>
+    
+    <td class="highlight"><?= number_format($minutes,0,'.',','); ?></td>
+    
+    <td>$<?= number_format($dates[$i][0]['rl_cost'],2,'.',',');?></td>
+    <td>$<?= number_format($dates[$i][0]['oa_cost'],2,'.',','); ?></td>
+    <td>$<?= number_format($dates[$i][0]['wb_cost'],2,'.',','); ?></td>
+    
+    <td class="highlight">$<?= number_format($dollars,2,'.',','); ?></td>
+    <td><?= $html->link('$'.number_format($dates[$i][0]['enhanced_cost'],2,'.',','),"/enhancedservices/viewbyaccountbyweek/".$dates[$i][0]['acctgrpid']."/$myYear/$myWeek"); ?></td>
+    <td class="highlight">$<?= number_format($dates[$i][0]['grandtotal_cost'],2,'.',','); ?></td>
+  </tr>
+  <? endfor; ?>
+</table>

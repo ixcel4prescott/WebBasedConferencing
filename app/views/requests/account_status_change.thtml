@@ -1,0 +1,7 @@
+<div style="margin-top: 1em">
+  <strong><?= $html->link(ucfirst($request['Account']['bcompany']), '/accounts/view/' . $request['Account']['acctgrpid']) ?>(<?= $html->link($request['Account']['acctgrpid'], '/accounts/view/' . $request['Account']['acctgrpid']) ?>)</strong> 
+  requested to change their account status to <strong><?= $account_statuses[$request['RequestData']['acctstat']] ?></strong>
+</div>
+
+<h2 style="margin-top: 1em">Reason Given</h2>
+<pre><?= $request['RequestData']['status_change_reason'] ?></pre>

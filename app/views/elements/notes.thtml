@@ -1,0 +1,52 @@
+<style type="text/css">
+#notes {
+  list-style-type: none;
+}
+
+#notes .title {
+  font-weight: bold;
+}
+
+#notes .details {
+  color: #444;
+  font-size: smaller;
+  font-style: italic;
+}
+
+#notes .body {
+  width: 100%;
+  padding: 0.25em 0.5em;
+  border: 1px solid #ccc;
+}
+</style>
+
+<ul id="notes">
+  <? if($notes): ?>
+  <? foreach($notes as $n): ?>
+  <li class="note">
+    <div class="header">
+      <span class="title"><a href="#notes"><?= $n['Note']['title'] ?></a></span> 
+      <span class="details"><?= $time->niceShort($n['Note']['created']) ?> by <?= $html->link($n['User']['name'], '/users/view/' . $n['User']['id']) ?></span>
+    </div>
+    <div class="body" style="display:none">
+      <?= $n['Note']['body'] ?>
+    </div>
+  </li>
+  <? endforeach; ?>
+  <? else: ?>
+  <li class="italic">No notes found</li>
+  <? endif; ?>
+</ul>
+
+<script type="text/javascript">
+$(document).ready(function() {
+    $('#notes .title a').toggle( 
+	function() {
+	    $(this).parents('.header').siblings('.body').slideDown();
+	}, 
+	function() {
+	    $(this).parents('.header').siblings('.body').slideUp();
+	}
+    );
+});
+</script>

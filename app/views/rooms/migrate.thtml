@@ -1,0 +1,5 @@
+<? if($rv): ?>
+<span class="italic">Migration pending...</span>
+<? else: ?>
+<span class="bold">Migration request failed...</span>
+<? endif; ?>

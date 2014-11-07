@@ -1,0 +1,360 @@
+<style type="text/css">
+tr.even td {
+  background: #EFF7FF;
+}
+
+#home legend {
+   padding: 0;
+}
+
+.changeset {
+  margin-top: 0.5em;
+}
+
+.changeset ul {
+  list-style-position: inside;
+  margin-left: 1em;
+  text-align: justify;
+}
+
+#left {
+  width: 35%;
+  float: left;
+  padding-right: 2%;
+}
+
+#right {
+  width: 60%;
+  float: left;
+  padding-left: 2%;
+  border-left:  1px solid #ccc;
+}
+
+#code_check_set, #account_set, #room_set {
+  margin-bottom: 1em;
+}
+
+#code_check_message, #account_message, #room_message {
+  padding: 1em 0.5em;
+  margin-top: 0.5em;
+}
+
+.available {
+  background: #D2FFA6;
+  border: 1px solid #006400 ;
+  color: #006400;
+}
+
+.error, .taken {
+  border: 1px solid #900;
+  background: #FFDFDF;
+  color: #900;
+}
+
+#requests, #usage {
+  width: 100%;
+}
+
+#requests th, #requests td {
+  padding: 3px 5px;
+  text-align: left;
+}
+
+#usage th, #usage td {
+  padding: 3px 5px;
+  text-align: right;
+}
+
+#reservations {
+  width: 100%;
+}
+
+#reservations thead th, #reservations tbody .day {
+  padding: 0;
+}
+
+#reservations .day td {
+  border: none;
+  padding: 0;
+}
+
+#reservations .day table {
+  border: none;
+}
+
+#reservations th {
+  text-align: center;
+}
+
+#reservations tbody .day {
+  vertical-align: top;
+  text-align: left;
+  white-space: normal;
+  height: 150px;
+  font-size: x-small;
+  border-right: 1px solid #ccc;
+}
+
+#reservations .day a {
+  font-weight: normal;
+}
+
+#reservations .day td {
+  padding: 3px 3px;
+}
+
+#reservations .day td.time {
+}
+
+#reservations .day td.event {
+  white-space: normal;
+  text-align: left;
+}
+</style>
+
+<div id="home">
+  <h1 style="margin-bottom: 2em">
+    <? $cur_hour = date('G') ?>
+    Good 
+    <? if($cur_hour >= 4 and $cur_hour < 12): ?>
+    Morning,
+    <? elseif($cur_hour >= 12 && $cur_hour < 18): ?>
+    Afternoon,
+    <? else: ?>
+    Evening,
+    <? endif; ?>
+
+    <?= $user['User']['name'] ?>
+  </h1>
+
+  <div id="left">
+    <fieldset id="search_set">
+      <legend>Search for Accounts, Contacts and Rooms</legend>
+      
+      <form method="get" id="search" action="/search">
+	<div>
+	  <input type="text" name="query" id="search_set_query"/>
+	  <button class="submit" type="submit">
+	    <?= $html->image('search.gif') ?> Search
+	  </button>
+	</div>
+      </form>
+    </fieldset>
+
+    <fieldset id="code_check_set">
+      <legend>Check Code Availablity</legend>
+      
+      <form method="get" id="code_check">
+	<div>
+	  <input type="text" name="code" id="code"/>
+	  <button class="submit" type="submit">
+	    <?= $html->image('check.gif') ?> Go
+	  </button>
+	</div>
+	<div id="code_check_message" style="display:none"></div>
+      </form>
+    </fieldset>
+
+    <fieldset id="account_set">
+      <legend>Go to an Account</legend>
+      <form method="get" id="account">
+	<div>
+	  <input type="text" name="acctgrpid" id="acctgrpid"/>
+	  <button class="submit" type="submit">
+	    <?= $html->image('check.gif') ?> Go
+	  </button>
+	</div>
+	<div id="account_message" style="display:none"></div>
+      </form>    
+    </fieldset>
+
+    <fieldset id="room_set">
+      <legend>Go to a Room</legend>
+      <form method="get" id="room">
+	<div>
+	  <input type="text" name="accountid" id="accountid"/>
+	  <button class="submit" type="submit">
+	    <?= $html->image('check.gif') ?> Go
+	  </button>
+	</div>
+	<div id="room_message" style="display:none"></div>
+      </form>    
+    </fieldset>
+    
+    <? if($changelog): ?>
+    <fieldset>
+      <legend>What's New</legend>
+
+      <? while($s=fgets($changelog)): ?>
+        <? if(preg_match('/\d\d\d\d-\d\d-\d\d/', $s)): ?>
+	<div class="changeset">
+	  <h2><?= date('F j, Y', strtotime($s)) ?></h2>
+	  
+	  <ul>
+	    <? while(($s=trim(fgets($changelog))) && !empty($s)): ?>
+	    <li><?= $s ?></li>	  
+	    <? endwhile; ?>
+	  </ul>
+
+	</div>
+        <? endif; ?>
+      <? endwhile; ?>
+    </fieldset>
+    <? endif; ?>
+
+  </div>
+  <div id="right">
+    <? if($data): ?>
+    <h1>Usage Summary</h1>
+    
+    <table id="usage" style="margin-bottom: 1em">
+      <tr>
+        <th>Date</th>
+        <th>Resless Minutes</th>
+        <th>OA Minutes</th>	
+        <th>Web Minutes</th>		
+        <th>Total</th>	
+      </tr>
+      <? for($i=0; $i<count($data); $i++): ?> 
+      <tr class="<?= $i%2 ? 'odd' : 'even' ?>">
+        <td><?= date('m/d', strtotime($data[$i]['date'])) ?></td>
+        <td><?= number_format($data[$i]['rl_minutes']) ?></td>
+        <td><?= number_format($data[$i]['oa_minutes']) ?></td>
+        <td><?= number_format($data[$i]['wb_minutes']) ?></td>
+        <td><?= number_format($data[$i]['total_minutes']) ?></td>
+      </tr>
+      <? endfor; ?>
+    </table>    
+    <? endif; ?>
+
+    <? if($reservations): ?>
+    <h1>Your Reservations for the Week of <?= date('F j, Y', strtotime($start)) ?></h1>
+
+    <table id="reservations" style="margin-bottom: 1em">
+      <tr>
+        <th>Mon</th>
+        <th>Tue</th>
+        <th>Wed</th>
+        <th>Thu</th>
+        <th>Fri</th>
+      </tr>           
+      <tr>
+	<? for($i=1; $i<6; $i++): ?>
+	<td class="day">
+	   
+	  <? if(isset($reservations[$i])): ?>
+	  <table>
+	    <? foreach($reservations[$i] as $r): ?>
+	    <tr>
+	      <td class="time"><?= date('g:ia', strtotime($r['ConferenceTime'])) ?></td>
+	      <td class="event"><?= $html->link($r['CompanyName'], '/reservations/view/' . $r['ReservationID']) ?></td>
+	    </tr>
+	    <? endforeach; ?>
+	  </table>
+	  <? endif; ?>
+
+	</td>	
+	<? endfor; ?>	 
+      </tr>
+    </table>
+    <? endif;?>
+
+    <? if($requests): ?>
+    <h1>Your Last <?= count($requests) ?> Requests</h1>
+
+    <table id="requests">
+      <tr>
+	<th>Account</th>
+	<th>Room</th>
+	<th>Type</th>
+	<th>Status</th>	
+      </tr>
+      <? for($i=0; $i<count($requests); $i++): ?>
+      <tr class="<?= $i%2 ? 'odd' : 'even' ?>">
+        <td><?=$html->link($requests[$i]['RequestView']['acctgrpid'],'/accounts/view/'.$requests[$i]['RequestView']['acctgrpid'])?></td>
+        <td><?=$html->link($requests[$i]['RequestView']['accountid'],'/rooms/view/'.$requests[$i]['RequestView']['accountid'])?></td>
+        <td><?= $requests[$i]['RequestView']['type_name'] ?></td>
+        <td><?= $requests[$i]['RequestView']['status_name'] ?></td>
+      </tr>
+      <? endfor; ?>
+    </table>
+    <? endif; ?>
+    
+  </div>
+</div>
+
+<script type="text/javascript">
+$(document).ready(function() {
+
+  $('#search_set_query').example('Search');
+  $('#code').example('Entry Code');
+  $('#acctgrpid').example('Account Number');
+  $('#accountid').example('Confirmation Number');
+
+  $('#code_check').submit(function() {
+    $('#code_check_message').slideUp();
+
+    var code = $('#code').val().replace(/\s*/g, "");
+ 
+    if(code.search(/^\d{6,}$/) != -1) {
+       $('#code_check_message').removeClass().slideUp();
+
+       $.ajax({
+         type: 'POST', 
+         url: '/home/check_code',
+         data: {'data[Room][code]': code},
+         dataType: 'json', 
+         beforeSend: function(xhr) {  
+           $('#code_check :input').attr('disabled', 'disabled');
+         },
+         complete: function(xhr, status) {
+           $('#code_check :input').attr('disabled', '');
+         },
+         error: function(xhr, status, err) { 
+           window.alert('An error occurred');
+         },
+         success: function(data, status) {
+           $('#code_check_message')
+             .html(code + " <strong>" + (data ? "IS" : "IS NOT") + "</strong> available")
+             .addClass(data ? "available" : "taken")
+             .slideDown();
+         }
+       });
+
+    } else {
+       $('#code_check_message').html("<strong>Please enter a valid code (six or more digits)</strong>").addClass("error").slideDown();
+    }
+
+    return false;
+  });
+
+  $('#account').submit( function() {
+    $('#account_message').removeClass().slideUp();
+
+    var acctgrpid = $('#acctgrpid').val();
+
+    if(acctgrpid != "") {
+      window.location='/accounts?query=' + acctgrpid;
+    } else {
+      $('#account_message').html('<strong>Please enter an account number</strong>').addClass("error").slideDown();      
+    }
+
+    return false;
+  });
+
+  $('#room').submit( function() {
+    $('#room_message').removeClass().slideUp();
+
+    var accountid = $('#accountid').val();
+    
+    if(accountid != "") {
+      window.location='/rooms?query=' + accountid;
+    } else {
+      $('#room_message').html('<strong>Please enter a confirmation number</strong>').addClass("error").slideDown();
+    }
+
+    return false;
+  });
+
+});
+</script>

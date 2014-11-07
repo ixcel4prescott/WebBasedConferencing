@@ -1,0 +1,223 @@
+<style type="text/css">
+#request_header {
+  padding: 0.5em 1em;
+  margin: auto;
+  margin-top: 0.5em;
+  margin-right: 10px;
+}
+
+#request_header img {
+  vertical-align: middle;
+  margin: auto;
+  margin: 9px 0;
+  margin-right: 5px;
+}
+
+#request_header label {
+}
+
+#RequestComments {
+  width: 15em;
+}
+
+#request_header button img {
+  margin: 0
+}
+
+#request_header button {
+  vertical-align: middle;
+  margin-left: 2px;
+  width: 10em;
+  padding: 2px 0;
+}
+
+#request_header h3 {
+  color: #000;
+}
+
+#request_body { 
+  margin-top: 0.5em;
+  margin-right: 10px;
+  border: 1px solid #ccc;
+  padding: 0.5em 1em;
+}
+
+.completed,.approved {
+  background: #D2FFA6;
+  border: 1px solid #9AEE49;
+}
+
+.authorize, .manual {
+  background: #FFECBF;
+  border: 1px solid #EEAA00;
+}
+
+.failed, .denied, .canceled {
+  background: #FFC8BF;
+  border: 1px solid #FF2300;
+}
+
+.automated {
+  background: #DDEEFF;
+  border: 1px solid #CCDDEE;
+}
+</style>
+
+<form id="request_form">
+  <input type="hidden" name="data[Request][id]" value="<?= $request['Request']['id']?>"/>
+
+  <? if(!$read_only): ?>
+  <div id="request_header" class="<?= $type ?>">
+
+    <div>
+      <? if($type == 'automated'): ?>
+      <?= $html->image('info.gif') ?>This request will be handled by an automated process
+
+      <? elseif($type == 'authorize'): ?>
+      <?= $html->image('notice.gif') ?>
+
+      <button id="approve">
+	<img src="/img/approve.gif"/> Approve
+      </button>
+
+      <button id="deny">
+	<img src="/img/disapprove.gif"/> Deny
+      </button>
+
+      <button id="cancel">
+	<img src="/img/cancel.gif"/> Cancel
+      </button>
+
+      <label for="RequestComments">Comments:</label>
+      <?= $html->input('Request/comments') ?>
+
+      <? elseif($type == 'manual'): ?>
+      <?= $html->image('notice.gif') ?>
+
+      <button id="complete">
+	<img src="/img/check.gif"/> Complete
+      </button>
+
+      <button id="fail">
+	<img src="/img/cross.gif"/> Failed
+      </button>
+
+      <label for="RequestComments">Comments:</label>
+      <?= $html->input('Request/comments') ?>
+      
+      <? elseif($type == 'failed'): ?>
+      <?= $html->image('notice.gif') ?> This request has <strong>failed</strong>.
+
+      <button id="approve">
+	<img src="/img/retry.gif"/> Retry
+      </button>
+
+      <? else: ?>
+      <?= $html->image('info.gif') ?>
+      This request has been <strong><?= $type ?></strong> 
+
+      <? if(!empty($request['Request']['signed_off_by'])): ?>
+      by <?= $html->link($user['User']['name'], '/users/view/' . $user['User']['id']) ?>.
+      <? endif ?>
+
+      <? endif; ?>
+    </div>
+
+
+    <? if(!empty($multi)&& $type == 'authorize'): ?>
+    <div style="margin-left: 42px; margin-bottom: 0.5em">
+
+      <?= $html->checkbox('Request/apply_similar') ?>
+      <label for="RequestApplySimilar" style="margin-left: 0.5em">
+	Also update similar <strong><?= $request['RequestStatus']['name'] ?> <?= $request['RequestType']['name'] ?></strong> requests in queue submitted by <strong><?= $request['User']['name'] ?></strong>
+	for account <strong><?= $request['Request']['acctgrpid'] ?></strong>.
+      </label>
+    </div>
+    <? endif; ?>
+
+    <? if(!empty($request['Request']['comments'])): ?>
+    <div><strong>Comments:</strong> <pre><?= $request['Request']['comments'] ?></pre></div>
+    <? endif; ?>
+
+    <? if(!empty($request['Request']['effective_date'])): ?>
+    <div style="margin-left: 42px">
+      This request will go into effect on <strong><?= date('m/d/y', strtotime($request['Request']['effective_date'])) ?></strong> once approved
+    </div>
+    <? endif; ?>
+
+  </div>
+  <? endif; ?>
+
+  <div id="request_body">
+    <h1 style="margin-top:0.5em"><?= $header ?></h1>
+
+    <?= $content_for_layout ?>
+  </div>
+</form>
+
+
+<script type="text/javascript">
+$(document).ready( function() {
+
+    function update_status(url) {
+	$.ajax({
+	    'type'       : 'post',
+	    'url'        : url, 
+	    'data'       : $('#request_form').serialize(),
+	    'dataType'   : 'html',
+	    'beforeSend' : function(xhr) {
+		$('#request_header button').attr('disabled' , 'disabled');
+	    },
+	    'success'    : function(data, status) {
+                $('#request' + $('#RequestId').val()).remove();
+		$('#request_header').replaceWith(data);
+                tb_remove();
+                update_queue();
+	    },
+	    'error'      : function(xhr, status, err) {
+		window.alert('An error occurred changing the status of this request');
+	    }, 
+	    'complete'   : function(xhr, status) {
+		$('#request_header button').attr('disabled' , '');
+	    }
+	});
+    }
+
+    $('#approve').click( function() {
+	update_status('/requests/status/approved');
+        return false;
+    });
+    
+    $('#deny').click( function() {
+        if($('#RequestComments').val() != '') 
+          update_status('/requests/status/denied')
+        else
+          window.alert('Please specify the reason for the denial in the comments field');
+
+        return false;
+    });
+
+    $('#cancel').click( function() {
+        if($('#RequestComments').val() != '') 
+  	  update_status('/requests/status/canceled');
+        else
+          window.alert('Please specify the reason for the cancellation in the comments field');
+
+        return false;
+    });
+
+    $('#complete').click( function() {
+	update_status('/requests/status/completed');
+        return false;
+    });
+
+    $('#fail').click( function() {
+        if($('#RequestComments').val() != '') 
+  	  update_status('/requests/status/failed');
+        else
+          window.alert('Please specify the reason for the failure in the comments field');
+
+        return false;
+    });      
+});
+</script>

@@ -1,0 +1,18 @@
+<table>
+  <tr>
+    <th>Submitted By:</th>
+    <td><?= $html->link($user['User']['name'], 'http://myca/users/view/' . $user['User']['id']) ?></td>
+  </tr>
+  <tr>
+    <th>Subject:</th>
+    <td><?= $feedback['Feedback']['subject'] ?></td>
+  </tr>
+  <tr>
+    <th>Type:</th>
+    <td><?= $feedback['Feedback']['type'] ?></td>
+  </tr>  
+</table>
+
+<div class="body">
+  <?= $feedback['Feedback']['body'] ?>
+</div>

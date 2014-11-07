@@ -1,0 +1,68 @@
+<style type="text/css">
+#accounts_pane {
+   margin: auto;
+   padding-bottom: 20px;
+   border: 1px solid #ccc;
+   padding: 10px 20px;
+}
+
+#accounts th, #accounts td {
+  padding: 3px 5px;
+  text-align: left;
+}
+
+tr.even td {
+  background: #EFF7FF;
+}
+
+span.current {
+  color: #FF9C2A;
+  font-weight: bold;
+}
+
+</style>
+
+<? $pagination->setPaging($paging) ?>
+
+<div id="accounts_pane">
+
+  <h1>Agent Accounts</h1>
+
+  <form method="get" style="margin-top: 1em; margin-bottom: 1em">
+    <label for="query">Search:</label>
+    <input id="query" type="text" name="query" value="<?= $query ?>"/>
+    <button type="submit" id="submit">
+      <?= $html->image('search.gif', aa('class', 'valign')) ?> Search
+    </button>
+  </form>
+
+  <p style="float: right">
+    <a href="<?= '?'.http_build_query(Array('export' => 1, 'query' => @$_GET['query'])) ?>">
+      <img src="/img/excel.gif">	
+      <strong>Export to Excel</strong>
+    </a>
+  </p>
+
+  <table id="accounts" style="width: 100%; margin-top: 1em">
+    <tr>
+      <th><?= $pagination->sortBy('acctgrpid', 'Account ID') ?></th>
+      <th><?= $pagination->sortBy('company') ?></th>
+      <th><?= $pagination->sortBy('contact') ?></th>
+      <th><?= $pagination->sortBy('agent_name', 'Agent') ?></th>
+      <th><?= $pagination->sortBy('salesperson') ?></th>
+    </tr>
+    
+    <? for($i=0; $i<count($data); $i++): ?>
+       <tr class="<?= $i%2 ? 'odd' : 'even' ?>">
+	 <td><?= $html->link($data[$i]['AgentAccount']['acctgrpid'], '/accounts/view/'.$data[$i]['AgentAccount']['acctgrpid']) ?></td>
+	 <td><?= $html->link($data[$i]['AgentAccount']['company'], '/accounts/view/'.$data[$i]['AgentAccount']['acctgrpid']) ?></td>
+	 <td><?= $data[$i]['AgentAccount']['contact'] ?></td>
+	 <td><?= $html->link($data[$i]['AgentAccount']['agent_name'], '/resellers/view/' . $data[$i]['AgentAccount']['resellerid']) ?></td>
+	 <td><?= $html->link($data[$i]['AgentAccount']['salesperson'], '/salespeople/view/' . $data[$i]['AgentAccount']['salespid']) ?></td>	 
+       </tr>
+    <? endfor; ?>
+  </table>
+
+  <?= $this->renderElement('pagination') ?>
+
+</div>

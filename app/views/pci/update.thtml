@@ -1,0 +1,245 @@
+<style type="text/css">
+#billing_pane {
+   margin: auto;
+   padding-bottom: 20px;
+   border: 1px solid #ccc;
+   padding: 10px 20px;
+}
+
+#card_on_file th, #card_on_file td {
+  padding: 3px 5px;
+}
+
+#card_on_file th {
+  text-align: right;
+}
+
+.expired {
+  background: #FFC8BF;
+  border: 1px solid #FF2300;
+  margin: 1em 0;
+  padding: 0.5em 0.25em;
+  font-weight: bold;
+}
+
+.notice {
+  padding: 0.5em 0.25em;
+  background: #FFECBF;
+  border: 1px solid #EEAA00;
+}
+
+div.box {
+  margin-bottom: 10px;
+  margin-right: 5px;
+}
+
+div.box table {
+  table-layout: fixed;
+  width: 100%;
+  border: none;
+}
+
+div.box td, div.box th {
+  border: none;
+}
+
+div.box table th {
+  width: 15em;
+  text-align: right;
+}
+
+th, td {
+  padding: 3px 5px;
+  text-align: left;
+  white-space: normal
+}
+
+div.box tr.noborder th {
+  border-top: none;
+}
+
+.headline {
+  font-weight: bold;
+  border-bottom: 1px solid #ccc;
+  margin-bottom: 10px;
+}
+
+.headline a {
+  font-size: smaller;
+}
+
+</style>
+
+<div id="billing_pane">
+
+  <? if($cc and !empty($cc['CreditCard']['expiration_date'])): ?>
+  <? 
+    if( is_numeric($cc['CreditCard']['expiration_date'])){
+      $exp_date = getdate($cc['CreditCard']['expiration_date']);
+    } else {
+      $exp_date = getdate(strtotime($cc['CreditCard']['expiration_date']));
+    }
+    $expired  = $exp_date < time() ? true : false;
+  ?>
+  <? endif; ?>
+
+  <?= $this->renderElement('title', aa('title', 'Update Credit Card Information')) ?>
+  <? if(!empty($cc)): ?>
+  <div class="box">
+    <div class="headline">Existing Credit Card</div>
+    <table>
+      <tr>
+        <th> Card Holder's Name :</th> <td> <?= $cc['CreditCard']['name_on_card'] ?> </td>
+      </tr>
+      <tr>
+        <th> Expiration Date :</th> <td> <?= $exp_date['month'] . ' ' . $exp_date['year'] ?> </td>
+      </tr>
+      <tr>
+        <th> Last Four Digits:</th> <td> <?= $cc['CreditCard']['last_four'] ?> </td> 
+      </tr>
+    </table>
+  </div>
+  <? endif; ?>
+  
+  <form method="post">
+    <?= $html->hidden('Pci/acctgrpid', aa('value', $account['Account']['acctgrpid'])) ?>
+      
+    <? if(!empty($cc) && $expired): ?>
+    <div class="expired">
+      The credit card on file has expired.
+    </div>
+    <? endif; ?>
+
+    <fieldset>
+      <legend>Update Credit Card Information</legend>
+
+      <div id="pci_fields">
+        <div class="input">
+          <label class="right" for="AccountBillcc">Bill Credit Card:</label>
+          <?= $html->selectTag('Account/billcc', aa(1,'Yes', 0, 'No'), aa('value', array_key_exists('billcc', $this->data['Account']) ? $this->data['Account']['billcc'] : $account['Account']['billcc'])) ?>
+        </div>
+
+        <div class="input">
+          <label class="right" for="authenticateCC">Authorize New Credit Card:</label>
+          <?= $html->selectTag('temp/authenticateCC', aa(1,'Yes', 0, 'No'), aa('value', $authenticate), array(), null, false) ?>
+        </div>
+
+        <div id="authenticate_cc_form">
+          <div class="input">
+            <label class="right required" for="PciName_on_card">Card Holder's Name:</label>
+            <?= $html->input('Pci/name_on_card') ?>
+            <?= $html->tagErrorMsg('Pci/name_on_card', (!empty($save_messages['name_on_card']) ? $save_messages['name_on_card'] : "Please enter the card holder's name")) ?>   
+          </div>
+
+          <div class="input">
+            <label class="right required" for="PciCard_type">Card Type:</label>
+            <?= $html->selectTag('Pci/card_type', aa('amex','American Express','discover','Discover','mastercard','MasterCard','visa','Visa')) ?>
+            <?= $html->tagErrorMsg('Pci/card_type', (!empty($save_messages['card_type']) ? $save_messages['card_type'] : "Please enter a credit card type")) ?>
+          </div>
+
+          <div class="input">
+            <label class="right required" for="PciCreditcard">Credit Card Number:</label>
+            <?= $html->input('Pci/card_number', aa('autocomplete', 'off')) ?>
+            <?= $html->tagErrorMsg('Pci/card_number', (!empty($save_messages['card_number']) ? $save_messages['card_number'] : 'Please enter a valid credit card number')) ?>   
+          </div>
+
+          <div class="input">
+            <label class="right required" for="PciCvv">CVV:</label>
+            <?= $html->input('Pci/cvv', aa('autocomplete', 'off')) ?>
+            <?= $html->tagErrorMsg('Pci/cvv', (!empty($save_messages['cvv']) ? $save_messages['cvv'] : "Please enter a valid CVV number")) ?>   
+          </div>
+
+          <div class="input">
+            <label class="right required" for="PciCcexpire">Expiration Date:</label>
+            <?= $html->selectTag('Pci/ccexpire_month', aa(1,1,2,2,3,3,4,4,5,5,6,6,7,7,8,8,9,9,10,10,11,11,12,12)) ?> / <?= $html->yearOptionTag('Pci/ccexpire', null, date('Y'), date('Y')+25) ?>
+            <?= $html->tagErrorMsg('Pci/ccexpire', "Please select a valid expiration date") ?>   
+          </div>
+
+          <div class="input">
+            <label class="right required" for="PciFirst_name">Card Holder's First Name:</label>
+            <?= $html->input('Pci/first_name') ?>
+            <?= $html->tagErrorMsg('Pci/first_name', (!empty($save_messages['first_name']) ? $save_messages['first_name'] : "Please enter the card holder's first name")) ?>   
+          </div>
+
+          <div class="input">
+            <label class="right required" for="PciCcLast_name">Card Holder's Last Name:</label>
+            <?= $html->input('Pci/last_name') ?>
+            <?= $html->tagErrorMsg('Pci/last_name', (!empty($save_messages['last_name']) ? $save_messages['last_name'] : "Please enter the card holder's last name")) ?>   
+          </div>
+  	
+          <div class="input">
+            <label class="right required" for="Pcistreet_address">Card Holder's Street Address:</label>
+            <?= $html->input('Pci/street_address', aa('value', $account['Account']['baddr1'] . (!empty($account['Account']['baddr2']) ? $account['Account']['baddr2'] : ''))) ?>
+            <?= $html->tagErrorMsg('Pci/street_address', (!empty($save_messages['street_address']) ? $save_messages['street_address'] : "Please enter the card holder's address")) ?>   
+          </div>
+
+          <div class="input">
+            <label class="right required" for="PciCity">Card Holder's City:</label>
+            <?= $html->input('Pci/city', aa('value', $account['Account']['city'])) ?>
+            <?= $html->tagErrorMsg('Pci/city', "Please enter the card holder's city") ?>   
+            <?= $html->tagErrorMsg('Pci/city', (!empty($save_messages['city']) ? $save_messages['city'] : "Please enter the card holder's city")) ?>   
+          </div>
+
+          <div class="input">
+            <label class="right required" for="PciPostal_code">Card Holder's ZIP:</label>
+            <?= $html->input('Pci/postal_code', aa('value', $account['Account']['zip'])) ?>
+            <?= $html->tagErrorMsg('Pci/postal_code', (!empty($save_messages['postal_code']) ? $save_messages['postal_code'] : "Please enter the card holder's zip code")) ?>   
+          </div>
+
+          <div class="input">
+            <label class="right required" for="PciState">Card Holder's State:</label>
+            <?= $html->selectTag('Pci/state', $states, aa('value', $account['Account']['state'])) ?>
+            <?= $html->tagErrorMsg('Pci/state', (!empty($save_messages['state']) ? $save_messages['state'] : "Please select a state")) ?>   
+          </div>
+
+          <div class="input">
+            <label class="right required" for="PciCountry">Card Holder's Country:</label>
+            <?= $html->selectTag('Pci/country', $countries, aa('value', $account['Account']['country'])) ?> 
+            <?= $html->tagErrorMsg('Pci/country', (!empty($save_messages['country']) ? $save_messages['country'] : "Please select a country")) ?>   
+          </div>
+
+          <div class="input">
+            <label class="right required" for="PciPhone_number">Card Holder's Phone:</label>
+            <?= $html->input('Pci/phone_number', aa('value', $account['Account']['phone'])) ?>
+            <?= $html->tagErrorMsg('Pci/phone_number', (!empty($save_messages['phone_number']) ? $save_messages['phone_number'] : "Please enter the card holder's phone number")) ?>   
+          </div>
+        </div>
+      </div>
+    </fieldset>    
+
+    <div class="submit">
+      <button class="cancel" type="button">
+	<?= $html->image('cross.gif') ?> Cancel
+      </button>
+      <button class="submit" type="submit">
+	<?= $html->image('check.gif') ?> Update
+      </button>
+    </div>
+  </form>
+</div>
+
+<script type="text/javascript">
+$(document).ready( function() {
+  $('button.cancel').back('/accounts/view/<?= $account['Account']['acctgrpid'] ?>');
+
+  $('#PciWipe').click(function() {
+    var disabled = ''; 
+    if(this.checked)
+      disabled = 'disabled';
+
+    $('#pci_fields :input').attr('disabled', disabled);
+   
+  });
+
+  $('#tempAuthenticateCC').change(function() {
+    var disabled = 'disabled'; 
+    if ($(this).val() == 1)
+       disabled = '';
+    
+    $('#authenticate_cc_form :select').attr('disabled', disabled)
+    $('#authenticate_cc_form :input').attr('disabled', disabled)
+  });
+
+  $('#tempAuthenticateCC').change();
+});
+</script>

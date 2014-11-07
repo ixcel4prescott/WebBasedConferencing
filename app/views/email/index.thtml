@@ -1,0 +1,112 @@
+<?= $javascript->link('jquery.scrollabletable.js') ?>
+
+<style type="text/css">
+#email_pane {
+   margin: auto;
+}
+
+#rooms th,#rooms td {
+  padding: 3px 5px;
+}
+
+#rooms td, #results td {
+  text-align: left;
+}
+
+#results th {
+    text-align: center;
+}
+
+tr.even td {
+  background: #EFF7FF;
+}
+
+#rooms {
+  border-collapse: separate;
+  border: 1px solid #CCDDEE;
+}
+
+#rooms td, #rooms th {
+  border: 1px solid #CCDDEE;
+}
+
+.error {
+  color: #900;
+}
+</style>
+
+<div id="email_pane">
+
+  <?= $this->renderElement('title', aa('title', 'Welcome Emails')) ?>
+
+  <p>
+    Please confirm the rooms to send welcome emails to.
+  </p>
+
+  <form method="post" style="margin-top: 1em">
+    <input type="hidden" name="data[Room][accountid][]" value=""/>
+
+    <fieldset>
+      <legend>Select Rooms</legend>
+      
+      <table id="rooms" style="margin-top: 1em; width: 100%">	  
+	<thead>
+	  <tr>
+	    <th class="small center"><a href="" id="all">All</a><br/><a href="" id="none">None</a></th>
+	    <th>Confirmation #</th>
+	    <th>Contact</th>
+	    <th>CEC</th>
+	    <th>PEC</th>
+	  </tr>
+	</thead>
+	<tbody>	    
+	  <? for($i=0; $i<count($rooms); $i++): ?>
+	     <tr class="<?= $i%2 ? 'odd' : 'even' ?>">
+	       <td style="text-align:center">
+		 <input type="checkbox" name="data[Room][accountid][]" value="<?= $rooms[$i]['Room']['accountid'] ?>" <?= !$rooms[$i]['Room']['dialinNoid'] ? 'disabled="disabled"' : '' ?>
+			<?= in_array($rooms[$i]['Room']['accountid'], $this->data['Room']['accountid']) ? 'checked="checked"' : '' ?> />
+               </td>
+	       <td>
+		 <?= $rooms[$i]['Room']['accountid'] ?>&nbsp;
+		 
+		 <? if(!$rooms[$i]['Room']['dialinNoid']): ?>
+		 <?= $html->link('Please specify a dialin number before mailing', '/rooms/view/' . $rooms[$i]['Room']['accountid'], aa('class', 'error')) ?>
+		 <? endif; ?>
+	       </td>
+	       <td><?= $rooms[$i]['Room']['contact'] ?></td>
+	       <td><?= format_passcode($rooms[$i]['Room']['cec']) ?></td>
+	       <td><?= format_passcode($rooms[$i]['Room']['pec']) ?></td>
+	     </tr>   
+	 <? endfor; ?>
+	</tbody>
+      </table>        
+    </fieldset>
+
+    <div class="submit">
+      <button class="cancel" type="button">
+	<?= $html->image('cross.gif') ?> Cancel
+      </button>
+      <button class="submit" type="submit">
+	Next <?= $html->image('next.gif') ?>
+      </button>
+    </div>
+
+  </form>
+</div>
+
+<script type="text/javascript">
+$(document).ready( function() {
+
+    $('button.cancel').back('/accounts/view/<?= $account['Account']['acctgrpid'] ?>');
+
+    $('#all').click( function() {
+	$('#rooms :checkbox').attr('checked', 'checked');
+	return false; 
+    });
+
+    $('#none').click( function() {
+	$('#rooms :checkbox').attr('checked', '');
+	return false; 
+    });
+});
+</script>

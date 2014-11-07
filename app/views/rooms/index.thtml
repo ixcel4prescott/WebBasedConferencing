@@ -1,0 +1,202 @@
+<? if(!$is_ajax): ?> 
+
+<?
+if(isset($account))
+   $menu_items = Array( Array( 'text' => 'Back to ' . $account['Account']['acctgrpid'],  
+                                'icon' => 'previous.gif', 
+			        'url'  => '/accounts/view/' . $account['Account']['acctgrpid']), 
+
+                        Array( 'text' => 'Change Statuses',  
+                               'icon' => 'lightbulb.gif', 
+			       'url'  => '/rooms/select/' . $account['Account']['acctgrpid'] . '/statuses'));
+else
+  $menu_items = null;
+
+?>
+
+
+<?= $javascript->link('jquery.util.js') ?>
+
+<style type="text/css">
+#rooms_pane {
+   margin: auto;
+   padding-bottom: 20px;
+   border: 1px solid #ccc;
+   padding: 10px 20px;
+}
+
+#rooms_pane th, #rooms_pane td {
+  padding: 3px 5px;
+  text-align: left;
+}
+
+tr.even td {
+  background: #EFF7FF;
+}
+
+span.current {
+  color: #FF9C2A;
+  font-weight: bold;
+}
+
+fieldset {
+  padding: 0px 10px 10px 5px;
+}
+
+#rooms_pane tr.other td {
+  background: #eee;
+  font-style: italic;
+  color: #666;
+}
+
+#rooms_pane tr.other td a {
+  color: #555;
+}
+
+.filter {
+  margin-bottom: 0.3em;
+}
+
+.filter label {
+   width: 10em;
+   display: inline;
+   float:left;
+   margin-right: 0.5em;
+   text-align: right;
+}
+
+.span-3, .span-4, .span-5, .span-6, .span-7, .span-8, .span-9 {float:left; margin-right:10px}
+.last {margin-right:0;}
+.span-3 {width:110px}
+.span-4 {width:150px}
+.span-5 {width:190px}
+.span-6 {width:230px;}
+.span-7 {width:270px;}
+.span-8 {width:310px;}
+.span-9 {width:350px;}
+.clear {clear:both;}
+
+
+</style>
+<? endif; ?> 
+
+<? $pagination->setPaging($paging) ?>
+
+<div id="rooms_pane">
+  
+  <? if(empty($_GET['embed'])): ?>
+  <?= $this->renderElement('toolbar', Array('items' => $menu_items)) ?>
+
+  <?= $this->renderElement('title', aa('title', !empty($account) ? 'Room Index for Account ' . $account['Account']['acctgrpid'] : 'Room Index', 'target', 'room_index' )) ?>
+  
+  <form method="get" style="margin-top: 1em; margin-bottom: 1em">
+    <div class="filter">
+      <div class="span-9">
+        <label for="query"><strong>Search Rooms:</strong></label>
+        <input id="query" type="text" name="query" value="<?= $query ?>"/>
+        <br/>
+        <label for="bridge"><strong>Bridge:</strong></label>
+        <select name="bridge" id "bridge">
+        <? foreach($bridges as $bridge_id => $bridge_desc): ?>
+          <? if(!array_key_exists('bridge', $_GET) || $_GET['bridge'] != $bridge_id): ?>
+          <?= "<option value=\"".$bridge_id. "\">".$bridge_desc."</option>" ?>
+          <? elseif($_GET['bridge'] == $bridge_id): ?>
+          <?= "<option value=\"".$bridge_id. "\" selected>".$bridge_desc."</option>" ?>
+          <? endif; ?>
+	    <? endforeach; ?>
+        </select>
+        <br/>
+        <div style="margin-left: 10.5em">
+          <input type="checkbox" id="all" name="all" value="1" <?= !empty($_GET['all']) ? 'checked="checked"' : '' ?>/>
+          <label for="all" style="float:none">Include Cancelled Rooms</label>
+        </div>
+      </div>
+      <div class="span-3 last">
+        <button type="submit">
+	      <?= $html->image('search.gif', aa('class', 'valign')) ?> Search
+        </button>
+      </div>
+    </div>
+  </form>
+  <p style="float: right">
+        <br/>
+        <br/>
+    <a href="<?= '?'.http_build_query(Array('export' => 1, 'query' => @$_GET['query'], 'all' => @$_GET['all'], 'bridge' => @$_GET['bridge'])) ?>">
+      <img src="/img/excel.gif">	
+      <strong>Export to Excel</strong>
+    </a>
+  </p>
+
+  <? endif; ?>
+
+  <table style="width: 100%; margin-top: 1em">
+    <thead>
+      <tr>
+	<? if(!$account): ?>
+	<th><?= $pagination->sortBy('acctgrpid', 'Account') ?></th>     
+	<? endif; ?>
+	
+	<th><?= $pagination->sortBy('accountid', 'Confirmation Number') ?></th>
+	<th><?= $pagination->sortBy('contact', 'Topic') ?></th>
+
+	<th><?= $pagination->sortBy('billingcode', 'Billing Code') ?></th>
+
+	<? if(empty($_GET['embed']) && empty($account) ): ?>
+	<th><?= $pagination->sortBy('company') ?></th>
+	<? endif; ?>
+
+	<th><?= $pagination->sortBy('cec', 'CEC') ?></th>
+	<th><?= $pagination->sortBy('pec', 'PEC') ?></th>
+
+	<th><?= $pagination->sortBy('roomstat', 'Status') ?></th>
+	<th style="text-align:center">Edit</th>
+      </tr>
+    </thead>
+    <tbody>
+      <? for($i=0; $i<count($data); $i++): ?>
+	 <tr class="<?= $i%2 ? 'odd' : 'even' ?>">
+
+	   <? if(!$account): ?>
+	   <td><?= $html->link($data[$i]['RoomView']['acctgrpid'], '/accounts/view/' . $data[$i]['RoomView']['acctgrpid']) ?></td>
+	   <? endif; ?>
+
+	   <td><?= $html->link($data[$i]['RoomView']['accountid'], '/rooms/view/' . $data[$i]['RoomView']['accountid']) ?></td>
+	   <td><?= $data[$i]['RoomView']['contact'] ?></td>
+
+	   <td><?= $data[$i]['RoomView']['billingcode'] ?></td>
+
+	   <? if(empty($_GET['embed']) && empty($account)): ?>
+	   <td><?= $data[$i]['RoomView']['company'] ?></td>
+	   <? endif; ?>
+
+	   <? if(is_numeric($data[$i]['RoomView']['cec'])): ?>
+	   <td><?= format_passcode($data[$i]['RoomView']['cec']) ?></td>
+	   <? else: ?>
+	   <td><?= $data[$i]['RoomView']['cec'] ?></td>
+	   <? endif; ?>
+
+	   <? if(is_numeric($data[$i]['RoomView']['pec'])): ?>
+	   <td><?= format_passcode($data[$i]['RoomView']['pec']) ?></td>
+	   <? else: ?>
+	   <td><?= $data[$i]['RoomView']['pec'] ?></td>
+	   <? endif; ?>
+
+	   <td><?= $html->link($data[$i]['RoomView']['roomstat'], '/rooms/status/' . $data[$i]['RoomView']['accountid'] ) ?></td>	 
+	   <td style="text-align:center"><a href="/rooms/edit/<?= $data[$i]['RoomView']['accountid'] ?>"><?= $html->image('edit.gif') ?></a></td>
+	 </tr>
+	 <? endfor; ?>
+    </tbody>
+  </table>
+
+  <?= $this->renderElement('pagination') ?>
+</div>
+
+<? if(!$is_ajax): ?>
+<script type="text/javascript">
+$(document).ready( function() {
+  $('#rooms_pane').paginate();
+  $('#all').click( function() { this.form.submit(); });
+});
+</script>
+<? endif; ?>
+

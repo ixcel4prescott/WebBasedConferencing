@@ -1,0 +1,1 @@
+A <strong><?= $request['RequestStatus']['name'] ?></strong> request is in the queue to change the status of account <strong><?= $request['Request']['acctgrpid'] ?></strong>

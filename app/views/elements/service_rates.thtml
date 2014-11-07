@@ -1,0 +1,168 @@
+<div class="rates">
+  <div class="input">
+    <label class="right" for="ServiceRateRsvless">Reservationless Rate:</label>
+    <?= $html->input('ServiceRate/rsvless', aa('class', 'spinner')) ?>
+  </div>
+
+  <div class="input extended_rates">
+    <label class="right" for="ServiceRateRsvlesstoll">Reservationless Toll Rate:</label>
+    <?= $html->input('ServiceRate/rsvlesstoll', aa('class', 'spinner')) ?>
+  </div>
+
+  <div class="input">
+    <label class="right" for="ServiceRateMeetmetollfree">Operator Assisted Rate:</label>
+    <?= $html->input('ServiceRate/meetmetollfree', aa('class', 'spinner')) ?>
+  </div>
+
+  <div class="input extended_rates">
+    <label class="right" for="ServiceRateMeetmetoll">Operator Assisted Toll Rate:</label>
+    <?= $html->input('ServiceRate/meetmetoll', aa('class', 'spinner')) ?>
+  </div>
+
+  <div class="input extended_rates">
+    <label class="right" for="ServiceRateEventmeetme">Event Rate:</label>
+    <?= $html->input('ServiceRate/eventmeetme', aa('class', 'spinner')) ?>
+  </div>
+
+  <div class="input extended_rates">
+    <label class="right" for="ServiceRateEventmeetmetoll">Event Toll Rate:</label>
+    <?= $html->input('ServiceRate/eventmeetmetoll', aa('class', 'spinner')) ?>
+  </div>
+
+  <div class="select">
+    <label class="right" for="ServiceRateType">WebInterpoint Rate Type:</label>
+    <?= $html->selectTag('ServiceRate/webinterpoint_rate_type', Array('metered' => 'Metered', 'flat' => 'Flat'), null, null, null, false) ?>
+  </div>
+
+  <div class="input">
+    <label class="right" for="ServiceRateWebinterpointppm">WebInterpoint Metered Rate:</label>
+    <?= $html->input('ServiceRate/webinterpointppm', aa('class', 'spinner')) ?>
+  </div>
+
+  <div class="input">
+    <label class="right" for="ServiceRateWebinterpointflat">WebInterpoint Flat Rate:</label>
+    <?= $html->input('ServiceRate/webinterpointflat', aa('class', 'flat_rate_spinner', 'style', 'text-align:right')) ?>
+  </div>
+</div>
+
+<div class="select servicerate">
+  <label class="right required" for="<?= $id ?>">Service Rate:</label>
+  <?= $html->selectTag($name, isset($service_rates) ? $service_rates : a()) ?>
+  <button type="button" id="rate_find_button">
+    Find
+  </button>
+  <button type="button" id="rate_clear_button">
+    Clear
+  </button>
+  <?= $html->tagErrorMsg($name, 'Please select a service rate') ?>
+</div>
+
+<script type="text/javascript">
+$(document).ready( function() {
+ 
+    $('#ServiceRateWebinterpointRateType').val(Number($('#ServiceRateWebinterpointflat').val()) >0 ? 'flat' : 'metered')
+
+    $('#ServiceRateWebinterpointRateType').change(function() {
+	switch(this.value) {
+        case 'flat':
+	    $('#ServiceRateWebinterpointppm').val('').parent('div.input').hide();
+	    $('#ServiceRateWebinterpointflat').parent('div.input').show();
+            break;
+  
+        case 'metered':
+	    $('#ServiceRateWebinterpointflat').val('').parent('div.input').hide();
+	    $('#ServiceRateWebinterpointppm').parent('div.input').show();	    
+            break;
+	}
+    }).change();
+    
+    function format_rate(r) { return (Number(r)/10000.0).toFixed(4); }
+
+    function load_rate() {
+	var val = $(this).val().toString();
+	
+	if(val != '' && val != -1) {
+	    $.ajax({
+		'type':       'GET', 
+		'url':        '/servicerates/rate/' + $(this).val().toString(),
+		'dataType':   'json', 
+		'beforeSend': function(xhr) {
+		  $('#AccountDefaultServicerate,#RoomServicerate,div.rates input,div.rates select,#rate_find_button,#rate_clear_button,#ServiceRateWebinterpointRateType').attr('disabled', 'disabled');
+		},
+		'success':    function(data, status) {
+		    if(data) {
+			$('#ServiceRateRsvless').val(format_rate(data.rsvless));
+			$('#ServiceRateRsvlesstoll').val(format_rate(data.rsvlesstoll));
+			$('#ServiceRateMeetmetollfree').val(format_rate(data.meetmetollfree));
+			$('#ServiceRateMeetmetoll').val(format_rate(data.meetmetoll));
+			$('#ServiceRateEventmeetme').val(format_rate(data.eventmeetme));
+			$('#ServiceRateEventmeetmetoll').val(format_rate(data.eventmeetmetoll));
+			$('#ServiceRateWebinterpointppm').val(format_rate(data.webinterpointppm));
+			$('#ServiceRateWebinterpointflat').val(format_rate(data.webinterpointflat));
+		        $('#ServiceRateWebinterpointRateType').val((Number(data.webinterpointflat) > 0) ? 'flat' : 'metered');
+		    }
+		}, 
+		'complete':   function(xhr, status) {
+		  $('#AccountDefaultServicerate,#RoomServicerate,div.rates input,div.rates select,#rate_find_button,#rate_clear_button,#ServiceRateWebinterpointRateType').attr('disabled', '');
+		}
+	    });
+	}
+    }
+    
+    $('#<?= $id ?>').change(load_rate);
+
+    function load_rates(e, reset) {
+	$.ajax({
+	    'type'       : 'post',
+	    'url'        : '/servicerates/<?= $mode ?>',
+	    'data'       : $('#AccountSalespid,#AccountAcctgrpid,#RoomAcctgrpid,#RoomAccountid,div.rates input').serialize(),
+	    'dataType'   : 'html',
+	    'beforeSend' : function() {
+	      $('#AccountDefaultServicerate,#RoomServicerate,div.rates input,div.rates select,#rate_find_button,#rate_clear_button,#ServiceRateWebinterpointRateType').attr('disabled', 'disabled')
+	    },
+	    'success'    : function(html) {
+		try {
+		    $('#RoomServicerate,#AccountDefaultServicerate').replaceWith(html);
+
+                    if(reset)
+                      $('#<?= $id ?>').val('');
+
+                    $('#<?= $id ?>').change(load_rate).change();
+		} catch(e) {
+		}
+	    },
+	    'complete'   : function() {
+	      $('#AccountDefaultServicerate,#RoomServicerate,div.rates input,div.rates select,#rate_find_button,#rate_clear_button,#ServiceRateWebinterpointRateType').attr('disabled', '')
+	    }
+	});
+    }
+
+    <? if(isset($initial_ajax) && $initial_ajax): ?>
+    load_rates(undefined);
+    <? endif; ?>
+
+    $('#ServiceRateWebinterpointRateType').change( function() {
+	$('#<?= $id ?>').val('');
+    });
+
+    $('div.rates input.spinner').spinner().change( function() {
+	$('#<?= $id ?>').val('');
+    });
+
+    $('div.rates input.flat_rate_spinner').spinner({max: 500.0, min: 1.0});
+
+    $('#rate_find_button').click(load_rates);
+
+    $('#rate_clear_button').click( function() {
+	$('#ServiceRateRsvless').val('');
+	$('#ServiceRateRsvlesstoll').val('');
+	$('#ServiceRateMeetmetollfree').val('');
+	$('#ServiceRateMeetmetoll').val('');
+	$('#ServiceRateEventmeetme').val('');
+	$('#ServiceRateEventmeetmetoll').val('');
+	$('#ServiceRateWebinterpointppm').val('');  
+	$('#ServiceRateWebinterpointflat').val('');  
+	load_rates(null, true);
+    });
+});
+</script>

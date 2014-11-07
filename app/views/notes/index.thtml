@@ -1,0 +1,102 @@
+<style type="text/css">
+#notes_pane {
+   margin: auto;
+   padding-bottom: 20px;
+   border: 1px solid #ccc;
+   padding: 10px 20px;
+}
+
+#notes_pane th,#notes_pane td {
+  padding: 3px 5px;
+  text-align: left;
+  
+}
+
+tr.even td {
+  background: #EFF7FF;
+}
+
+span.current {
+  color: #FF9C2A;
+  font-weight: bold;
+}
+</style>
+
+<? $pagination->setPaging($paging) ?>
+
+<div id="notes_pane">
+
+  <? if(isset($entity) && isset($object_id)): ?>
+  <?= $this->renderElement('title', aa('title', 'Note Index for ' . $entity . ': ' . $object_id, 'target', 'note_index' )) ?>
+  <? elseif(isset($entity)): ?>
+  <?= $this->renderElement('title', aa('title', 'Note Index for ' . $entity, 'target', 'note_index' )) ?>
+  <? else: ?>
+  <?= $this->renderElement('title', aa('title', 'Note Index', 'target', 'note_index')) ?>
+  <? endif; ?>
+
+  <? if(isset($entity) && isset($object_id)): ?>
+  <p class="smaller">
+    <?= $html->image('note_add.gif', aa('class', 'valign')) ?> <?= $html->link('Add a Note', '/notes/create/' . $entity . '/' . $object_id) ?>
+  </p>
+  <? endif; ?>
+
+  <form method="get" style="margin-top: 1em; margin-bottom: 1em">
+    <label for="query">Search:</label>
+    <input id="query" type="text" name="query" value="<?= $query ?>"/>
+    <button type="submit" id="submit">
+      <?= $html->image('search.gif', aa('class', 'valign')) ?> Search
+    </button>
+  </form>
+
+  <table style="width: 100%; margin-top: 1em">
+    <tr>
+      <th><?= $pagination->sortBy('title') ?></th>
+
+      <? if(!isset($entity)): ?>
+      <th><?= $pagination->sortBy('entity', 'Type') ?></th>
+      <? endif; ?>
+
+      <? if(!isset($object_id)): ?>
+      <th><?= $pagination->sortBy('object_id', 'Attached To') ?></th>
+      <? endif; ?>
+
+      <th><?= $pagination->sortBy('user_id', 'User') ?></th>
+      <th><?= $pagination->sortBy('created') ?></th>
+      <th style="text-align:center"><?= $pagination->sortBy('sticky') ?></th>
+    </tr>
+    
+    <? for($i=0; $i<count($data); $i++): ?>
+       <tr class="<?= $i%2 ? 'odd' : 'even' ?>">
+         <td><?= $html->link(shorten($data[$i]['Note']['title']), '/notes/view/' . $data[$i]['Note']['id'] ) ?></td>
+
+	 <? if(!isset($entity)): ?>
+	 <td><?= $html->link($data[$i]['Note']['entity'], '/notes/index/' . $data[$i]['Note']['entity']) ?></td>
+	 <? endif; ?>
+
+	 <? if(!isset($object_id)): ?>
+	 <td><?= $html->link($data[$i]['Note']['object_id'], '/notes/index/' . $data[$i]['Note']['entity'] . '/' . $data[$i]['Note']['object_id']) ?></td>
+	 <? endif; ?>
+
+	 <td><?= $html->link($data[$i]['User']['name'],  '/users/view/' . $data[$i]['User']['id'] ) ?></td>
+	 <td><?= $time->niceShort($data[$i]['Note']['created']) ?></td>
+	 <td class="sticky center"><?= $html->link($html->image($data[$i]['Note']['sticky'] ? 'check.gif' : 'cross.gif'), '/notes/stick/' . $data[$i]['Note']['id'], null, false, false) ?></td>
+       </tr>
+    <? endfor; ?>
+  </table>
+
+  <?= $this->renderElement('pagination') ?>
+</div>
+
+<script type="text/javascript">
+$(document).ready(function() {
+    $('.sticky a').click( function() {
+	var current = this;
+	$.post(this.href, {}, 
+	       function(data, status) {
+		   current.innerHTML = data;
+	       }
+	);
+	return false;
+    });
+});
+</script>

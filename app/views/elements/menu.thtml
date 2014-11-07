@@ -1,0 +1,209 @@
+<?
+
+$ic_employee = isset($_SESSION['ic_employee']);
+
+$menu = Array();
+
+$icons = Array('Operations' => '/img/lightbulb.gif', 
+	       'Reports'    => '/img/chart.gif',
+	       'Users'      => '/img/users.gif',
+	       'Requests'   => '/img/flag.gif', 
+               'System'     => '/img/cog.gif' );
+
+$reports_menu = Array( 'Growth Leaders'      => '/reports/topx', 
+		       'Loss Leaders'        => '/reports/topx?sort=percent_change&order=asc', 
+		       'New Accounts'        => '/reports/new_accounts',
+		       'Usage'               => '/reports/usage');
+
+$users_menu = Array( 'User Index' => '/users', 
+		     'Add a User' => '/users/create' );
+
+$operations_menu = Array( 'Account Index'     => '/accounts', 
+			  'Create an Account' => '/accounts/create', 
+                          'Contact Index'     => '/contacts',
+                          'Search'            => '/search',
+                          'Note Index'        => '/notes',
+                          'Room Index'        => '/rooms');
+		     
+$requests_menu = Array( 'Request Queue'  => '/requests' );
+		       
+$system_menu = Array('MyCA Logs'     => '/system/logs', 
+        'Backend Logs'  => '/backend',
+        'Audit Logs'    => '/audit' ); 
+
+if($ic_employee) {
+  $reports_menu['Agent Accounts']    = '/reports/agent_accounts';
+  $operations_menu['Dialin Numbers'] = '/dialinnumbers';
+  $operations_menu['Reservations']   = 'http://rms.myconferenceadmin.com/reservations/month';
+}
+
+switch($user['User']['level_type']) {
+  case 'reseller_admin':
+  case 'reseller':
+
+    if($ic_employee) {
+      $reports_menu['Resellers Report'] = '/reports/resellers';
+      //$reports_menu['Usage by Date']    = '/reports/usage_by_date';
+
+      $requests_menu['Request Groups']  = '/requestgroups';
+
+      $operations_menu['Resellers']   = '/resellers';
+      $operations_menu['Salespeople'] = '/salespeople';
+      $operations_menu['Spectel']        = '/spectel';     
+    }
+
+    $reports_menu['Salesperson Report']  = '/reports/topsales';
+
+    ksort($reports_menu);
+    ksort($operations_menu);
+    ksort($users_menu);
+    ksort($requests_menu);
+    ksort($system_menu);
+
+    $menu['Reports']    = $reports_menu;
+    $menu['Operations'] = $operations_menu;
+
+    if($ic_employee)
+      $menu['Users'] = $users_menu;
+
+    $menu['Requests'] = $requests_menu;
+
+    if($ic_employee)
+      $menu['System'] = $system_menu;
+
+    break;
+
+  case 'salesperson':
+
+    ksort($reports_menu);
+    ksort($operations_menu);
+    ksort($requests_menu);
+
+    $menu['Reports']    = $reports_menu;
+    $menu['Operations'] = $operations_menu;
+    break;
+
+  case 'admin':
+
+    ksort($operations_menu);
+    ksort($requests_menu);
+
+    $menu['Operations'] = $operations_menu;
+    $menu['Requests']   = $requests_menu;
+    break;
+
+  default:
+    break;
+}
+?>
+
+<style type="text/css">
+#menu img {
+   margin-right: 5px;
+}
+
+#menu ul {
+  list-style-type: none;
+  width: 100%;
+}
+
+#menu li {
+  font-size: smaller;
+  margin-bottom: 2px;
+  background: #eee;
+  padding: 5px 0;
+  padding-left: 5px;
+}
+
+#menu li.heading {
+  font-weight: bold;
+  background: #DFDFDF;
+}
+
+#menu li.item a {
+  padding-left: 20px;
+}
+
+#menu a:hover {
+    color: #6297AF;
+}
+
+#history {
+  width: 160px;
+}
+
+#history option {
+  padding: 3px 5px;
+  margin: auto;
+}
+
+#history option.even {
+   background: #eee;
+}
+</style>
+
+<ul id="menu">
+  
+  <li class="heading">
+    <img src="/img/clock.gif" class="valign"/>
+    History
+  </li>
+  <li class="item">
+    <select id="history" name="history">
+    <option value="">Please Select...</option>
+
+    <? if(isset($_SESSION['history'])): ?>
+    <? for($i=0; $i<count($_SESSION['history']); $i++): ?> 
+    <option value="<?= $_SESSION['history'][$i]['url'] ?>" class="<?= $i%2 ? 'odd' : 'even' ?>">
+      <?= $_SESSION['history'][$i]['name'] ?>
+    </option>
+    <? endfor; ?>
+    <? endif; ?>
+
+    </select>
+  </li>
+
+  <? foreach($menu as $heading => $submenu): ?>
+  <li class="heading">
+    <? if(isset($icons[$heading])): ?>
+    <img src="<?= $icons[$heading] ?>" class="valign"/>
+    <? endif; ?>
+    <?= $heading ?>
+  </li>
+
+  <? foreach($submenu as $k => $v): ?>
+  <li class="item"><a href="<?= $v ?>"><?= $k ?></a></li>
+  <? endforeach; ?>
+
+  <? endforeach; ?>
+  
+  <? if($ic_employee): ?>
+  <li class="heading">
+    <img src="/img/information.gif" class="valign"/>
+    <a href="/wiki">Documentation Wiki</a>
+  </li>
+  <? endif; ?>
+
+  <li class="heading">
+    <img src="/img/bug.gif" class="valign"/>
+    <a href="/feedback">Bug Reports/Feedback</a>
+  </li>  
+
+  <li class="heading">
+    <img src="/img/password.gif" class="valign"/>
+    <a href="/users/password">Change Your Password</a>
+  </li>
+  <li class="heading">
+    <img src="/img/logout.gif" class="valign"/>
+    <a href="/users/logout">Logout</a>
+  </li>
+</ul>
+
+<script type="text/javascript">
+$(document).ready(function() {
+   $('#history').change(function() {
+     if(this.value != '')
+        window.location = this.value;
+   });
+});  
+</script>

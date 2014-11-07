@@ -1,0 +1,189 @@
+<?
+// Build tab delimited string for copy/paste back 
+function build_copy($rows)
+{
+  $out = a("Account\tFirst Name\tLast Name\tAddress 1\tAddress 2\tCity\tState\tZIP\tLogin\tPIN");
+
+  for($i=1; $i<count($rows); $i++)
+    $out[] = sprintf("%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\r\n", 
+		   $rows[$i]['BillingCode'], 
+		   $rows[$i]['FirstName'], 
+		   $rows[$i]['LastName'], 
+		   $rows[$i]['Address1'], 
+		   $rows[$i]['Address2'], 
+		   $rows[$i]['City'], 
+		   $rows[$i]['State'], 
+		   $rows[$i]['PostalCode'], 
+		   $rows[$i]['LoginName'], 
+		   $rows[$i]['PIN'] );
+  
+  return implode("\r\n", $out);
+}
+?>
+
+<style type="text/css">
+#pin_pane {
+   margin: auto;
+   padding-bottom: 20px;
+   border: 1px solid #ccc;
+   padding: 10px 20px;
+}
+
+#pin_pane td, th {
+  text-align: left; 
+  padding: 3px 5px;
+}
+
+td.error {
+  border: 1px solid #f00;
+  background: #FFBFBF;
+}
+
+form div.input label, form div.select label, form div.checkbox label {
+}
+
+form div.input textarea {
+  width: 420px;
+}
+
+div.submit input {
+  margin-left: 60px;
+}
+
+div.notice {
+  background: #FFECBF;
+  border: 1px solid #EEAA00;
+  padding: 1em;
+  margin: 1em 0;
+}
+</style>
+
+<div id="pin_pane">  
+
+  <?= $this->renderElement('title', aa('title', 'Import PINs')) ?>
+
+  <form method="post" enctype="multipart/form-data">
+
+    <fieldset>
+      <legend>Import Data</legend>
+
+      <p>
+	<strong>NOTE:</strong> A max of <?= MAX_PINS ?> can be imported at a time.
+      </p>
+
+      <div class="select">
+         <label class="right required" for="PinBridgeid">Bridge:</label>
+	 <?= $html->selectTag('Pin/bridgeid', $bridges) ?>
+         <?= $html->tagErrorMsg('Pin/bridgeid', 'Please select a bridge') ?>   
+      </div>
+
+      <div class="select">
+         <label class="right required" for="FormType">Type:</label>
+         <?= $html->selectTag('Form/type', aa('paste', 'Copy and Paste from Excel', 'csv', 'Import CSV'), null, null, null, false) ?>
+	 <?= $html->link('Template', '/files/pin_template.csv', aa('class', 'smaller')) ?>
+      </div>
+
+      <div class="input" id="paste_pane">
+         <label class="right required" for="DataRows">Rows:</label>
+         <?= $html->textarea('Data/Rows', aa('rows', 10, 'cols', 80, 'style', 'width: inherit')) ?>
+      </div>
+      
+     <div class="input" id="upload_pane">
+        <label class="right required" for="DataUpload">Upload CSV:</label>
+        <?= $html->file('upload') ?>
+     </div>
+
+      <div class="submit">
+	<button class="cancel" type="button">
+	  <?= $html->image('cross.gif') ?> Cancel
+	</button>
+	<button class="submit" type="submit">
+	  <?= $html->image('check.gif') ?> Import
+	</button>
+      </div>
+    </fieldset>
+  </form>
+
+  <? if(isset($rows)): ?>
+
+  <fieldset>
+    <legend>Export Data</legend>
+
+    <div style="margin-top: 1em">
+      
+      <? if($errors): ?>
+      <p class="italic">
+	The highlighted cells contain errors and PINs were not created:
+      </p>
+      <? endif; ?>
+
+      <table>
+	<tr>
+	  <th>Account</th>
+	  <th>First Name</th>
+	  <th>Last Name</th>
+	  <th>PIN</th>
+	</tr>
+
+	<? for($i=1; $i<count($rows); $i++): ?>
+	   <tr>
+	     <td class="<?= isset($errors[$i]['company']) ? 'error' : '' ?>"><?= $rows[$i]['company'] ?></td>
+	     <td class="<?= isset($errors[$i]['first_name']) ? 'error' : '' ?>"><?= $rows[$i]['first_name'] ?></td>
+	     <td class="<?= isset($errors[$i]['last_name']) ? 'error' : '' ?>"><?= $rows[$i]['last_name'] ?></td>
+	     <td class="<?= isset($errors[$i]['pin']) ? 'error' : '' ?>"><?= $rows[$i]['pin'] ?></td>
+	   </tr>
+	   <? endfor; ?>
+      </table>
+      <? endif; ?>
+    </div>
+   
+    <? if(isset($errors) && !$errors): ?>
+    <p style="margin-top: 1em">
+      <a id="excel_link" href="">Export to Excel</a>
+    </p>
+
+    <div id="excel_output" style="display: none">
+      <p class="italic">
+	Right-click, Select All, Copy and Paste into Excel.
+      </p>
+
+      <textarea rows="10" cols="80" style="font-size: 12px" readonly="readonly"><?= build_copy($rows) ?></textarea>
+    </div>
+    <? endif; ?>
+
+  </fieldset>
+
+</div>
+
+<script type="text/javascript">
+$(document).ready( function() {
+
+  $('button.cancel').back('/');
+
+  $('#FormType').change( function() {
+    if(this.value == 'paste') {
+      var show = '#paste_pane';
+      var hide = '#upload_pane';
+    } else if(this.value == 'csv') {
+      var show = '#upload_pane';
+      var hide = '#paste_pane';
+    }
+
+    $(hide).hide();
+    $(show).show();
+
+  }).change();
+
+  $('#excel_link').toggle( 
+    function() {
+      $('#excel_output').slideDown();
+      return false;
+    },
+    function() {
+     $('#excel_output').slideUp();
+     return false;
+   }
+  );
+
+});
+</script>

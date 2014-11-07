@@ -1,0 +1,12 @@
+<p>&nbsp;</p>
+
+<p>Dear <?= $user['name'] ?>,</p>
+
+<p>
+  Congratulations, your one step away from accessing your account online!<br /> Please <a href="http://www.myconferenceadmin.com/users/verify/<?= $user['verification_code'] ?>">Click here</a> to complete the registration process.
+</p>
+<p>Thank You, <br/>
+  <br />
+  MyConferenceAdmin Support</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>

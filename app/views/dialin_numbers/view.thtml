@@ -1,0 +1,78 @@
+<style type="text/css">
+#dialin_number_profile {
+   margin: auto;
+   padding-bottom: 20px;
+   border: 1px solid #ccc;
+   padding: 10px 20px;
+}
+
+#dialin_number {
+  margin-top: 1em;
+}
+
+#dialin_number th, #dialin_number td {
+  padding: 3px 5px;
+}
+
+
+#dialin_number th {
+  text-align: right
+}
+
+#dialin_number td {
+  text-align: left;
+}
+</style>
+
+<div id="dialin_number_profile">
+
+  <h1>Dialin Number: <?= $dialin_number['DialinNumber']['description'] ?></h1>
+
+  <p class="smaller" style="margin-top: 1em">
+    <a href="/dialinnumbers/edit/<?= $dialin_number['DialinNumber']['id'] ?>"><?= $html->image('edit.gif', aa('class', 'valign')) ?> Edit</a>
+  </p>
+
+  <table id="dialin_number">
+    <tr>
+      <th>ID:</th>
+      <td><?= $dialin_number['DialinNumber']['id'] ?></td>
+    </tr>
+    <tr>
+      <th>Description:</th>
+      <td><?= $dialin_number['DialinNumber']['description'] ?></td>
+    </tr>
+    <tr>
+      <th>Toll-Free Number:</th>
+      <td><?= $dialin_number['DialinNumber']['tollfreeno'] ?></td>
+    </tr>
+    <tr>
+      <th>Toll Number:</th>
+      <td><?= $dialin_number['DialinNumber']['tollno'] ?></td>
+    </tr>
+    <tr>
+      <th>Activation Date:</th>
+      <td><?= $dialin_number['DialinNumber']['activationdate'] ?></td>
+    </tr>
+    <tr>
+      <th>Active:</th>
+      <td><?= $dialin_number['DialinNumber']['active'] ? $html->image('check.gif') : $html->image('cross.gif') ?></td>
+    </tr>
+    <tr>
+      <th>Bridge:</th>
+      <td><?= $dialin_number['DialinNumber']['bridge'] ?></td>
+    </tr>
+  </table>
+
+  <h2 style="font-size: 14px; margin-top: 1em">Associated Resellers:</h2>
+  <ul style="list-style-type: none">
+    <? foreach($resellers as $i): ?>
+    <li>
+      <?= $html->link(!empty($i['rdesc']) ? sprintf('%s(%s)', $i['name'], $i['rdesc'])  : $i['name'], '/resellers/view/' . $i['resellerid']) ?></li>
+    <? endforeach; ?>    
+  </ul>
+
+
+  <p style="margin-top: 1em">
+    <?= $html->link('&laquo; Back', '/dialinnumbers', aa('class', 'smaller'), null, false)  ?>
+  </p>
+</div>

@@ -1,0 +1,1 @@
+There are <strong><?= $request['RequestStatus']['name'] ?></strong> rate change requests in the queue for account <strong><?= $request['Request']['acctgrpid'] ?></strong>

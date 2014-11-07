@@ -1,0 +1,67 @@
+<? $pagination->setPaging($paging) ?>
+
+<style type="text/css">
+#requests {
+  width: 100%;
+  margin-top: 1em;
+}
+
+#requests td {
+  text-align: left;
+}
+
+#requests th,#requests td {
+  padding: 3px 5px;
+  text-align: left;
+}
+
+tr.even td {
+  background: #EFF7FF;
+}
+
+#rate_change_pane {
+   margin: auto;
+   padding-bottom: 20px;
+   border: 1px solid #ccc;
+   padding: 10px 20px;
+}
+
+span.current {
+  color: #FF9C2A;
+  font-weight: bold;
+}
+
+</style>
+
+<div id="rate_change_pane">
+  <h1>Rate Change Requests for <?= $month ?>/<?= $year ?></h1>
+
+  <div class="center">
+    <?= $html->image('previous.gif') ?> <a href="/reports/rate_change/<?= $prev ?>"><?= $prev ?></a>
+
+    <? if($next): ?>
+    <a href="/reports/rate_change/<?= $next ?>"><?= $next ?></a> <?= $html->image('next.gif') ?>
+    <? endif; ?>
+  </div>
+
+  <table id="requests">
+    <tr>
+      <th><?= $pagination->sortBy('created') ?></th>
+      <th><?= $pagination->sortBy('creator') ?></th>
+      <th><?= $pagination->sortBy('status') ?></th>
+      <th><?= $pagination->sortBy('acctgrpid') ?></th>
+      <th><?= $pagination->sortBy('accountid') ?></th>
+    </tr>
+    <? for($i=0; $i<count($requests); $i++): ?>
+    <tr class="<?= $i%2 ? 'odd' : 'even' ?>">
+      <td><?= $time->niceShort($requests[$i]['RequestView']['created']) ?></td>
+      <td><?= $requests[$i]['RequestView']['creator_name']  ?></td>
+      <td><?= $html->link($requests[$i]['RequestView']['status_name'], '/requests/index/' . $requests[$i]['RequestView']['id'] ) ?></td>
+      <td><?= $html->link($requests[$i]['RequestView']['acctgrpid'], '/accounts/view/' . $requests[$i]['RequestView']['acctgrpid']) ?></td>
+      <td><?= $html->link($requests[$i]['RequestView']['accountid'], '/rooms/view/' . $requests[$i]['RequestView']['accountid']) ?></td>
+    </tr>
+    <? endfor; ?>
+  </table>
+
+  <?= $this->renderElement('pagination') ?>
+</div>

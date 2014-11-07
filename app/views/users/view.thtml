@@ -1,0 +1,143 @@
+<style type="text/css">
+#user_profile {
+   margin: auto;
+   padding-bottom: 20px;
+   border: 1px solid #ccc;
+   padding: 10px 20px;
+}
+
+#user_profile th,#user_profile td {
+  padding: 3px 5px;
+}
+
+#user_profile td {
+  text-align: left;
+}
+
+#profile th {
+  text-align: right;
+}
+</style>
+
+<div id="user_profile">
+  
+  <h1><?= $user['User']['name'] ?></h1>
+
+  <p class="smaller" style="margin-top: 1em">
+    <a href="/users/edit/<?= $user['User']['id'] ?>"><?= $html->image('edit.gif', aa('class', 'valign')) ?> Edit</a>
+  </p>
+
+  <table id="profile" style="margin-top: 1em">
+
+    <tr>
+      <th>User ID:</th>
+      <td><?= $user['User']['id'] ?></td>
+    <tr>
+    
+    <? if($user['User']['username']): ?>
+    <tr>
+      <th>Username:</th>
+      <td><?= $user['User']['username'] ?></td>
+    <tr>
+    <? endif; ?>
+
+    <tr>
+      <th>Company:</th>
+      <td><?= $user['User']['company_name'] ?></td>
+    <tr>
+
+    <tr>
+      <th>Email:</th>
+      <td><?= $html->link($user['User']['email'], "mailto:{$user['User']['email']}") ?></td>
+    <tr>
+
+    <? if(!empty($user['User']['phone'])): ?> 
+    <tr>
+      <th>Phone:</th>
+      <td><?= $user['User']['phone']?></td>
+    </tr>
+    <? endif; ?>
+
+    <tr>
+      <th>Group:</th>
+      <td><?= $user['User']['level_type'] ?></td>
+    <tr>
+
+    <tr>
+      <th>Logins:</th>
+      <td><?= $user['User']['logins'] ?></td>
+    <tr>
+
+    <tr>
+      <th>Active:</th>
+      <td><?= $user['User']['active'] ? 'Yes' : 'No' ?></td>
+    <tr>
+
+    <tr>
+      <th>Verified:</th>
+      <td><?= $user['User']['verified'] ? 'Yes' : 'No' ?></td>
+    <tr>
+
+    <tr>
+      <th>Created:</th>
+      <td><?= $time->niceShort($user['User']['created']) ?></td>
+    <tr>
+
+    <tr>
+      <th>Modified:</th>
+      <td><?= $time->niceShort($user['User']['modified']) ?></td>
+    <tr>
+  </table>
+
+  <h1 style="margin-top: 1em">Last <?= count($requests) ?> Requests</h1>
+
+  <table style="width:100%">
+    <tr>
+      <th>Account Group</th>
+      <th>Account</th>
+      <th>Request Type</th>
+      <th>Request Status</th>
+      <th>Created</th>
+      <th>Modified</th>
+    </tr>
+    <? foreach($requests as $r): ?>
+    <tr>
+      <td><?= $html->link($r['RequestView']['acctgrpid'], '/accounts/view/' . $r['RequestView']['acctgrpid']) ?></td>
+      <td><?= $html->link($r['RequestView']['accountid'], '/rooms/view/' . $r['RequestView']['accountid']) ?></td>
+      <td><?= $r['RequestView']['type_name'] ?></td>
+      <td><?= $html->link($r['RequestView']['status_name'], '/requests/index/' . $r['RequestView']['id']) ?></td>
+      <td><?= $time->nice($r['RequestView']['created']) ?></td>
+      <td><?= $time->nice($r['RequestView']['modified']) ?></td>
+    </tr>
+    <? endforeach; ?>
+  </table>
+
+  <h1 style="margin-top: 1em">Last <?= count($diffs) ?> Modifications</h1>
+  
+  <table style="width:100%">
+    <tr>
+      <th>Entity</th>
+      <th>Operation</th>
+      <th>Object</th>
+      <th>Created</th>
+    </tr>
+    <? foreach($diffs as $d): ?>
+    <tr>
+      <td><?= $d['DiffLog']['entity'] ?></td>
+      <td><?= $op_map[$d['DiffLog']['op']] ?></td>
+      <td><?= $html->link($d['DiffLog']['object_id'], '/audit/view/' . $d['DiffLog']['entity'] . '/' . $d['DiffLog']['object_id'] . '/' . $d['DiffLog']['id'] ) ?></td>
+      <td><?= $time->nice($d['DiffLog']['created']) ?></td>
+    </tr>
+    <? endforeach; ?>
+  </table>
+
+  <p style="margin-top: 1em">
+    <?= $html->link('&laquo; Back', '/users', aa('id', 'back'), null, false)  ?>
+  </p>
+</div>
+
+<script type="text/javascript">
+$(document).ready( function() {
+  $('#back').back(document.referrer);
+});
+</script>

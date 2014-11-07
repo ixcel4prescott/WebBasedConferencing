@@ -1,0 +1,191 @@
+<?
+$menu_items = Array( Array( 'text' => 'Back to ' . $contact['Contact']['acctgrpid'],  
+			    'icon' => 'previous.gif', 
+			    'url'  => '/accounts/view/' . $contact['Contact']['acctgrpid']),
+		     Array( 'text' => 'Update Contact',  
+			    'icon' => 'edit.gif', 
+			    'url'  => '/contacts/edit/' . $contact['Contact']['id']),
+		     Array( 'text' => 'Change Status', 
+			    'icon' => 'lightbulb.gif',
+			    'url'  => '/contacts/status/' . $contact['Contact']['id']), 
+		     Array( 'text' => 'Add a Room',  
+			    'icon' => 'room.gif', 
+			    'url'  => '/rooms/create/' . $contact['Contact']['id']) );
+?>
+
+<style type="text/css">
+div#contact_frame {
+   margin: auto;
+}
+
+.headline {
+  font-weight: bold;
+  border-bottom: 1px solid #ccc;
+  margin-bottom: 10px;
+}
+div#left_column, div#right_column {
+  float: right; 
+  margin-bottom: 20px;
+  width: 50%;
+}
+
+div.box {
+  margin-bottom: 10px;
+  margin-right: 5px;
+}
+
+th, td {
+  padding: 3px 5px;
+  text-align: left;
+  white-space: normal
+}
+
+tr.even td {
+  background: #EFF7FF;
+}
+
+#rooms,#info {
+   width: 100%;
+}
+</style>
+
+<div id="contact_frame">
+  <?= $this->renderElement('toolbar', Array('items' => $menu_items)) ?>
+
+  <?= $this->renderElement('title', aa('title', $full_name, 'target', 'contact_view' )) ?>
+
+  <div id="left_column">
+    <div class="box">
+      <div class="headline">Rooms Belonging to this Contact</div>
+
+      <? if(!empty($contact['Room'])): ?>
+      <table id="rooms">
+	<thead>
+	  <tr>
+	    <th>Confirmation Number</th>
+	    <th>Bridge</th>
+	    <th>Name</th>
+	    <th>CEC</th>
+	    <th>PEC</th>
+	    <th>Status</th>
+	  </tr>
+	</thead>
+	<tbody>
+	  <? for($i=0; $i<count($contact['Room']); $i++): ?>	     
+	  <tr class="<?= $i%2 ? 'odd' : 'even' ?>">
+	    <td><?= $html->link($contact['Room'][$i]['accountid'], '/rooms/view/' . $contact['Room'][$i]['accountid']) ?></td>
+	    <td><?= $bridges[$contact['Room'][$i]['bridgeid']] ?></td>
+	    <td><?= $contact['Room'][$i]['contact'] ?></td>
+	    <td><?= format_passcode($contact['Room'][$i]['cec']) ?></td>
+	    <td><?= format_passcode($contact['Room'][$i]['pec']) ?></td>
+	    <td><?= $statuses[$contact['Room'][$i]['roomstat']] ?></td>
+	  </tr>
+	  <? endfor; ?>
+	</tbody>
+      </table>
+      <? else: ?>
+      <p class="italic">No Active Rooms</p>
+      <? endif?>
+    </div>
+  </div>
+
+  <div id="right_column">
+
+    <div class="box">
+      <div class="headline">Contact Information</div>
+
+      <table id="info">
+	<tr>
+	  <th>ID:</th>
+	  <td><?= $contact['Contact']['id'] ?></td>
+	</tr>
+
+	<tr>
+	  <th>Name:</th>
+	  <td><?= $full_name ?></td>
+	</tr>
+
+	<tr>
+	  <th>Account:</th>
+	  <td><?= $html->link($contact['Account']['acctgrpid'], '/accounts/view/' . $contact['Account']['acctgrpid']) ?></td>
+	</tr>
+
+	<tr>
+	  <th>Account:</th>
+	  <td><?= $html->link($contact['Status']['description'], '/contacts/status/' . $contact['Contact']['id']) ?></td>
+	</tr>
+
+	<tr>
+	  <th>Company:</th>
+	  <td><?= $contact['Contact']['company'] ?></td>
+	</tr>
+
+	<tr>
+	  <th>Position:</th>
+	  <td><?= $contact['Contact']['position'] ?></td>
+	</tr>
+
+	<tr>
+	  <th>Email:</th>
+	  <td><?= $text->autoLinkEmails($contact['Contact']['email']) ?></td>
+	</tr>
+
+	<tr>
+	  <th>Phone:</th>
+	  <td><?= $contact['Contact']['phone'] ?></td>
+	</tr>
+
+	<tr>
+	  <th>Address:</th>
+	  <td><?= $contact['Contact']['address1'] ?></td>
+	</tr>
+
+	<? if(!empty($contact['Contact']['address2'])): ?>
+	<tr>
+	  <th></th>
+	  <td><?= $contact['Contact']['address2'] ?></td>
+	</tr>
+	<? endif; ?>
+
+	<? if(!empty($contact['Contact']['address3'])): ?>
+	<tr>
+	  <th></th>
+	  <td><?= $contact['Contact']['address3'] ?></td>
+	</tr>
+	<? endif; ?>
+
+	<tr>
+	  <th>City:</th>
+	  <td><?= $contact['Contact']['city'] ?></td>
+	</tr>
+
+	<? if(!empty($state)): ?>
+	<tr>
+	  <th>State:</th>
+	  <td><?= $state['State']['name'] ?></td>
+	</tr>
+	<? endif; ?>
+
+	<tr>
+	  <th>Postal Code:</th>
+	  <td><?= $contact['Contact']['zip'] ?></td>
+	</tr>
+
+	<? if(!empty($country)): ?>
+	<tr>
+	  <th>Country:</th>
+	  <td><?= $country['Country']['name'] ?></td>
+	</tr>
+	<? endif; ?>
+
+	<? if(!empty($country)): ?>
+	<tr>
+	  <th>Time Zone:</th>
+	  <td><?= $time_zone['TimeZone']['description'] ?></td>
+	</tr>
+	<? endif; ?>
+
+      </table>
+    </div>
+  </div>
+</div>

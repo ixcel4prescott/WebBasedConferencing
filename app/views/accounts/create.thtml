@@ -1,0 +1,329 @@
+<style type="text/css">
+#edit_pane {
+   margin: auto;
+   padding-bottom: 20px;
+   border: 1px solid #ccc;
+   padding: 10px 20px;
+}
+
+#dialin_numbers {
+   margin-left: 210px;
+   margin-top: 10px;
+   border: 1px solid #ccc;
+}
+
+#dialin_numbers th, #dialin_numbers td {
+   border-top: 1px solid #ccc;
+}
+
+#dialin_numbers th {
+   background: #eee;
+   text-align: right;
+}
+</style>
+
+<div id="edit_pane">
+
+  <?= $this->renderElement('title', aa('title', 'Create an Account')) ?>
+
+  <form method="post" id="account_form">
+    <fieldset>
+      <legend>Account Information</legend>
+
+      <div class="select">
+         <label class="right required" for="AccountSalespid">Salesperson:</label>
+         <?= $html->selectTag('Account/salespid', $salespeople) ?>
+         <?= $html->tagErrorMsg('Account/salespid', 'Please select a salesperson') ?>
+      </div>
+
+      <? if(!$generated_id): ?>
+      <div class="input">
+         <label class="right required" for="AccountAcctgrpid">Account ID:</label>
+         <?= $html->input('Account/acctgrpid') ?>
+         <?= $html->tagErrorMsg('Account/acctgrpid', 'Please enter an account id') ?>
+      </div>
+      <? endif; ?>
+
+      <div class="select">
+         <label class="right required" for="AccountDefaultBridge">Default Bridge:</label>
+         <?= $html->selectTag('Account/default_bridge', $bridges, $default_bridge) ?>
+         <?= $html->tagErrorMsg('Account/default_bridge', 'Please select a default bridge') ?>   
+      </div>
+
+      <div class="select">
+        <label class="right required" for="Accountdefault_product_id">Product:</label>
+        <?= $html->selectTag('Account/default_product_id', $products, null, null, null, false) ?>
+        <?= $html->tagErrorMsg('Room/default_product_id', 'Please select a default product') ?>
+      </div>
+
+      <div class="input">
+         <label class="right required" for="BrandingWebinterpointUrl">WebInterpoint URL:</label>
+         <?= $html->input('Branding/webinterpoint_url') ?>
+         <?= $html->tagErrorMsg('Branding/webinterpoint_url', 'Please enter an valid url') ?>
+      </div>
+	  
+	   <div class="input">
+         <label class="right required" for="BrandingSmartCloudUrl">SmartCloud URL:</label>
+         <?= $html->input('Branding/smartcloud_url') ?>
+         <?= $html->tagErrorMsg('Branding/smartcloud_url', 'Please enter an valid url') ?>
+      </div>
+	  
+      <div class="select">
+         <label class="right required" for="AccountDialinNoid">Dialin Number:</label>
+         <?= $html->selectTag('Account/dialinNoid', $dialin_numbers, $default_dialin) ?>
+         <?= $html->tagErrorMsg('Account/dialinNoid', 'Please select a dialin number') ?>
+         <table id="dialin_numbers" >
+	   <tr>
+	     <th>Toll-Free Number:</th><td id="toll_free"></td>
+	   </tr>
+	   <tr>
+	     <th>Toll Number:</th><td id="toll"></td>
+	   </tr>
+         </table>
+      </div>
+
+    </fieldset>
+
+    <fieldset>
+      <legend>Company Information</legend>
+
+      <div class="input">
+        <label class="right required" for="AccountBcompany">Company:</label>
+        <?= $html->input('Account/bcompany') ?>
+        <?= $html->tagErrorMsg('Account/bcompany', 'Please specify a unique company name') ?>
+      </div>
+
+      <div class="input">
+        <label class="right required" for="AccountBaddr1">Address:</label>
+        <?= $html->input('Account/baddr1') ?>
+        <?= $html->tagErrorMsg('Account/baddr1', 'Please specify an address') ?>
+      </div>
+
+      <div class="input">
+        <label class="right" for="AccountBaddr2">&nbsp;</label>
+        <?= $html->input('Account/baddr2') ?>
+      </div>
+
+      <div class="input">
+        <label class="right required" for="AccountCity">City:</label>
+        <?= $html->input('Account/city') ?>
+        <?= $html->tagErrorMsg('Account/city', 'Please specify a city') ?>
+      </div>
+
+      <div class="select">
+        <label class="right required" for="AccountState">State:</label>
+        <?= $html->selectTag('Account/state', $states) ?>
+        <?= $html->tagErrorMsg('Account/state', 'Please select a state') ?>
+      </div>
+
+      <div class="input">
+        <label class="right required" for="AccountZip">ZIP Code:</label>
+        <?= $html->input('Account/zip') ?>
+        <?= $html->tagErrorMsg('Account/zip', 'Please specify a zip code') ?>   
+      </div>
+
+      <div class="select">
+        <label class="right required" for="AccountCountry">Country:</label>
+        <?= $html->selectTag('Account/country', $countries) ?>
+        <?= $html->tagErrorMsg('Account/country', 'Please select a country') ?>
+      </div>
+
+
+      <div class="select">
+        <label class="right required" for="AccountTimezone">Time Zone:</label>
+        <?= $html->selectTag('Account/time_zone', $time_zones) ?>
+        <?= $html->tagErrorMsg('Account/time_zone', 'Please select a time zone') ?>
+      </div>
+
+      <div class="input">
+        <label class="right" for="AccountFax">Fax:</label>
+        <?= $html->input('Account/fax') ?>
+      </div>
+
+      <div class="input" >
+         <label class="right" for="AccountSicCode">SIC Code:</label>
+	 <?= $html->selectTag('Account/sicCode', $sic_codes) ?>
+      </div>
+
+      <div class="input" >
+         <label class="right" for="AccountCompanySize">Company Size:</label>
+	 <?= $html->selectTag('Account/cosizeid', $company_size) ?>
+      </div>
+
+    </fieldset>
+
+    <fieldset>
+      <legend>Billing Contact</legend>
+
+      <div class="input">
+	<label class="right required" for="AccountBcontactFirstName">Name:</label>
+	<?= $html->input('Account/bcontact_first_name', Array('class' => 'short')) ?>
+	<?= $html->input('Account/bcontact_last_name', Array('class' => 'short')) ?>
+	<?= $html->tagErrorMsg('Account/bcontact_first_name', 'Please specify a first name') ?>
+	<?= $html->tagErrorMsg('Account/bcontact_last_name', 'Please specify a last name') ?>
+      </div>
+
+      <div class="input">
+        <label class="right required" for="AccountPhone">Phone:</label>
+        <?= $html->input('Account/phone') ?>
+        <?= $html->tagErrorMsg('Account/phone', 'Please specify a phone number') ?>
+      </div>
+
+      <div class="input">
+        <label class="right required" for="AccountEmail">Email:</label>
+        <?= $html->input('Account/email') ?>
+        <?= $html->tagErrorMsg('Account/email', 'Please enter a valid email address') ?>
+      </div>
+
+    </fieldset>
+
+    <fieldset>
+      <legend>Corporate Contact</legend>
+
+      <div class="checkbox">
+        <label class="right required" for="AccountSameAsBilling">Same as Billing Contact:</label>
+        <?= $html->checkbox('Account/same_as_billing') ?>
+      </div>
+
+      <div class="input">
+	<label class="right required" for="AccountCorpcontactFirstName">Name:</label>
+	<?= $html->input('Account/corpcontact_first_name', Array('class' => 'short')) ?>
+	<?= $html->input('Account/corpcontact_last_name', Array('class' => 'short')) ?>
+	<?= $html->tagErrorMsg('Account/corpcontact_first_name', 'Please specify a first name') ?>
+	<?= $html->tagErrorMsg('Account/corpcontact_last_name', 'Please specify a last name') ?>
+      </div>
+
+      <div class="input">
+        <label class="right required" for="AccountCorpphone">Phone:</label>
+        <?= $html->input('Account/corpphone') ?>
+        <?= $html->tagErrorMsg('Account/corpphone', 'Please specify a phone number') ?>
+      </div>
+
+      <div class="input">
+        <label class="right required" for="AccountCorpemail">Email:</label>
+        <?= $html->input('Account/corpemail') ?>
+        <?= $html->tagErrorMsg('Account/corpemail', 'Please a valid email address') ?>
+      </div>
+
+    </fieldset>
+
+    <fieldset>
+      <legend>Billing</legend>
+
+      <?= $html->hiddenTag('Account/billing_method_id', METERED_BILLING_METHOD) ?>
+
+      <?= $html->hiddenTag('Account/billing_frequency_id', MONTHLY_BILL_FREQUENCY) ?>
+
+      <div class="select">
+        <label class="right required" for="AccountInvdelmeth">Delivery Method:</label>
+        <?= $html->selectTag('Account/invdelmeth', $invoice_delivery_methods) ?>
+        <?= $html->tagErrorMsg('Account/invdelmeth', 'Please select a delivery method') ?>
+      </div>
+
+      <div class="select">
+        <label class="right required" for="AccountInvoiceTermsId">Terms:</label>
+        <?= $html->selectTag('Account/invoice_terms_id', $invoice_terms) ?>
+        <?= $html->tagErrorMsg('Account/invoice_terms_id', 'Please select valid invoice terms (e.g. if bill credit card is selected the invoice terms must be set to Credit Card)') ?>
+      </div>
+
+      <div class="input">
+        <label class="right" for="AccountOptdesc1">Optional Description:</label>
+        <?= $html->input('Account/optdesc1') ?>
+      </div>
+
+      <div class="input">
+        <label class="right" for="AccountOptval1">Optional Value:</label>
+        <?= $html->input('Account/optval1') ?>
+      </div>
+    </fieldset>
+
+    <div class="submit">
+      <button class="cancel" type="button">
+        <?= $html->image('cross.gif') ?> Cancel
+      </button>
+      <button class="submit" type="submit" name="manual">
+        <?= $html->image('check.gif') ?> Create
+      </button>
+    </div>
+  </form>
+</div>
+
+<script type="text/javascript">
+
+function get_time_zones(){
+    $.ajax({
+      type: "POST",
+      url: "/time_zones/get_time_zones",
+      data: "country=" + $('#AccountCountry').val() + '&type=Account',
+      success: function(html){
+        tz_select_parent = $('#AccountTimeZone').parent()
+        tz_select_parent.replaceWith(html);
+      }
+    });
+}
+
+$(document).ready( function() {
+
+  $('button.cancel').back('/accounts');
+
+  var dialin_map = <?= json_encode($dialin_map) ?>;
+
+  $('#AccountSalespid,#AccountDefaultBridge').change( function() {
+    this.form.submit();
+  });
+
+  if($('#AccountSalespid').val() !== '')
+    $('#account_form input,#account_form button.submit,#account_form select:not(#AccountSalespid,#AccountDefaultBridge)').attr('disabled', '');
+  else
+    $('#account_form input,#account_form button.submit,#account_form select:not(#AccountSalespid,#AccountDefaultBridge)').attr('disabled', 'disabled');
+
+  $('#AccountSameAsBilling').change( function() {
+      $('#AccountCorpcontactFirstName,#AccountCorpcontactLastName,#AccountCorpemail,#AccountCorpphone').attr('disabled', (this.checked || this.disabled) ? 'disabled' : '');
+  }).change();
+
+  $('#AccountBillcc').click( function() {
+      if(this.checked)
+	  $('#PciCreditcard,#PciCcexpireMonth,#PciCcexpireYear,#PciCcholdername,#PciCcholderstreet,#PciCcholderzip').prev('label').addClass('required');
+      else
+	  $('#PciCreditcard,#PciCcexpireMonth,#PciCcexpireYear,#PciCcholdername,#PciCcholderstreet,#PciCcholderzip').prev('label').removeClass('required');
+  });
+
+  $('#AccountDialinNoid').change( function() {
+
+     if(this.value) {
+	 $('#toll_free').html(dialin_map[this.value][0]);
+	 $('#toll').html(dialin_map[this.value][1]);
+	 $('#dialin_numbers').show();
+     } else {
+	 $('#dialin_numbers').hide();
+     }
+
+  }).change();
+
+  $('#AccountState').change(function (){
+    if ($('#AccountState').val()){
+      if ($('#AccountState').val() == 'XX'){
+        $('#AccountCountry').val('');
+      } else if ($('#AccountState').val() in us_states){
+        $('#AccountCountry').val('US');
+      } else if ($('#AccountState').val() in provinces){
+        $('#AccountCountry').val('CA');
+      }
+      get_time_zones();
+    }
+  });
+  
+  $('#AccountCountry').change(function (){
+    if ($('#AccountCountry').val() != 'CA' && $('#AccountCountry').val() != 'US'){
+      $('#AccountState').val('XX');
+    } else {
+      $('#AccountState').val('');
+    }
+    get_time_zones();
+  });
+
+});
+
+var us_states = <? echo json_encode($us_states)?>;
+var provinces = <? echo json_encode($provinces)?>;
+</script>

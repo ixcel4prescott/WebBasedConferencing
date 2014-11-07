@@ -1,0 +1,124 @@
+<style type="text/css">
+#salesperson_pane {
+   margin: auto;
+   padding-bottom: 20px;
+   border: 1px solid #ccc;
+   padding: 10px 20px;
+}
+
+#people input.commission {
+  width: 2em;
+}
+
+#people {
+  border: none;
+}
+
+#people th {
+  background: none;
+  border: none;
+  padding: 0;
+}
+
+#people td {
+  border: none;
+  padding: 0;
+  text-align: left;
+  padding-right: 3px;
+  padding-bottom: 3px;
+}
+</style>
+
+<div id="salesperson_pane">
+  <h1>Create a Salesperson</h1>
+
+  <form method="post">
+    <div class="select">
+       <label class="right required" for="SalespersonResellerid">Reseller:</label>
+       <?= $html->selectTag('Salesperson/resellerid', $resellers) ?>
+       <?= $html->tagErrorMsg('Salesperson/resellerid', 'Please select a reseller') ?>   
+    </div>
+
+    <div class="input">
+      <label class="right required">Salespeople:</label>
+      <table id="people">
+	<tr>
+          <th>First Name</th>
+	  <th>Last Name</th>
+	</tr>
+	<tr>
+          <td>
+	    <input type="text" name="data[Salesperson][person][0][firstname]" 
+		   value="<?= $this->data['Salesperson']['person'][0]['firstname'] ?>"/>
+	  </td>
+          <td>
+	    <input type="text" name="data[Salesperson][person][0][lastname]" 
+		   value="<?= $this->data['Salesperson']['person'][0]['lastname'] ?>"/>
+	  </td>
+          <td>
+	    <input type="text" name="data[Salesperson][person][0][commission]" class="commission"
+		   value="<?= $this->data['Salesperson']['person'][0]['commission'] ?>"/>%
+	  </td>
+	  <td class="bold italic">Account Manager</td>
+	</tr>
+	<tr>
+          <td>
+	    <input type="text" name="data[Salesperson][person][1][firstname]" 
+		   value="<?= $this->data['Salesperson']['person'][1]['firstname'] ?>"/>
+	  </td>
+          <td>
+	    <input type="text" name="data[Salesperson][person][1][lastname]" 
+		   value="<?= $this->data['Salesperson']['person'][1]['lastname'] ?>"/>
+	  </td>
+          <td>
+	    <input type="text" name="data[Salesperson][person][1][commission]" class="commission"
+		   value="<?= $this->data['Salesperson']['person'][1]['commission'] ?>"/>%
+	  </td>
+	</tr>
+	<tr>
+          <td>
+	    <input type="text" name="data[Salesperson][person][2][firstname]" 
+		   value="<?= $this->data['Salesperson']['person'][2]['firstname'] ?>"/>
+	  </td>
+          <td>
+	    <input type="text" name="data[Salesperson][person][2][lastname]" 
+		   value="<?= $this->data['Salesperson']['person'][2]['lastname'] ?>"/>
+	  </td>
+          <td>
+	    <input type="text" name="data[Salesperson][person][2][commission]" class="commission" 
+		   value="<?= $this->data['Salesperson']['person'][2]['commission'] ?>"/>%
+	  </td>
+	</tr>
+      </table>
+    </div>
+
+    <div class="input">
+       <label class="right required" for="SalespersonEmail">Email:</label>
+       <?= $html->input('Salesperson/email') ?>
+       <?= $html->tagErrorMsg('Salesperson/email', 'Please enter an email address') ?>   
+    </div>    
+
+    <div class="input">
+       <label class="right" for="SalespersonFranchiseId">Franchise ID:</label>
+       <?= $html->input('Salesperson/franchise_id') ?>
+    </div>
+
+    <div class="submit">
+      <button class="cancel" type="button">
+	<?= $html->image('cross.gif') ?> Cancel
+      </button>
+      <button class="submit" type="submit">
+	<?= $html->image('check.gif') ?> Create
+      </button>
+    </div>
+  </form>
+</div>
+
+<script type="text/javascript">
+$(document).ready(function() {
+
+  $('button.cancel').back('/salespeople');
+
+});
+</script>
+

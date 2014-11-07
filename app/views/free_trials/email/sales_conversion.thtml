@@ -1,0 +1,10 @@
+<h3>Conversion Attempt Email Sent</h3>
+
+A conversion attempt email was sent to <strong><?= $free_trial['FreeTrial']['first_name'].
+    ' '.$free_trial['FreeTrial']['last_name'].
+    '</strong> of <strong>'.$free_trial['FreeTrial']['company_name'] ?></strong>
+<br />
+<br />
+Proposal: <a href="<?= SIGNUP_URL.'/admin/proposals/view/'.$free_trial['Proposal']['id'] ?>"> <?= SIGNUP_URL.'/admin/proposals/view/'.$free_trial['Proposal']['id'] ?> </a>
+
+

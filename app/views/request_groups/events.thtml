@@ -1,0 +1,12 @@
+<? for($i=0; $i<count($events); $i++): ?>
+<tr>
+  <td><?= $statuses[$events[$i][0]['status']] ?></td>
+  <td class="left"><?= $types[$events[$i][0]['type']] ?></td>
+  <td class="center">
+    <a href="" class="delete"><?= $html->image('cancel.gif') ?></a>
+    <input type="hidden" name="data[Event][request_group_id]" value="<?= $events[$i][0]['request_group_id'] ?>"/>
+    <input type="hidden" name="data[Event][status]" value="<?= $events[$i][0]['status'] ?>"/>
+    <input type="hidden" name="data[Event][type]" value="<?= $events[$i][0]['type'] ?>"/>
+  </td>
+</tr>
+<? endfor; ?>

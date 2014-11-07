@@ -1,0 +1,156 @@
+<style type="text/css">
+#clients_pane {
+   margin: auto;
+   padding-bottom: 20px;
+   border: 1px solid #ccc;
+   padding: 10px 20px;
+}
+
+#clients {
+    width: 100%;
+}
+
+#clients_pane th, #clients_pane td {
+  padding: 3px 5px;
+  text-align: left;
+}
+
+tr.even td {
+  background: #EFF7FF;
+}
+
+#results {
+    margin-left: 215px;
+    margin-bottom: 1em;
+}
+</style>
+
+<div id="clients_pane">
+  <?= $this->renderElement('title', aa('title', $client['SpectelClient']['ClientName'], 'target', 'spectel_client_move')) ?>
+
+  <form method="post">
+    
+    <?= $html->hidden('Page/state') ?>
+    <?= $html->hidden('SpectelClient/src') ?>
+
+    <input type="hidden" name="data[SpectelReservation][ReservationRef][]" value="" />
+
+    <table id="clients">
+      <tr>
+	<th style="text-align:center">
+	  <a id="all" href="#all" class="smaller">Select All</a><br/>
+	  <a id="none" href="#none" class="smaller">Select None</a>
+	</th>
+	<th>Account ID</th>
+	<th>Reservation Ref</th>
+	<th>Name</th>
+	<th>CEC</th>
+	<th>PEC</th>
+      </tr>
+      
+      <? for($i=0; $i<count($conferences); $i++): ?>
+	 <tr class="<?= $i%2 ? 'odd' : 'even' ?>">
+	   <td style="text-align:center">
+	     <input type="checkbox" name="data[SpectelReservation][ReservationRef][]" value="<?= $conferences[$i]['ReservationRef'] ?>" 
+		    <?= in_array($conferences[$i]['ReservationRef'], $this->data['SpectelReservation']['ReservationRef']) ? 'checked="checked"' : '' ?>/></td>
+	   <td><?= $html->link($conferences[$i]['accountid'], '/rooms/view/' . $conferences[$i]['accountid'] ) ?></td>
+	   <td><?= $conferences[$i]['ReservationRef'] ?></td>
+	   <td><?= $conferences[$i]['ConferenceName'] ?></td>
+	   <td><?= $conferences[$i]['UsesMPIN'] ?></td>
+	   <td><?= $conferences[$i]['UsesCPIN'] ?></td>
+	 </tr>
+	 <? endfor; ?>
+    </table>
+
+    <div class="input" style="margin-top: 1em">
+       <label class="right required" for="SpectelClientClientRef">Destination Client:</label>
+       <?= $html->input('SpectelReservation/ClientRef') ?>
+
+       <button id="search">
+	 <?= $html->image('search.gif', aa('class', 'valign')) ?> Search Clients
+       </button>
+       
+       <a href="" id="cancel" style="display:none">
+	 <?= $html->image('cancel.gif', aa('class', 'valign', '')) ?>
+       </a>
+
+       <?= $html->tagErrorMsg('SpectelClient/ClientRef', 'Please specify a client') ?>
+    </div>
+
+    <div id="results"></div>
+
+    <div class="submit" style="margin-top:1em">
+      <button class="cancel" type="button">
+	<?= $html->image('cross.gif') ?> Cancel
+      </button>
+      <button class="submit" type="submit">
+        <?= $html->image('check.gif') ?> Move
+      </button>
+    </div>
+  </form>
+</div>
+
+<script type="text/javascript">
+$(document).ready( function() {
+    
+    $('button.cancel').back('/spectel/view/<?= $client['SpectelClient']['ClientRef'] ?>');
+    
+    $('#all').click( function() {
+	$('#clients :checkbox').attr('checked', 'checked');
+	return false; 
+    });
+    
+    $('#none').click( function() {
+	$('#clients :checkbox').attr('checked', '');
+	return false; 
+    });
+    
+    $('#search').click( function() {
+	$('#results').load('/spectel/search', 
+			   {'data[SpectelClient][src]': $('#SpectelClientSrc').val(), 'data[SpectelReservation][ClientRef]': $('#SpectelReservationClientRef').val()}, 
+			   function() {
+			       $('#results a').click( function() {
+				   $('#SpectelReservationClientRef').val($(this).html()).attr('readonly', 'readonly');
+				   $('#results').html('');				   
+				   $('#search').hide();
+				   $('#cancel').show();
+
+                                   $('button.submit').attr('disabled', '');
+                                   $('#PageState').val(1);
+				   return false;
+			       });
+			   });
+
+	return false;
+    });
+
+    $('#cancel').click( function() {
+	$('#search').show();
+	$('#cancel').hide()
+        $('#rates').hide();
+	$('#SpectelReservationClientRef').attr('readonly', '').val('').keyup();
+
+        $('button.submit').attr('disabled', 'disabled')
+        $('#PageState').val(0);
+	return false;
+    });
+
+    $('#SpectelReservationClientRef').keyup( function() {
+          var disabled = 'disabled';
+
+          if(this.value != '')
+            disabled = '';
+				 
+          $('#search').attr('disabled', disabled);
+    }).keyup();
+
+    if($('#PageState').val()) {
+      $('button.submit').attr('disabled', '');
+      $('#SpectelReservationClientRef').attr('readonly', 'readonly');
+      $('#search').hide();
+      $('#cancel').show();
+    }
+  
+
+});
+</script>

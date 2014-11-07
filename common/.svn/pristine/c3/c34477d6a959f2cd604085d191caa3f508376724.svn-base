@@ -1,0 +1,1 @@
+A <strong><?= $request['RequestStatus']['name'] ?></strong> request is in the queue to create a new reservation belonging to account <strong><?= $request['Request']['acctgrpid'] ?></strong>

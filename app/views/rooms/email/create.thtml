@@ -1,0 +1,69 @@
+<style type="text/css">
+#summary th {
+  text-align: right;
+  margin-right: 1em;
+}
+
+#rooms {
+  margin-top: 1em;
+}
+</style>
+
+<h1><?= count($rooms)>1 ? 'Rooms Created' : 'Room Created' ?></h1>
+
+<table id="summary">
+  <? if(count($rooms)==1): ?>
+  <tr>
+    <th>Confirmation Number:</th>
+    <td><a href="https://admin.myconferenceadmin.com/rooms/view/<?= $rooms[0]['Room']['accountid'] ?>"><?= $rooms[0]['Room']['accountid'] ?></a></td>
+  </tr>
+  <tr>
+    <th>Conference Name:</th>
+    <td><?= $rooms[0]['Room']['confname'] ?></td>
+  </tr>
+  <tr>
+    <th>Contact:</th>
+    <td><?= $rooms[0]['Room']['contact'] ?></td>
+  </tr>
+  <tr>
+    <th>Company:</th>
+    <td><?= $rooms[0]['Room']['company'] ?></td>
+  </tr>
+  <tr>
+    <th>Chair Code:</th>
+    <td><?= $rooms[0]['Room']['cec'] ?></td>
+  </tr>
+  <tr>
+    <th>Participant Code:</th>
+    <td><?= $rooms[0]['Room']['pec'] ?></td>
+  </tr>
+  <? else: ?>
+  <tr>
+    <th>Company:</th>
+    <td><?= $rooms[0]['Room']['company'] ?></td>
+  </tr>
+  <? endif; ?>
+
+</table>
+
+<? if(count($rooms)>1): ?>
+<table id="rooms">
+  <tr>
+    <th style="text-align: left">Confirmation Number</th>
+    <th style="text-align: left">Confirmation Name</th>
+    <th style="text-align: left">Contact</th>
+    <th style="text-align: center">CEC</th>
+    <th style="text-align: center">PEC</th>
+  </tr>
+
+  <? foreach($rooms as $room): ?>
+  <tr>
+    <td><?= $room['Room']['accountid'] ?></td>
+    <td><?= $room['Room']['confname'] ?></td>    
+    <td><?= $room['Room']['contact'] ?></td>
+    <td style="text-align: center"><?= $room['Room']['cec'] ?></td>
+    <td style="text-align: center"><?= $room['Room']['pec'] ?></td>
+  </tr>
+  <? endforeach; ?>
+</table>
+<? endif; ?>

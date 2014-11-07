@@ -1,0 +1,672 @@
+<? common_vendor('charts') ?>
+
+<?= $javascript->link('jquery.util.js') ?>
+
+<?
+$menu_items = Array(
+  Array('text' => 'Edit Account', 'icon' => 'edit.gif',
+    'url'  => '/accounts/edit/' . $account['AccountView']['acctgrpid']), 
+  Array( 'text' => 'Update CC Info', 'icon' => 'creditcards.gif', 
+    'url'  => '/pci/update/' . $account['AccountView']['acctgrpid']), 
+  Array('text' => 'Change Status', 'icon' => 'lightbulb.gif', 
+    'url'  => '/accounts/status/' . $account['AccountView']['acctgrpid']),
+  Array('text' => 'Add a Note', 'icon' => 'note_add.gif', 
+    'url'  => '/notes/create/Account/' . $account['AccountView']['acctgrpid']),
+  Array('text' => 'Add a Contact', 'icon' => 'contact_add.gif', 
+    'url'  => '/contacts/create/' . $account['AccountView']['acctgrpid']),
+  Array('text' => 'PINs', 'icon' => 'key.gif', 
+    'url'  => '/pins/index/' . $account['AccountView']['acctgrpid']), 
+  Array( 'text' => 'Usage', 'icon' => 'database_table.gif', 
+    'url'  => '/codrs/index/?account=' . $account['AccountView']['acctgrpid'])
+);
+if ($user['User']['level_type'] != SALESPERSON_LEVEL){
+  $menu_items[] = Array('text' => 'Reassign Salesperson',  
+    'icon' => 'users.gif',
+    'url'  => '/accounts/reassign_salesperson/' . $account['AccountView']['acctgrpid']);
+}
+				
+if($session->check('ic_employee')) {
+  $menu_items[] = Array( 'text' => 'View on Salesforce',  
+			 'icon' => 'user_suit.gif', 
+			 'url'  => 'https://na3.salesforce.com/search/SearchResults?searchType=1&sbstr=' . $account['AccountView']['acctgrpid'], 
+			 'new'  => true );
+
+  $menu_items[] = Array( 'text' => 'Welcome Email',  
+			 'icon' => 'email.gif', 
+			 'url'  => '/rooms/select/' . $account['AccountView']['acctgrpid'] . '/email');
+
+  $menu_items[] = Array( 'text' => 'Wallet Cards',  
+			 'icon' => 'card.gif', 
+			 'url'  => '/wallet_cards/account/' . $account['AccountView']['acctgrpid']);
+}
+
+?>
+
+<style type="text/css">
+div#account_frame {
+  margin: auto;
+}
+
+.headline {
+  font-weight: bold;
+  border-bottom: 1px solid #ccc;
+  margin-bottom: 10px;
+}
+
+.headline a {
+  font-size: smaller;
+}
+
+div#left_column, div#right_column {
+  float: right; 
+  margin-bottom: 20px;
+  width: 50%;
+}
+
+div.box {
+  margin-bottom: 10px;
+  margin-right: 5px;
+}
+
+div.box table {
+  table-layout: fixed;
+  width: 100%;
+  border: none;
+}
+
+div.box td, div.box th {
+  border: none;
+}
+
+div.full_box {
+  margin-bottom: 20px;
+  clear: right;
+}
+
+div.box table th {
+  width: 15em;
+  text-align: right;
+}
+
+th, td {
+  padding: 3px 5px;
+  text-align: left;
+  white-space: normal
+}
+
+div.box tr.noborder th {
+  border-top: none;
+}
+
+tr.even td {
+  background: #EFF7FF;
+}
+
+#rooms {
+  width: 100%;
+  border-collapse: separate;
+  border: 1px solid #CCDDEE;
+}
+
+#rooms td, #rooms th {
+  border: 1px solid #CCDDEE;
+}
+
+table.rates {
+ background: inherit;
+ border: none;
+}
+
+table.rates th, table.rates td {
+  border: none;
+  background: inherit;
+}
+
+#invoices {
+  height: 150px;
+  overflow: scroll;
+}
+
+.expired {
+  background: #FFC8BF;
+  border: 1px solid #FF2300;
+  margin: 1em 0;
+  padding: 0.5em 0.25em;
+  font-weight: bold;
+}
+
+div.notice {
+  background: #FFECBF;
+  border: 1px solid #EEAA00;
+  padding: 0.25em;
+  margin: 0.25em 0;
+}
+
+span.current {
+  color: #FF9C2A;
+  font-weight: bold;
+}
+</style>
+
+<div id="account_frame">
+
+  <? if($owned_by_other): ?>
+  <div class="notice center">
+    This account belongs to <strong><?= $account['AccountView']['salesperson_name'] ?></strong>. All modifications will be pending approval.
+  </div>
+  <? endif; ?>
+
+  <? if(!$owned_by_other): ?>
+  <?= $this->renderElement('toolbar', Array('items' => $menu_items)) ?>
+  <? endif; ?>
+
+  <?= $this->renderElement('title', aa('title', $account['AccountView']['acctgrpid'] . ' - ' . $account['AccountView']['company'], 
+        'target', 'account_view' )) ?>
+
+  <? if(!$owned_by_other): ?>
+  <div id="right_column">
+    <div class="box"  style="height: 250px">
+      <?= InsertChart ( "/img/charts.swf", "/graphs/charts_library", "/graphs/usage_monthlyaccount/$year/$month/$account_s", 400, 200, "ffffff", true) ?>
+    </div>
+
+    <div class="box">
+      <div class="headline">
+	Service Rates
+      </div>
+      
+      <? if($account['BillingMethod'][0]['code'] == METERED_BILLING_CODE): ?>
+      <table>
+        <? foreach($service_rates_summary as $sr): ?>
+        <tr>
+          <th><?= $sr['ServiceType']['description'] ?>:</th>
+          <td><?= is_null($sr['AccountServiceRatesSummary']['derived_retail_rate']) ? '&mdash;' : $sr['AccountServiceRatesSummary']['derived_retail_rate'] ?></td>
+        </tr>
+        <? endforeach; ?>
+      </table>
+      <? elseif($account['BillingMethod'][0]['code'] == FLATRATE_BILLING_CODE): ?>
+      <table>
+        <tr>
+          <th>Flat Rate Charge:</th>
+          <td><?= $account['AccountBillingMethod']['flat_rate_charge'] ?> (per Room)</td>
+        </tr>
+      </table>      
+      <? elseif($account['BillingMethod'][0]['code'] == NONBILLABLE_BILLING_CODE): ?>
+      <p><strong>Rooms under this account default to being Non-Billable</strong></p>
+      <? endif; ?>
+    </div>
+
+    <div class="box">
+      <div class="headline">Invoices</div>
+        Select a Date to retrieve an invoice
+        <form action="/accounts/invoice/<?=$account['AccountView']['acctgrpid']?>" method="GET" style="margin-top: 1em; margin-bottom: 1em" >
+          <select name=invoiceMonth>
+             <? for ($invoiceMonth = 1; $invoiceMonth <= 12; $invoiceMonth++): ?>
+               <option <?= (int)date('n') == $invoiceMonth ? 'selected' : '' ?> value="<?= $invoiceMonth ?>" ><?= $invoiceMonth ?></option>
+             <? endfor ?>
+          </select>
+           <select name="invoiceYear">
+             <? $invoiceYear = (int)date('Y');
+             while ($invoiceYear >= 2007): ?>
+               <option value="<?= $invoiceYear ?>" ><?= $invoiceYear ?></option>
+               <? $invoiceYear--;
+             endwhile ?>
+          </select>
+          <button type="submit">
+	        <?= $html->image('search.gif', aa('class', 'valign')) ?> Search
+          </button>
+        </form>
+    </div>
+  </div>
+  <? endif; ?>
+
+  <? if(!$owned_by_other): ?>
+  <div id="left_column">
+  <? else: ?>
+  <div>
+  <? endif; ?>
+    <div class="box" style="height: 250px">
+
+      <div class="headline">
+	Contact Info 
+    <? if(!$owned_by_other): ?>
+    [<a href="/accounts/edit/<?= $account['AccountView']['acctgrpid'] ?>">Edit</a>]
+    <? endif; ?>
+      </div>
+
+      <table>
+	<tr>
+	  <th>Company Address:</th>
+	  <td>
+
+	    <?= $account['AccountView']['addr1'] ?><br/>
+
+	    <? if(trim($account['AccountView']['addr2'])): ?>
+	    <?= $account['AccountView']['addr2'] ?><br/>
+	    <? endif; ?>
+
+	    <?= $account['AccountView']['city'] ?>, 
+	    <?= $account['AccountView']['state'] ?> 
+	    <?= $account['AccountView']['zip'] ?><br/>
+        <?= $country['Country']['name'] ?><br/>
+      
+	    <? if(trim($account['AccountView']['phone'])): ?>
+	    <?= trim($account['AccountView']['phone']) ?><br/>
+	    <? endif; ?>
+      
+	    <? if(trim($account['AccountView']['fax'])): ?>
+	    <?= trim($account['AccountView']['fax']) ?><br/>
+	    <? endif; ?>
+	  </td>
+	</tr>
+	<tr>
+	  <th>Time Zone:</th>
+	  <td>
+	    <?= $time_zone['TimeZone']['description'] ?><br/>
+	  </td>
+	</tr>
+	<? if(!empty($account['BillingContact']) and !$owned_by_other): ?>
+        <tr>
+	  <th>Billing Contact:</th>
+	  <td>
+	    <a href="/contacts/view/<?= $account['BillingContact'][0]['id'] ?>">
+	      <?= $account['BillingContact'][0]['first_name'] ?>
+ 	      <?= $account['BillingContact'][0]['middle_name'] ?>
+	      <?= $account['BillingContact'][0]['last_name'] ?>
+	    </a><br/>
+	    <?= $html->link($account['BillingContact'][0]['email'], 'mailto:'. $account['BillingContact'][0]['email']) ?><br/>
+	    <?= $account['BillingContact'][0]['phone'] ?><br/>
+	  </td>
+        </tr>
+	<? endif; ?>
+	<? if(!empty($account['CorporateContact']) and !$owned_by_other): ?>
+        <tr>
+	  <th>Corporate Contact:</th>
+	  <td>
+	    <a href="/contacts/view/<?= $account['CorporateContact'][0]['id'] ?>">
+	      <?= $account['CorporateContact'][0]['first_name'] ?>
+ 	      <?= $account['CorporateContact'][0]['middle_name'] ?>
+	      <?= $account['CorporateContact'][0]['last_name'] ?>
+	    </a><br/>
+	    <?= $html->link($account['CorporateContact'][0]['email'], 'mailto:'. $account['CorporateContact'][0]['email']) ?><br/>
+	    <?= $account['CorporateContact'][0]['phone'] ?><br/>
+	  </td>
+        </tr>
+	<? endif; ?>
+      </table>
+    </div>
+    
+    <div class="box">
+      <div class="headline">Account Management</div>
+
+      <table>
+	<tr>
+	  <th>Reseller:</th><td><?= $account['AccountView']['reseller_name'] ?>(<strong><?= $account['AccountView']['resellerid'] ?></strong>)</td>
+	</tr>
+	<tr>
+	  <th>Manager:</th>
+	  <td><?= trim($account['AccountView']['salesperson_email']) ? $html->link($account['AccountView']['salesperson_accountmanager'], "mailto:{$account['AccountView']['salesperson_email']}") : $account['AccountView']['salesperson_accountmanager']  ?> (<strong><?= $account['AccountView']['salespid'] ?></strong>)</td>
+	</tr>
+	<tr>
+	  <th>Account Number:</th><td><?= $account['AccountView']['acctgrpid'] ?></td>
+	</tr>
+	<tr>
+          <th>Account Status:</th>
+          <td><?= $html->link($account['AccountView']['acctstatus'], "/accounts/status/{$account['AccountView']['acctgrpid']}") ?></td>
+        </tr>
+	<tr>
+          <th>Status Last Updated:</th>
+          <td><?= date('Y-m-d',strtotime($account['AccountView']['acctstatdate'])) ?></td>
+        </tr>
+	<tr>
+	  <th>Default Bridge:</th>
+	  <td>
+	    <? if(!empty($account['DefaultBridge']['bridge_id'])): ?>
+	    <?= $bridges[$account['DefaultBridge']['bridge_id']] ?>
+	    <? else: ?>
+	    <span class="italic">No default bridge set, <?= $html->link('Update Account', '/accounts/edit/' . $account['AccountView']['acctgrpid'])?></span>
+	    <? endif; ?>
+	  </td>
+	</tr>
+    <tr>
+	  <th>Default Product:</th>
+	  <td>
+	    <? if(!empty($account['Product']['name'])): ?>
+	    <?= $account['Product']['name'] ?>
+	    <? else: ?>
+	    <span class="italic">No default product set, <?= $html->link('Update Account', '/accounts/edit/' . $account['AccountView']['acctgrpid'])?></span>
+	    <? endif; ?>
+	  </td>
+	</tr>
+    <? if(!$owned_by_other): ?>
+	<tr>
+	  <th>WebInterpoint URL:</th>
+	  <td>
+	    <? if(!empty($account['Branding']['webinterpoint_url'])): ?>
+	    <?= $html->link($account['Branding']['webinterpoint_url'], $account['Branding']['webinterpoint_url']) ?>
+	    <? else: ?>
+	    <span class="italic">No WebInterpoint URL set, <?= $html->link('Update Account', '/accounts/edit/' . $account['AccountView']['acctgrpid'])?></span>
+	    <? endif; ?>
+	  </td>
+	</tr>
+	<tr>
+	  <th>SmartCloud URL:</th>
+	  <td>
+	    <? if(!empty($account['Branding']['smartcloud_url'])): ?>
+	    <?= $html->link($account['Branding']['smartcloud_url'], $account['Branding']['smartcloud_url']) ?>
+	    <? else: ?>
+	    <span class="italic">No SmartCloud URL set, <?= $html->link('Update Account', '/accounts/edit/' . $account['AccountView']['acctgrpid'])?></span>
+	    <? endif; ?>
+	  </td>
+	</tr>
+    <tr>
+	  <th>Dialin Number:</th>
+	  <td>
+	    <? if(!empty($account['AccountView']['dialinNo_description'])): ?>
+	    <?= $account['AccountView']['dialinNo_description'] ?>
+	    <? else: ?>
+	    <span class="italic">No Dialin Numbers set, <?= $html->link('Update Account', '/accounts/edit/' . $account['AccountView']['acctgrpid'])?></span>
+	    <? endif; ?>
+	  </td>
+	</tr>
+    <tr>
+	  <th>Toll-Free Number:</th>
+	  <td>
+	    <? if(!empty($account['AccountView']['dialinNo_tollfreeno'])): ?>
+	    <?= $account['AccountView']['dialinNo_tollfreeno'] ?>
+	    <? else: ?>
+	    <span class="italic">No Dialin Numbers set, <?= $html->link('Update Account', '/accounts/edit/' . $account['AccountView']['acctgrpid'])?></span>
+	    <? endif; ?>
+	  </td>
+	</tr>
+    <tr>
+	  <th>Toll Number:</th>
+	  <td>
+	    <? if(!empty($account['AccountView']['dialinNo_tollno'])): ?>
+	    <?= $account['AccountView']['dialinNo_tollno'] ?>
+	    <? else: ?>
+	    <span class="italic">No Dialin Numbers set, <?= $html->link('Update Account', '/accounts/edit/' . $account['AccountView']['acctgrpid'])?></span>
+	    <? endif; ?>
+	  </td>
+	</tr>
+    <? endif; ?>
+      </table>
+      </div>
+
+  <? if(!$owned_by_other): ?>
+    <div class="box">
+      <div class="headline">Billing Info</div>
+
+    <?
+    if($credit_card) {
+        $expiration_date = strtotime($credit_card['CreditCard']['expiration_date']);
+        $expired  = $expiration_date < time() ? true : false;
+    } else { 
+        $expired = false;
+    }
+    ?>
+
+	 <? if($expired): ?>
+	 <div class="expired">
+	   The credit card on file has expired.
+	 </div>
+	 <? endif; ?>
+
+	 <table>
+
+           <tr>
+             <th>Billing Method</th>
+             <td><?= $account['BillingMethod'][0]['description'] ?></td>
+           </tr>
+           <tr>
+             <th>Billing Frequency</th>
+             <td><?= $account['BillingFrequency'][0]['description'] ?></td>
+           </tr>
+
+	   <? if($credit_card): ?>
+	   <tr>
+	     <th>Credit Card:</th>
+	     <td><?= 'XXXX-XXXX-XXXX-' . $credit_card['CreditCard']['last_four'] ?></td>
+	   </tr>
+	   
+	   <tr>
+	     <th>Credit Card Type:</th>
+	     <td><?= $credit_card['CreditCard']['card_type'] ?></td>
+	   </tr>
+
+	   <tr>
+	     <th>Expiration Date:</th>
+	     <td><?= strftime("%m/%y", $expiration_date) ?></td>
+	   </tr>
+	   <? elseif($account['AccountView']['billcc']): ?>
+	   <tr>
+	     <th>Credit Card:</th>
+	     <td class="italic">No Card on File</td>
+	   </tr>
+	   <? endif; ?>
+
+	   <? if ($account['AccountView']['billcc']): ?>
+  	   <tr><th>Automatically Bill CC:</th><td><?= $html->image('check.gif') ?></td></tr>
+	   <? endif; ?>
+
+	   <tr><th>Terms:</th><td><?= $account['AccountView']['terms'] ?></td></tr>	
+	   <tr><th>Tax Exempt:</th><td><?= $account['AccountView']['taxexempt'] ? 'Yes' : 'No' ?></td></tr>
+	   <tr><th>Invoice Type:</th><td><?= $account['AccountView']['invoicetype'] ?></td></tr>
+	   <tr><th>Invoice Delivery:</th><td><?= $account['AccountView']['inv_delmethod'] ?></td></tr>
+	 </table>
+    </div>
+  </div>
+</div>
+
+  <div class="full_box">
+    <div class="headline">Notes 
+      [ <?= $html->link('View All', '/notes/index/Account/' .  $account['AccountView']['acctgrpid']) ?> | 
+        <a href="/notes/create/Account/<?= $account['AccountView']['acctgrpid'] ?>?back=<?= urlencode('/accounts/view/' . $account['AccountView']['acctgrpid']) ?>">Add a Note</a> ] </div>
+    <?= $this->renderElement('notes', aa('notes', $notes)) ?>
+  </div>
+
+  <div class="full_box">
+    <div class="headline">
+      Contacts
+      [ <?= $html->link('View All', '/contacts/index/' .  $account['AccountView']['acctgrpid']) ?> | 
+      <?= $html->link('Export All', '/contacts/index/' .  $account['AccountView']['acctgrpid'].'?export=1') ?> |
+      <a href="/contacts/create/<?= $account['AccountView']['acctgrpid'] ?>">Add a Contact</a> ]
+    </div>
+
+    <div id="contacts_pane">
+      <h1 class="center">Please wait, loading...</h1>
+    </div>
+    
+  </div>
+
+  <div class="full_box">
+    <div class="headline">
+      Active Rooms 
+      [ <?= $html->link('View All', '/rooms/index/' .  $account['AccountView']['acctgrpid']) ?> | 
+      <?= $html->link('Export All', '/rooms/index/' .  $account['AccountView']['acctgrpid'].'?export=1&embed=1') ?> |
+      <a href="/rooms/select/<?= $account['AccountView']['acctgrpid'] ?>/statuses">Change Statuses</a> | 
+      <a href="/pins/index/<?= $account['AccountView']['acctgrpid'] ?>">Pins</a> |
+      <a href="/rooms/select/<?= $account['AccountView']['acctgrpid'] ?>/bulkupdates">Bulk Update</a> ]
+    </div>
+
+    <div id="rooms_pane">
+      <h1 class="center">Please wait, loading...</h1>
+    </div>
+  </div>
+
+  <div class="full_box">
+    <div class="headline">
+      Year to Date Report for <?= $year ?>
+      [ 
+        <? $this_year = date('Y') ?>
+      	<? for($i=2007; $i<=$this_year; $i++): ?>
+	<?= $html->link($i, sprintf('/accounts/view/%s/%s', $account['AccountView']['acctgrpid'], $i)) ?>
+	
+	<? if($i != $this_year): ?> | <? endif; ?>
+
+	<? endfor; ?>
+      ]
+    </div>
+    <table style="width: 100%">
+      <tr>
+	<th>Date</th>
+	<th class="center">Reservationless<br/>Minutes</th>
+	<th class="center">Operator Assisted<br/>Minutes</th>
+	<th class="center">Web<br/>Minutes</th>
+	<th class="center">Total<br/>Minutes</th>
+	<th class="center">Reservationless<br/>Cost</th>
+	<th class="center">Operator Assisted<br/>Cost</th>
+	<th class="center">Web Cost</th>
+	<th class="center">Flat Cost</th>
+	<th class="center">Enhanced Services</th>
+	<th class="center">Other Cost</th>
+	<th class="center">Grand Total</th>
+      </tr>
+      
+      <? for($i=0; $i<count($ytd_dates); $i++): ?>
+
+	 <?
+
+      $calcYear = "20".substr($ytd_dates[$i]['YearToDateByAccount']['date'], 2, 2);
+      $calcMonth = substr($ytd_dates[$i]['YearToDateByAccount']['date'], 5, 2);
+
+	    ?>
+
+      <tr class="<?= $i%2 ? 'odd' : 'even' ?>" >
+
+	<td><?= $html->link($calcMonth.'/'.$calcYear,"/accounts/view/$account_s/$calcYear/$calcMonth"); ?></td>
+	<td class="center"><?= $ytd_dates[$i]['YearToDateByAccount']['reservationless_minutes']; ?></td>
+	<td class="center"><?= $ytd_dates[$i]['YearToDateByAccount']['operator_assisted_minutes']; ?></td>
+	<td class="center"><?= $ytd_dates[$i]['YearToDateByAccount']['web_minutes']; ?></td>
+	
+ <td class="center"><?= $ytd_dates[$i]['YearToDateByAccount']['total_minutes']; ?></td>
+	
+	<td class="center"><?= sprintf("$%.2f",$ytd_dates[$i]['YearToDateByAccount']['reservationless_cost']); ?></td>
+	<td class="center"><?= sprintf("$%.2f",$ytd_dates[$i]['YearToDateByAccount']['operator_assisted_cost']); ?></td>
+	<td class="center"><?= sprintf("$%.2f",$ytd_dates[$i]['YearToDateByAccount']['web_cost']); ?></td>
+	
+	<td class="center"><?= sprintf("$%.2f",$ytd_dates[$i]['YearToDateByAccount']['flat_cost']); ?></td>
+	<td class="center"><?= sprintf("$%.2f",$ytd_dates[$i]['YearToDateByAccount']['enhanced_service_cost']); ?></td>
+	<td class="center"><?= sprintf("$%.2f",$ytd_dates[$i]['YearToDateByAccount']['other_cost']); ?></td>
+	<td class="center"><?= sprintf("$%.2f",$ytd_dates[$i]['YearToDateByAccount']['total_cost']); ?></td>
+	
+      </tr>
+      <? endfor; ?>
+    </table>
+    <div class="smaller italic">* RL=Reservationless, OA=Operator Assisted</div>
+  </div>
+
+  <? if($mtd_dates): ?>
+  <div class="full_box">
+    <div class="headline">Month to Date Report for <?= date('F Y', strtotime(sprintf('%s-%02d-01', $year, $month))) ?></div>
+
+    <table style="width: 100%">
+      <tr>
+	<th>Date</th>
+	<th class="center">Reservationless<br/>Minutes</th>
+	<th class="center">Operator Assisted<br/>Minutes</th>
+	<th class="center">Web<br/>Minutes</th>
+	<th class="center">Total<br/>Minutes</th>
+	<th class="center">Reservationless<br/>Cost</th>
+	<th class="center">Operator Assisted<br/>Cost</th>
+	<th class="center">Web Cost</th>
+	<th class="center">Flat Cost</th>
+	<th class="center">Enhanced Services</th>
+	<th class="center">Other Cost</th>
+	<th class="center">Grand Total</th>
+      </tr>
+      
+      <? for($i=0; $i<count($mtd_dates); $i++): ?>
+
+	 <?
+
+	    $day = date('d',strtotime($mtd_dates[$i]['MonthToDateByAccount']['date']));
+	    $month = date('m',strtotime($mtd_dates[$i]['MonthToDateByAccount']['date']));
+	    $year = date('Y',strtotime($mtd_dates[$i]['MonthToDateByAccount']['date']));
+	 ?>
+	 
+      <tr class="<?= $i%2 ? 'odd' : 'even' ?>" >
+	<td>
+	  <? $d = date('m/d/Y',strtotime($mtd_dates[$i]['MonthToDateByAccount']['date'])) ?>
+    <?= $html->link($d, "/codrs/index/?acctgrpid={$account_s}&startdate={$d}&enddate={$d}"); ?>
+	</td>
+	<td class="center"><?= $mtd_dates[$i]['MonthToDateByAccount']['reservationless_minutes'] ?></td>
+	<td class="center"><?= $mtd_dates[$i]['MonthToDateByAccount']['operator_assisted_minutes'] ?></td>
+	<td class="center"><?= $mtd_dates[$i]['MonthToDateByAccount']['web_minutes'] ?></td>
+	
+	<td class="center"><?= $mtd_dates[$i]['MonthToDateByAccount']['total_minutes'] ?></td>
+	
+	<td class="center"><?= sprintf("$%.2f",$mtd_dates[$i]['MonthToDateByAccount']['reservationless_cost']) ?></td>
+	<td class="center"><?= sprintf("$%.2f",$mtd_dates[$i]['MonthToDateByAccount']['operator_assisted_cost']) ?></td>
+	<td class="center"><?= sprintf("$%.2f",$mtd_dates[$i]['MonthToDateByAccount']['web_cost']) ?></td>
+	
+	<td class="center"><?= sprintf("$%.2f",$mtd_dates[$i]['MonthToDateByAccount']['flat_cost']); ?></td>
+	<td class="center"><?= sprintf("$%.2f",$mtd_dates[$i]['MonthToDateByAccount']['enhanced_service_cost']); ?></td>
+	<td class="center"><?= sprintf("$%.2f",$mtd_dates[$i]['MonthToDateByAccount']['other_cost']); ?></td>
+	<td class="center"><?= sprintf("$%.2f",$mtd_dates[$i]['MonthToDateByAccount']['total_cost']); ?></td>
+      </tr>
+      <? endfor; ?>
+    </table>
+    <div class="smaller italic">* RL=Reservationless, OA=Operator Assisted</div>
+  </div>
+  <? endif; ?>
+
+  <div class="full_box">
+    <div class="headline">Requests</div>
+    <table id="queue" style="width:100%">
+      <thead>
+	<tr>
+	  <th class="left">ID</th>
+	  <th>Type</th>
+	  <th>Status</th>
+	  <th>Account#</th>
+	  <th>Room#</th>
+	  <th>Creator</th>
+	  <th>Created</th>
+	</tr>
+      </thead>
+      <tbody>
+        <? for($i=0; $i<count($requests); $i++): ?>
+	   <tr class="<?= $i%2 ? 'odd' : 'even' ?>" id="request<?= $requests[$i]['RequestView']['id'] ?>">
+	     <td>
+	       <?= $html->link($requests[$i]['RequestView']['id'], '/requests/index/' . $requests[$i]['RequestView']['id'], aa('class', 'id')) ?>
+	     </td>       
+	     <td><?= $requests[$i]['RequestView']['type_name'] ?></td>
+	     <td><?= $requests[$i]['RequestView']['status_name'] ?></td>
+	     <td><?= $requests[$i]['RequestView']['acctgrpid'] ? $html->link($requests[$i]['RequestView']['acctgrpid'], '/accounts/view/' . $requests[$i]['RequestView']['acctgrpid']) : '&mdash;' ?></td>
+	     <td><?= $requests[$i]['RequestView']['accountid'] ? $html->link($requests[$i]['RequestView']['accountid'], '/rooms/view/' . $requests[$i]['RequestView']['accountid']) : '&mdash;' ?></td>
+	     <td><?= $html->link($requests[$i]['RequestView']['creator_name'], '/users/view/' .  $requests[$i]['RequestView']['creator']) ?></td>
+	     <td><?= $time->niceShort($requests[$i]['RequestView']['created']) ?></td>
+	   </tr>
+	<? endfor; ?>
+      </tbody>
+    </table>
+  </div>
+
+ <?= $this->renderElement('history', aa('entity', 'Account', 'object_id', $account['AccountView']['acctgrpid'])) ?>
+ <? endif; ?>
+
+</div>
+
+
+<script type="text/javascript">
+$(document).ready( function() {
+
+    $('#rooms_pane').load(
+	'/rooms/index/<?= $account['AccountView']['acctgrpid'] ?>&embed=true', 
+	null, 
+	function() { 
+	  $('#rooms_pane').paginate(); 
+	}
+    );
+
+
+    $('#contacts_pane').load(
+	'/contacts/index/<?= $account['AccountView']['acctgrpid'] ?>&embed=true', 
+	null, 
+	function() { 
+	  $('#contacts_pane').paginate(); 
+	}
+    );
+    
+});
+</script>

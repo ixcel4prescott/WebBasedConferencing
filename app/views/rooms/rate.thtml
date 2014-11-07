@@ -1,0 +1,60 @@
+<?= $html->css('ui.datepicker') ?>
+<?= $javascript->link('ui.datepicker.js') ?>
+
+<?= $javascript->link('jquery.spinner') ?>
+<?= $html->css('jquery.spinner') ?>
+
+<style type="text/css">
+#rate_pane {
+   margin: auto;
+   padding-bottom: 20px;
+   border: 1px solid #ccc;
+   padding: 10px 20px;
+}
+
+div.notice {
+  background: #FFECBF;
+  border: 1px solid #EEAA00;
+  padding: 1em;
+  margin: 1em 0;
+}
+</style>
+
+<div id="rate_pane">
+  <?= $this->renderElement('title', aa('title', 'Update Rate for Room ' . $room['Room']['acctgrpid'] . ': ' . $room['Room']['contact'], 'target', 'room_rate' )) ?>
+
+  <form method="post">
+    <?= $html->hidden('Room/accountid') ?>
+
+    <?= $this->renderElement('service_rates', aa('mode', 'room', 'id', 'RoomServicerate', 'name', 'Room/servicerate',  'initial_ajax', true)) ?>
+
+    <div class="input">
+      <label class="right" for="RoomCanada">Canadian Rate:</label>
+      <?= $html->input('Room/canada', aa('class', 'spinner')) ?>
+      <?= $html->tagErrorMsg('Room/canada', 'Please select a Canadian rate') ?>
+    </div>
+
+    <div class="input">
+      <label class="right required" for="RoomEffectiveDate">Effective Date:</label>
+      <?= $html->input('Room/effective_date') ?>
+      <?= $html->tagErrorMsg('Room/effective_date', 'Please specify a date this rate change becomes effective') ?>   
+    </div>
+
+    <div class="submit">
+      <button class="cancel" type="button">
+	<?= $html->image('cross.gif') ?> Cancel
+      </button>
+      <button class="submit" type="submit">
+	<?= $html->image('check.gif') ?> Update
+      </button>
+    </div>
+  </form>
+</div>
+
+<script type="text/javascript">
+$(document).ready( function() {
+  $('button.cancel').back('/rooms/view/<?= $room['Room']['accountid'] ?>');
+  $('#RoomCanada').spinner();
+  $('#RoomEffectiveDate').datepicker();
+});
+</script>

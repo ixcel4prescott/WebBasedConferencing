@@ -1,0 +1,1 @@
+<?= $html->selectTag('Room/servicerate', $rates, $current_rate) ?>

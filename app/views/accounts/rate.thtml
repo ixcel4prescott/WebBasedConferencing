@@ -1,0 +1,66 @@
+<?= $html->css('ui.datepicker') ?>
+<?= $javascript->link('ui.datepicker.js') ?>
+
+<?= $javascript->link('jquery.spinner') ?>
+<?= $html->css('jquery.spinner') ?>
+
+<style type="text/css">
+#rate_pane {
+   margin: auto;
+   padding-bottom: 20px;
+   border: 1px solid #ccc;
+   padding: 10px 20px;
+}
+
+div.notice {
+  background: #FFECBF;
+  border: 1px solid #EEAA00;
+  padding: 1em;
+  margin: 1em 0;
+}
+</style>
+
+<div id="rate_pane">
+
+  <?= $this->renderElement('title', aa('title', 'Update Account Rate: ' . $account['Account']['acctgrpid'], 'target', 'account_rate_change' )) ?>
+
+  <form method="post">
+    <?= $html->hidden('Account/acctgrpid') ?>
+    <?= $html->hidden('Account/salespid') ?>
+
+    <div class="notice">
+      The account rate is the default rate for newly created rooms. Billing is tallied based on usage of individual rooms at their respective rates.
+    </div>
+
+    <?= $this->renderElement('service_rates', aa('mode', 'account', 'id', 'AccountDefaultServicerate', 'name', 'Account/default_servicerate', 'initial_ajax', true)) ?>
+
+    <div class="input">
+      <label class="right" for="AccountDefaultCanada">Default Canadian Rate:</label>
+      <?= $html->input('Account/default_canada', aa('class', 'spinner')) ?>
+      <?= $html->tagErrorMsg('Account/default_canada', 'Please select a default Canadian rate') ?>
+    </div>
+
+    <div class="input">
+      <label class="right required" for="AccountEffectiveDate">Effective Date:</label>
+      <?= $html->input('Account/effective_date') ?>
+      <?= $html->tagErrorMsg('Account/effective_date', 'Please specify a date this rate change becomes effective') ?>   
+    </div>
+
+    <div class="submit">
+      <button class="cancel" type="button">
+	<?= $html->image('cross.gif') ?> Cancel
+      </button>
+      <button class="submit" type="submit">
+	<?= $html->image('check.gif') ?> Update
+      </button>
+    </div>
+  </form>
+</div>
+
+<script type="text/javascript">
+$(document).ready( function() {
+  $('button.cancel').back('/accounts/view/<?= $account['Account']['acctgrpid'] ?>');
+  $('#AccountDefaultCanada').spinner();
+  $('#AccountEffectiveDate').datepicker();
+});
+</script>

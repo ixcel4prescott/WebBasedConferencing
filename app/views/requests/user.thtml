@@ -1,0 +1,19 @@
+<? if($data): ?>
+<table>
+  <? if(isset($data['Pending'])): ?>
+  <tr>
+    <th><?= $data['Pending'] ?></th>
+    <td>Requests Pending Approval</td>
+  </tr>
+  <? endif; ?>
+
+  <? if(isset($data['Approved'])): ?>
+  <tr>
+    <th><?= $data['Approved'] ?></th>
+    <td>Requests Ready for Work</td>
+  </tr>
+  <? endif; ?>
+</table>
+<? else: ?>
+   <span class="italic">No Open Requests</span>
+<? endif;  ?>

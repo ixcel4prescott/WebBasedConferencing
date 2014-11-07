@@ -1,0 +1,3 @@
+<? if($selections): ?>
+<?= count($selections) ?> selected
+<? endif; ?>

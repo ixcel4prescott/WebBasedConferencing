@@ -1,0 +1,3 @@
+<?
+
+common('models/system');

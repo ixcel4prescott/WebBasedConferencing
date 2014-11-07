@@ -1,0 +1,297 @@
+<?= $javascript->link('jquery.dimensions') ?>
+<?= $javascript->link('jquery.multiselect') ?>
+<?= $html->css('jquery.multiselect') ?>
+
+<style type="text/css">
+li.odd {
+  background: #eee;
+}
+
+.users {
+    list-style-type: none;
+    margin-left: 210px;
+    width: 40em;
+    margin-bottom: 10px;
+    height: 400px;
+    overflow: scroll;
+}
+
+.users li {
+  padding: 2px 3px;
+  border-bottom: 1px solid #ccc;
+}
+
+.delete img {
+  vertical-align: middle;
+}
+
+td, th {
+  padding: 3px 5px;
+  text-align: left;
+}
+
+</style>
+  <?= $this->renderElement('title', aa('title', 'Notification Groups')) ?>
+
+  <fieldset>
+    <legend>Add a Request Group</legend>
+
+    <form method="post" id="group_add_form" action="/requestgroups/create">
+      <div class="input">
+         <label class="right required" for="RequestGroupName">Name:</label>
+         <?= $html->input('RequestGroup/name') ?>
+	 <div class="error_message" id="ErrorRequestGroupName"></div>
+      </div>
+
+      <div class="submit">
+	<button class="cancel submit" type="submit">
+	  <?= $html->image('check.gif') ?> Create
+	</button>
+      </div>  
+    </form>
+  </fieldset>
+
+  <fieldset>
+    <legend>Request Groups</legend>
+
+    <form method="post" id="groups_to_users_form" action="/requestgroups/update_users">
+      <div class="select">
+	<label class="right required" for="RequestGroupId">Group:</label>
+	<?= $html->selectTag('RequestGroup/id', $groups) ?>
+      </div>
+
+      <div class="select" id="users_container" style="display:none">
+	<label class="right required" for="NotifiedUserNotifiedUser">Members:</label>
+	<?= $html->selectTag('NotifiedUser/NotifiedUser', $users, null, aa('id', 'users', 'disabled', 'disabled', 'multiple', 'multiple'), null, false) ?>
+      </div>
+
+      <div class="submit" id="group_submit" style="display:none">
+	<button class="cancel submit" type="submit">
+	  <?= $html->image('check.gif') ?> Update
+	</button>
+      </div>  
+
+      <div id="events_container" style="display:none">
+	<p style="margin-left: 215px">This group is notified of the following requests:</p>
+	<table style="margin-left: 215px">
+	  <tr>
+            <th>Status</th>
+	    <th>Type</th>
+	    <th></th>
+	  </tr>
+	  <tbody id="events">
+	  </tbody>
+	</table>
+      </div>
+
+    </form>
+  </fieldset>
+
+  <fieldset id="event_fieldset" style="display:none">
+    <legend>Add a Notification</legend>
+    
+    <form method="post" id="event_form" action="/requestgroups/update_events">
+
+      <?= $html->hidden('Event/request_group_id', aa('id', 'request_group_id')) ?>
+
+      <div class="select">
+        <label class="right required" for="RequestStatus">Status:</label>
+        <?= $html->selectTag('Event/status', $statuses) ?>
+	 <div class="error_message" id="ErrorEventStatus"></div>
+      </div>
+
+      <div class="select" style="margin-top:1em">
+        <label class="right required" for="RequestType">Type:</label>
+        <?= $html->selectTag('Event/type', $types) ?>
+	 <div class="error_message" id="ErrorEventType"></div>
+      </div>
+
+      <div class="submit">
+	<button class="cancel submit" type="submit">
+	  <?= $html->image('check.gif') ?> Add
+	</button>
+      </div>        
+
+    </form>
+  </fieldset>
+
+<script type="text/javascript">
+$(document).ready( function() {
+
+    $('#users').multiSelect({ selectAll: true });
+
+    function event_delete_cb() {
+	if(window.confirm('Are you sure you want to delete this notification?')) {
+	    $.ajax({
+		'type'       : 'POST', 
+		'data'       : $(this).nextAll(':hidden').serialize(),
+		'dataType'   : 'html', 
+		'url'        : '/requestgroups/remove_event',
+		'beforeSend' : function(xhr, status) {
+		}, 
+		'success'    : function(html, status) {
+		    $('#events').html(html);
+		    $('#events a.delete').click(event_delete_cb);
+		}, 
+		'error'      : function(xhr, status, err) {
+		    window.alert('An error occurred removing a notification from the group');
+		}, 
+		'complete'   : function(xhr, status) {
+		}
+	    });
+	}
+
+	return false;
+    }
+
+    function group_selector_cb() {
+	var val = $(this).val();
+
+        if(val != '') {
+            $('#request_group_id').val(val);
+
+	    $.ajax({
+		'url'        : '/requestgroups/view/' + val,
+		'dataType'   : 'html',
+		'success'    : function(html, status) {
+                    $('#users_container').html(html);
+                    $('#users').multiSelect({ selectAll: true });
+		    $('#users_container,#group_submit').show();
+		},
+		'error'      : function(xhr, status, err) {
+		    window.alert('An error occurred fetching group members');
+		},
+		'complete'   : function(xhr, status) {
+		}
+	    });
+
+            $.ajax({
+		'url'      : '/requestgroups/events/' + val, 
+		'dataType' : 'html', 
+		'success'    : function(html, status) {
+		    $('#events').html(html);
+		    $('#event_fieldset,#events_container').show();
+		    $('#events a.delete').click(event_delete_cb);
+		},
+		'error'      : function(xhr, status, err) {
+		    window.alert('An error occurred fetching group events');
+		},
+		'complete'   : function(xhr, status) {
+		}
+	    });
+
+	} else {
+	    $('#users_container,#group_submit,#event_fieldset,#events_container').hide();
+	}
+
+	return false;
+    }
+
+    $('#RequestGroupId').change(group_selector_cb).change();
+
+    $('#group_add_form').submit( function() {
+ 	var form = $(this);
+
+	if($('#RequestGroupName').val() != '') {
+	    $('#ErrorRequestGroupName').html('');
+
+	    $.ajax({
+		'type'       : 'POST', 
+		'data'       : $(this).serialize(),
+		'dataType'   : 'html',
+		'url'        : '/requestgroups/create', 
+		'beforeSend' : function(xhr, status) {
+		     form.find(':input').attr('disabled', 'disabled');
+		}, 
+		'success'    : function(html, status) {
+                    $('#RequestGroupId').replaceWith(html);
+		    $('#RequestGroupId').change(group_selector_cb).change();
+		    $('#RequestGroupName').val('');
+		}, 
+		'error'      : function(xhr, status, err) {
+		    window.alert('An error occurred creating a new request group.');
+		}, 
+		'complete'   : function(xhr, status) {
+		    form.find(':input').attr('disabled', '');
+		}
+	    });
+	} else {
+	    $('#ErrorRequestGroupName').html('Please enter a group name');
+	}
+	
+	return false;
+    });
+    
+    $('#groups_to_users_form').submit( function() {
+	var form = $(this);
+
+	$.ajax({
+	    'type'       : 'POST', 
+	    'data'       : $(this).serialize(),
+	    'dataType'   : 'json', 
+	    'url'        : '/requestgroups/update_users',
+	    'beforeSend' : function(xhr, status) {
+		form.find(':input').attr('disabled', 'disabled');
+	    }, 
+	    'success'    : function(json, status) {
+
+	    }, 
+	    'error'      : function(xhr, status, err) {
+		window.alert('An error occurred updating the users of a request group');
+	    }, 
+	    'complete'   : function(xhr, status) {
+		form.find(':input').attr('disabled', '');
+	    }
+	});
+	
+	return false;
+    });
+
+    $('#event_form').submit( function() {
+	var form = $(this);
+
+	var status = $('#EventStatus').val();
+	var type   = $('#EventType').val();
+
+	if(status != '' && type != '') {
+
+ 	    $('#ErrorEventStatus,#ErrorEventType').html('');
+
+	    $.ajax({
+		'type'       : 'POST', 
+		'data'       : $(this).serialize(),
+		'dataType'   : 'html', 
+		'url'        : '/requestgroups/update_events',
+		'beforeSend' : function(xhr, status) {
+		    form.find(':input').attr('disabled', 'disabled');
+		}, 
+		'success'    : function(html, status) {
+		    $('#events').html(html);
+		    $('#EventStatus').val('');
+		    $('#EventType').val('');
+		    $('#events a.delete').click(event_delete_cb);
+		}, 
+		'error'      : function(xhr, status, err) {
+		    window.alert('An error occurred adding a notification to the group');
+		}, 
+		'complete'   : function(xhr, status) {
+		    form.find(':input').attr('disabled', '');
+		}
+	    });
+	} else {
+	    if(status == '')
+ 		$('#ErrorEventStatus').html('Please select a status');
+	    else
+		$('#ErrorEventStatus').html('');
+
+	    if(type == '')
+		$('#ErrorEventType').html('Please select a request type');
+	    else
+		$('#ErrorEventType').html('');
+	}
+
+	return false;	
+    });
+
+});
+</script>

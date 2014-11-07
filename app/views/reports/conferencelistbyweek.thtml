@@ -1,0 +1,73 @@
+<style type="text/css">
+th,td {
+  padding: 5px 10px;
+  text-align: right;
+}
+
+tr.odd td {
+  background: #def;
+}
+
+.highlight {
+  color: #d22;
+}
+</style>
+
+<h1>Conference Listing By Week Report</h1>
+
+<div id="breadcrumbs" style="margin-bottom:10px;font-size:10pt">
+  <?= $html->link('Home', "/reports/usageByWeek") ?> &raquo; <?= $html->link($myYear, "/reports/usageByWeek/$myYear") ?> &raquo; 
+  <?= $html->link("Week starting ".date('m-d-Y', strtotime(date('Y-m-d',strtotime("$myYear-01-01 last sunday"))."+".($myWeek-1)." weeks")),"/reports/usageByWeek/$myYear/".$myWeek) ?> &raquo; 
+  <?= $html->link($myAccount, "/accounts/view/$myAccount/$myYear"); ?>
+</div>
+
+<table>
+  <tr>
+    <th class="left">Company</th>
+    <th>Confname</th>
+    <th>Confirmnum</th>
+    <th>Calltype</th>
+    <th>Bridge</th>
+    <th>DNIS</th>
+    <th>Conflegs</th>
+    <th>ANI</th>
+    <th>Entry Time</th>
+    <th>Minutes</th>
+    <th>PPM</th>
+    <th>Cost</th>
+  </tr>
+	
+  <? for($i=0; $i<count($dates); $i++): ?>
+    <? 
+       $minutes = 0;
+       $cost = 0;
+    		
+       $minutes += $dates[$i][0]['minutes'];
+       $cost += $dates[$i][0]['callcost'];
+    ?>
+    <tr class="<?= $i%2 ? 'odd' : 'even' ?>">
+      <td class="left"><?= $html->link($dates[$i][0]['company'], "/accounts/view/".$dates[$i][0]['acctgrpid']."/$myYear/"); ?></td>
+      <td><?= $dates[$i][0]['confname']; ?></td>
+      <td><?= $dates[$i][0]['accountid']; ?></td>
+      <td><?= $dates[$i][0]['calltype_text']; ?></td>
+      <td><?= $dates[$i][0]['sysname']; ?></td>
+      <td><?= $dates[$i][0]['dnis']; ?></td>
+      <td><?= $dates[$i][0]['conflegs']; ?></td>
+      <td><?= $dates[$i][0]['ani']; ?></td>
+      <td><?= $dates[$i][0]['starttime']; ?></td>
+      <td><?= $dates[$i][0]['minutes']; ?></td>
+      <td>$<?= $dates[$i][0]['ppm']; ?></td>
+      <td>$<?= $dates[$i][0]['callcost']; ?></td>
+    </tr>
+  <? endfor; ?>
+</table>
+
+<table style="margin-top: 1em">
+  <tr><th>Company</th><th>Total Minutes</th><th>Total Cost</th><th>Avg PPM</th></tr>
+  <tr style="background:#def">
+    <td><?= $myAccount ?></td>
+    <td><?= $minutes ?></td>
+    <td><?= $cost ?></td>
+    <td><?= $minutes>0 ? round($cost/$minutes,3) : 0 ?></td>
+  </tr>
+</table>

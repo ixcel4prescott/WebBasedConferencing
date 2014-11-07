@@ -1,0 +1,10 @@
+#header {
+    height: 90px;
+    background: url(/img/themes/default/background.gif) repeat-x;
+    margin-bottom: 5px;
+}
+
+#logo { 
+    margin-top: 20px;
+    margin-left: 5px;
+}

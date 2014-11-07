@@ -1,0 +1,79 @@
+<style type="text/css">
+#dialin_numbers_pane {
+   padding-bottom: 20px;
+}
+
+#dialin_numbers_table th,#dialin_numbers_table td {
+  padding: 3px 5px;
+  text-align: left;
+}
+
+tr.even td {
+  background: #EFF7FF;
+}
+
+span.current {
+  color: #FF9C2A;
+  font-weight: bold;
+}
+</style>
+
+<? $pagination->setPaging($paging) ?>
+
+<div id="dialin_numbers_pane">
+  <h1>Dialin Numbers</h1>
+
+  <p class="smaller" style="margin-top: 1em">
+    <a href="/dialinnumbers/create"><?= $html->image('phone.gif', aa('class', 'valign')) ?> Add a Dialin Number</a>
+  </p>
+
+  <form method="get" style="margin-top: 1em; margin-bottom: 1em">
+    <label for="query">Search:</label>
+    <input id="query" type="text" name="query" value="<?= $query ?>"/>
+    <button type="submit" id="submit">
+      <?= $html->image('search.gif', aa('class', 'valign')) ?> Search
+    </button>
+  </form>
+
+  <form method="get">
+    <table id="dialin_numbers_table" style="margin-top: 1em; width: 100%">
+      <tr>
+	<th>
+	  <?= $pagination->sortBy('description') ?>
+	</th>
+	<th>
+	  <?= $pagination->sortBy('tollfreeno', 'Toll-Free Number') ?>
+	</th>
+	<th>
+	  <?= $pagination->sortBy('tollno', 'Toll Number') ?>
+	</th>
+	<th>
+	  <?= $pagination->sortBy('activationdate', 'Activation Date') ?>
+	</th>
+	<th style="text-align: center">
+	  <?= $pagination->sortBy('active') ?>
+	</th>
+	<th style="text-align: center">
+	  <?= $pagination->sortBy('bridge') ?>
+	</th>
+	<th style="text-align: center">
+	  Edit
+	</th>
+      </tr>
+      
+      <? for($i=0; $i<count($data); $i++): ?>
+	 <tr class="<?= $i%2 ? 'odd' : 'even' ?>">
+           <td><?= $html->link(shorten($data[$i]['DialinNumber']['description']), '/dialinnumbers/view/' . $data[$i]['DialinNumber']['id'])  ?></td>
+	   <td><?= $data[$i]['DialinNumber']['tollfreeno']  ?></td>
+	   <td><?= $data[$i]['DialinNumber']['tollno']  ?></td>
+	   <td><?= date('m/d/Y', strtotime($data[$i]['DialinNumber']['activationdate']))  ?></td>
+	   <td style="text-align: center"><?= $data[$i]['DialinNumber']['active'] ? $html->image('check.gif') : $html->image('cross.gif') ?></td>
+	   <td style="text-align: center"><?= $data[$i]['DialinNumber']['bridge']  ?></td>
+	   <td style="text-align: center"><?= $html->link('<img src="/img/edit.gif" />', '/dialinnumbers/edit/' . $data[$i]['DialinNumber']['id'], null, null, false)  ?></td>
+	 </tr>
+       <? endfor; ?>
+    </table>
+  </form>
+
+  <?= $this->renderElement('pagination') ?>
+</div>

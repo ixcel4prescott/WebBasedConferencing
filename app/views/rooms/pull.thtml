@@ -1,0 +1,38 @@
+
+<style class="text/css">
+div#room_frame {
+   margin: auto;
+   border: 1px solid #ccc;
+   padding: 10px 20px;
+}
+</style>
+
+<div id="room_frame">
+  <?= $this->renderElement('title', aa('title', 'Pull a Room from the Bridge for Account ' . $account['Account']['acctgrpid'], 'target', 'room_pull' )) ?>
+
+  <form method="post">
+
+    <div class="input">
+      <label class="right required" for="RoomAccountid">Confirmation Number:</label>
+      <?= $html->input('Room/accountid') ?>
+      <?= $html->tagErrorMsg('Room/accountid/', 'Please enter a valid confirmation number') ?>   
+    </div>
+
+    <div class="submit">
+      <button class="cancel" type="button">
+	<?= $html->image('cross.gif') ?> Cancel
+      </button>
+      <button class="submit" type="submit" name="manual">
+	<?= $html->image('check.gif') ?> Pull
+      </button>
+    </div>
+
+  </form>
+</div>
+
+
+<script type="text/javascript">
+$(document).ready( function() {
+    $('button.cancel').back('/accounts/view/<?= $account['Account']['acctgrpid'] ?>');
+}
+</script>

@@ -1,0 +1,13 @@
+
+					<?php if (!$session->check('User')): ?>
+						<div id="login_box">
+						You are not logged in, please <?php echo $html->link('Sign-in...','/users/login'); ?></div>
+					<p style="margin-left:120px;"><br /><br /><br /><h1>Welcome to MyConferenceAdmin  Here&nbsp;you&nbsp;can:</h1>&bull;View your Usage report<br />&bull;View/Edit Account Information<br />&bull;View a Salesperson List<br />Please <?php echo $html->link('Sign-in...','/users/login'); ?></p>
+
+					<?php else: ?>
+						<br /><br />
+						<p>You are logged in. <br />You may click on a menu on the left</p>
+	
+					<?php endif; ?>
+					
+

@@ -1,0 +1,63 @@
+<style type="text/css">
+#salesperson_profile {
+   margin: auto;
+   padding-bottom: 20px;
+   border: 1px solid #ccc;
+   padding: 10px 20px;
+}
+
+#salesperson_profile th,#salesperson_profile td {
+  padding: 3px 5px;
+}
+
+#salesperson_profile td {
+  text-align: left;
+}
+
+#profile th {
+  text-align: right;
+}
+</style>
+
+<div id="salesperson_profile">
+  
+  <h1> <?= $salesperson['Salesperson']['accountmanager'] ?></h1>
+
+  <p class="smaller" style="margin-top: 1em">
+    <a href="/salespeople/edit/<?= $salesperson['Salesperson']['salespid'] ?>">
+      <?= $html->image('edit.gif', aa('class', 'valign')) ?> Edit
+    </a>
+  </p>
+
+  <table id="profile" style="margin-top: 1em">
+    <tr>
+      <th>ID:</th><td><?= $salesperson['Salesperson']['salespid'] ?></td>
+    <tr>
+    <tr>
+      <th>Name:</th><td><?= $salesperson['Salesperson']['name'] ?></td>
+    <tr>
+    <tr>
+      <th>Account Manager:</th><td><?= $salesperson['Salesperson']['accountmanager'] ?></td>
+    <tr>
+    <tr>
+      <th>Reseller:</th>
+      <td>
+	<? if($salesperson['Reseller']['agent']): ?>
+	<?= $html->link($salesperson['Reseller']['rdesc'], '/resellers/view/' . $salesperson['Reseller']['resellerid']) ?>
+	<? else: ?>
+	<?= $html->link($salesperson['Reseller']['name'], '/resellers/view/' . $salesperson['Reseller']['resellerid']) ?>
+	<? endif; ?>
+      </td>
+    <tr>
+    <tr>
+      <th>Email:</th>
+      <td><?= $html->link($salesperson['Salesperson']['email'], 'mailto:' . $salesperson['Salesperson']['email']) ?></td>
+    </tr>
+    <? if($salesperson['Salesperson']['franchise_id']): ?>
+    <tr>
+      <th>Franchise ID:</th>
+      <td><?= $salesperson['Salesperson']['franchise_id'] ?></td>
+    </tr>
+    <? endif; ?>
+  </table>
+</div>

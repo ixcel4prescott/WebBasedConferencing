@@ -1,0 +1,4 @@
+<div style="margin-top: 1em">
+  <strong><?= $html->link(ucfirst($request['Account']['bcompany']), '/accounts/view/' . $request['Account']['acctgrpid']) ?>(<?= $html->link($request['Account']['acctgrpid'], '/accounts/view/' . $request['Account']['acctgrpid']) ?>)</strong> requested to make a payment on their account in the amount of <strong>$<?= $request['RequestData']['amount'] ?></strong>.
+</div>
+

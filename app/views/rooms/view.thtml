@@ -1,0 +1,779 @@
+<?
+function format_rate($r) {
+  return sprintf('%.04f', (float)$r/10000.0);
+}
+
+function compare_setting($setting, $room, $bridge) {
+   return array_key_exists($setting, $room['Room']) && isset($bridge[$setting]) && (is_null($room['Room'][$setting]) || (string)$room['Room'][$setting] !== (string)$bridge[$setting]);
+}
+
+function is_different($setting, $room, $bridge) {
+   return compare_setting($setting, $room, $bridge) ? 'difference' : '';
+}
+
+function display_settings_notice($room, $bridge) {
+   if($bridge) {
+     foreach($bridge as $k => $v)
+       if(compare_setting($k, $room, $bridge))
+         return true;
+   }
+
+   return false;
+}
+
+$menu_items = Array( Array( 'text' => 'Back to ' . $room['Room']['acctgrpid'],
+          'icon' => 'previous.gif',
+          'url'  => '/accounts/view/' . $room['Room']['acctgrpid']),
+
+         Array( 'text' => 'Edit Room',
+          'icon' => 'edit.gif',
+          'url'  => '/rooms/edit/' . $room['Room']['accountid']),
+
+         Array( 'text' => 'Change Status',
+          'icon' => 'lightbulb.gif',
+          'url'  => '/rooms/status/' . $room['Room']['accountid']),
+
+         Array( 'text' => 'Update Rate',
+          'icon' => 'money_dollar.gif',
+          'url'  => '/rooms/rate/' . $room['Room']['accountid']),
+
+         Array( 'text' => 'Add a Note',
+          'icon' => 'note_add.gif',
+          'url'  => '/notes/create/Room/' . $room['Room']['accountid']),
+
+                     Array( 'text' => 'Usage',
+                'icon' => 'database_table.gif',
+          'url'  => '/codrs/index/?confirmation=' . $room['Room']['accountid']));
+
+if($session->check('ic_employee')) {
+  $menu_items[] = Array( 'text' => 'Wallet Card',
+       'icon' => 'card.gif',
+       'url'  => '/wallet_cards/room/' . $room['Room']['accountid']);
+}
+?>
+
+<style class="text/css">
+div#room_frame {
+   margin: auto;
+}
+
+tr.even td {
+  background: #EFF7FF;
+}
+
+
+div#left_column, div#right_column {
+  margin-auto;
+  float: right;
+  width: 50%;
+}
+
+.headline {
+  font-weight: bold;
+  border-bottom: 1px solid #ccc;
+  margin-bottom: 10px;
+}
+
+.headline a {
+  font-size: smaller;
+}
+
+div.box {
+  margin-bottom: 10px;
+  margin-right: 10px;
+}
+
+div.box table {
+  width: 100%;
+  table-layout: fixed;
+}
+
+div.box table th, div.box table td {
+   padding: 3px 5px;
+   white-space: normal;
+}
+
+div.box table th {
+  text-align: right;
+  width: 15em;
+}
+
+#toolbar {
+  margin-top: 1em;
+  margin-bottom: 1em;
+  border-collapse: separate;
+  border: none;
+}
+
+#toolbar td {
+  padding: 3px 5px;
+  border: 1px solid #CCDDEE;
+  text-align: center;
+  width: 8em;
+  background: #EFF7FF;
+  font-size: smaller;
+}
+
+.notice {
+  background: #FFECBF;
+  border: 1px solid #EEAA00;
+  padding: 1em;
+  margin: 1em 0;
+}
+
+.difference,.error {
+  border: 1px solid #900;
+  background: #FFDFDF;
+  color: #900;
+  font-weight: bold;
+}
+
+#queue, #usage {
+  width: 100%;
+}
+
+#queue th, #queue td, #usage th, #usage td {
+  text-align: left;
+  padding: 3px 5px;
+}
+</style>
+
+<div id="room_frame">
+  <?= $this->renderElement('toolbar', Array('items' => $menu_items)) ?>
+
+  <?= $this->renderElement('title', aa('title', $room['Room']['contact'] . '(' .  $room['Room']['accountid'] . ')', 'target', 'room_view' )) ?>
+
+  <div class="headline">Notes
+    [ <?= $html->link('View All', '/notes/index/Room/' . $room['Room']['accountid'] ) ?> |
+      <a href="/notes/create/Room/<?= $room['Room']['accountid'] ?>?back=<?= urlencode('/rooms/view/' . $room['Room']['accountid'] ) ?>">Add a Note</a>
+    ]
+
+  </div>
+
+  <div style="margin-bottom: 1em">
+    <?= $this->renderElement('notes', aa('notes', $notes)) ?>
+  </div>
+
+  <div id="right_column">
+
+    <div class="box">
+      <div class="headline">Dialin Numbers</div>
+      <table>
+  <tr>
+    <th>Bridge:</th>
+    <td><?= !empty($room['Bridge']['name']) ? $room['Bridge']['name'] : '<span style="color:#900">Unspecified</span>' ?></td>
+  </tr>
+  <tr>
+    <th>Name:</th><td><?= isset($room['DialinNumber']['description']) ? $room['DialinNumber']['description'] : '' ?></td>
+  </tr>
+  <tr>
+    <th>Toll Number:</th><td><?= isset($room['DialinNumber']['tollno']) ? $room['DialinNumber']['tollno'] : '' ?></td>
+  </tr>
+  <tr>
+    <th>Toll-Free Number:</th><td><?= isset($room['DialinNumber']['tollfreeno']) ? $room['DialinNumber']['tollfreeno'] : '' ?></td>
+  </tr>
+      </table>
+    </div>
+
+    <div class="box">
+      <div class="headline">Room Options</div>
+
+      <? if(display_settings_notice($room, $bridge_settings)): ?>
+      <div class="notice" id="settings_notice">
+  <strong>Please Note:</strong> Highlighted settings may be inaccurate to the actual settings on the bridge as a result of direct manipulation.
+
+  <div id="sync_holder" class="center">
+    <? if($pending_sync): ?>
+    <span class="italic">Sync pending...</span>
+    <? else: ?>
+    <button type="button" id="sync">
+      <?= $html->image('refresh.gif') ?>
+      Sync with Bridge
+    </button>
+    <? endif; ?>
+  </div>
+      </div>
+      <? endif; ?>
+
+      <table>
+
+  <? if($room['Room']['bridgeid'] != INTERCALL_BRIDGEID && $room['Room']['bridgeid'] != BT_BRIDGEID): ?>
+  <tr>
+    <th>Schedule Type:</th>
+    <td class="<?= is_different('scheduletype', $room, $bridge_settings)?>">
+      <?= $schedule_types[$room['Room']['scheduletype']] ?>
+    </td>
+  </tr>
+
+  <tr>
+    <th>Security Type:</th>
+    <td class="<?= is_different('securitytype', $room, $bridge_settings)?>">
+      <?= $security_types[$room['Room']['securitytype']] ?>
+    </td>
+  </tr>
+  <? endif; ?>
+
+  <tr>
+    <th>Language:</th>
+    <td class="<?= is_different('lang', $room, $bridge_settings)?>">
+      <?= $languages[$room['Room']['lang']] ?>
+    </td>
+  </tr>
+
+  <tr>
+    <th>Maximum Connections:</th>
+    <td class="<?= is_different('maximumconnections', $room, $bridge_settings)?>">
+      <?= $room['Room']['maximumconnections'] ?>
+    </td>
+  </tr>
+
+  <tr>
+    <th>Entry Announcement:</th>
+    <td class="<?= is_different('entryannouncement', $room, $bridge_settings)?>">
+      <?= $announcements[$room['Room']['entryannouncement']] ?>
+    </td>
+  </tr>
+
+  <tr>
+    <th>Exit Announcement:</th>
+    <td class="<?= is_different('exitannouncement', $room, $bridge_settings)?>">
+      <?= $announcements[$room['Room']['exitannouncement']] ?>
+    </td>
+  </tr>
+
+  <tr>
+    <th>Start Mode:</th>
+    <td class="<?= is_different('startmode', $room, $bridge_settings)?>">
+      <?= $start_modes[$room['Room']['startmode']] ?>
+    </td>
+  </tr>
+
+  <? if($room['Room']['bridgeid'] != INTERCALL_BRIDGEID && $room['Room']['bridgeid'] != BT_BRIDGEID): ?>
+  <tr>
+    <th>Ending Signal:</th>
+    <td class="<?= is_different('endingsignal', $room, $bridge_settings)?>">
+      <?= $ending_signals[$room['Room']['endingsignal']] ?>
+    </td>
+  </tr>
+
+  <tr>
+    <th>DTMF Signal:</th>
+    <td class="<?= is_different('dtmfsignal', $room, $bridge_settings)?>">
+      <?= $dtmf_signals[$room['Room']['dtmfsignal']] ?>
+    </td>
+  </tr>
+
+  <tr>
+    <th>Recording Signal:</th>
+    <td class="<?= is_different('recordingsignal', $room, $bridge_settings)?>">
+      <?= $recording_signals[$room['Room']['recordingsignal']] ?>
+    </td>
+  </tr>
+  <? endif; ?>
+
+  <tr>
+    <th>Billing Code:</th>
+    <td><?= $room['Room']['billingcode'] ?></td>
+  </tr>
+
+  <tr>
+    <th>Billing Method:</th>
+    <td><?= $billing_method ?></td>
+  </tr>
+
+  <tr>
+    <th>Operator Assisted:</th>
+    <td><?= $room['Room']['isopassist'] ? $html->image('check.gif') : $html->image('cross.gif') ?></td>
+  </tr>
+
+  <tr>
+    <th>Event:</th>
+    <td><?= $room['Room']['isevent'] ? $html->image('check.gif') : $html->image('cross.gif') ?></td>
+  </tr>
+
+  <tr>
+    <th>Email Report:</th>
+    <td><?= $room['Room']['emailrpt'] ? $html->image('check.gif') : $html->image('cross.gif') ?></td>
+  </tr>
+
+  <tr>
+    <th>Name Recording:</th>
+    <td class="<?= is_different('namerecording', $room, $bridge_settings)?>">
+      <? if($room['Room']['bridgeid'] == SPECTEL_BRIDGEID): ?>
+      <?= isset($spectel_namerecording_options[$room['Room']['namerecording']]) ? $spectel_namerecording_options[$room['Room']['namerecording']] : 'Off' ?>
+      <? else: ?>
+      <?= $room['Room']['namerecording'] ? $html->image('check.gif') : $html->image('cross.gif') ?>
+      <? endif; ?>
+    </td>
+  </tr>
+
+  <tr>
+    <th>Dialout Allowed:</th>
+    <td class="<?= is_different('dialout', $room, $bridge_settings)?>">
+      <?= $room['Room']['dialout'] ? $html->image('check.gif') : $html->image('cross.gif') ?>
+    </td>
+  </tr>
+
+  <tr>
+    <th>End on Chair Hangup:</th>
+    <td class="<?= is_different('endonchairhangup', $room, $bridge_settings)?>">
+      <?= $room['Room']['endonchairhangup'] ? $html->image('check.gif') : $html->image('cross.gif') ?>
+    </td>
+  </tr>
+
+  <? if($room['Room']['bridgeid'] != INTERCALL_BRIDGEID && $room['Room']['bridgeid'] != BT_BRIDGEID): ?>
+  <tr>
+    <th>Mute All During Playback:</th>
+    <td class="<?= is_different('muteallduringplayback', $room, $bridge_settings)?>">
+      <?= $room['Room']['muteallduringplayback'] ? $html->image('check.gif') : $html->image('cross.gif') ?>
+    </td>
+  </tr>
+  <? endif; ?>
+
+  <? if($room['Room']['bridgeid'] == SPECTEL_BRIDGEID): ?>
+  <tr>
+    <th>Bill Code Prompt:</th>
+    <td><?= $bridge_settings['bill_code_prompt'] ? $html->image('check.gif') : $html->image('cross.gif') ?></td>
+  </tr>
+  <? elseif($room['Room']['bridgeid'] == BT_BRIDGEID): ?>
+  <tr>
+    <th>Bill Code Prompt/Bill back:</th>
+    <td><?= $room['Room']['digitentry1'] ? $html->image('check.gif') : $html->image('cross.gif') ?></td>
+  </tr>
+  <? elseif($room['Room']['bridgeid'] == OCI_BRIDGEID): ?>
+  <tr>
+    <th>Digit Entry 1:</th>
+    <td class="<?= is_different('digitentry1', $room, $bridge_settings)?>">
+      <?= $digit_entries[$room['Room']['digitentry1']] ?>
+    </td>
+  </tr>
+
+  <tr>
+    <th>Confirm Digit Entry 1:</th>
+    <td class="<?= is_different('confirmdigitentry1', $room, $bridge_settings)?>">
+      <?= $room['Room']['confirmdigitentry1'] ? $html->image('check.gif') : $html->image('cross.gif') ?>
+    </td>
+  </tr>
+
+  <tr>
+    <th>Digit Entry 2:</th>
+    <td class="<?= is_different('digitentry2', $room, $bridge_settings)?>">
+      <?= $digit_entries[$room['Room']['digitentry2']] ?>
+    </td>
+  </tr>
+
+  <tr>
+    <th>Confirm Digit Entry 2:</th>
+    <td class="<?= is_different('confirmdigitentry2', $room, $bridge_settings)?>">
+      <?= $room['Room']['confirmdigitentry2'] ? $html->image('check.gif') : $html->image('cross.gif') ?>
+    </td>
+  </tr>
+  <? endif; ?>
+
+      </table>
+    </div>
+
+    <? if($webi_room || $webex_room || $live_meeting_room): ?>
+    <div class="box">
+      <div class="headline">Web Room</div>
+
+      <table>
+        <? if($webi_room): ?>
+        <tr>
+          <th>WebInterpoint Account:</th>
+          <td>
+            <?= $html->link($webi_room, '/rooms/view/' . $webi_room) ?>
+          </td>
+        </tr>
+        <? endif; ?>
+        <? if($webex_room): ?>
+        <tr>
+          <th>WebEx Account:</th>
+          <td>
+            <?= $html->link($webex_room, '/rooms/view/' . $webex_room) ?>
+          </td>
+        </tr>
+        <? endif; ?>
+        <? if($live_meeting_room): ?>
+        <tr>
+          <th>Live Meeting Account:</th>
+          <td>
+            <?= $html->link($live_meeting_room, '/rooms/view/' . $live_meeting_room) ?>
+          </td>
+        </tr>
+        <? endif; ?>
+      </table>
+    </div>
+    <? endif; ?>
+
+    <? if(!$room['Room']['isopassist'] && !$room['Room']['isevent']): ?>
+    <div class="box">
+      <div class="headline">Migrations of this Room</div>
+
+      <? if($migrations): ?>
+      <table>
+  <? foreach($migrations as $m): ?>
+  <tr>
+    <th><?= $m['Bridge']['name'] ?>:</th>
+    <td><?= $html->link($m['Room']['accountid'], '/rooms/view/' . $m['Room']['accountid']) ?></td>
+  </tr>
+  <? endforeach; ?>
+      </table>
+      <? endif; ?>
+
+      <? if($existing_migration_req && $existing_migration_req['Request']['status'] == REQSTATUS_APPROVED): ?>
+      <div class="notice center italic" style="padding: 1em 0">
+  Migration request pending...
+      </div>
+      <? elseif(!$migrations && $room['Room']['roomstat'] == 0): ?>
+      <div id="migration_holder" class="center notice">
+
+  <button type="button" id="migrate">
+    <?= $html->image('room_move.gif') ?>
+    Request Migration
+  </button>
+      </div>
+      <? endif; ?>
+
+    </div>
+    <? endif; ?>
+
+    <div class="box">
+      <div class="headline">Welcome Email</div>
+      <table>
+  <tr>
+     <? if(isset($welcome_email_log['WelcomeEmailLog']['sent'])): ?>
+        <th>Last Sent:</th><td><?= $welcome_email_log['WelcomeEmailLog']['sent'] ?></td>
+       <? else: ?>
+          <div class="notice center italic" style="padding: 1em 0">
+           No welcome emails have been sent.
+          </div>
+       <? endif; ?>
+
+  </tr>
+      </table>
+    </div>
+
+  </div>
+
+  <div id="left_column">
+
+    <div class="box">
+      <div class="headline">Room Profile [ <a href="/rooms/edit/<?= $room['Room']['accountid'] ?>">Edit</a> ]</div>
+
+      <table>
+  <tr>
+    <th>Room ID:</th>
+    <td><?= $room['Room']['accountid'] ?></td>
+  </tr>
+
+  <tr>
+    <th>Status:</th>
+    <td>
+      <?= $html->link($room['Status']['description'], '/rooms/status/' . $room['Room']['accountid']) ?><br/>
+      <span class="smaller"><?= $time->nice($room['Room']['roomstatdate']) ?></span>
+    </td>
+  </tr>
+
+  <tr>
+    <th>Chair Code:</th>
+    <td class="<?= is_different('cec', $room, $bridge_settings)?>"><?= format_passcode($room['Room']['cec']) ?></td>
+  </tr>
+
+  <tr>
+    <th>Participant Code:</th>
+    <td class="<?= is_different('pec', $room, $bridge_settings)?>"><?= format_passcode($room['Room']['pec']) ?></td>
+  </tr>
+
+  <tr>
+    <th>Presenter Code:</th>
+    <td><?= $room['Room']['prec'] ?></td>
+  </tr>
+
+  <tr>
+    <th>Account:</th>
+    <td><?= $html->link($room['Room']['acctgrpid'], '/accounts/view/' . $room['Room']['acctgrpid']) ?></td>
+  </tr>
+
+  <tr>
+    <th>Name:</th>
+    <td><?= $room['Room']['contact'] ?></td>
+  </tr>
+
+  <? if(!empty($room['Room']['email'])): ?>
+  <tr>
+    <th>Email:</th>
+    <td>
+       <? foreach(explode(',', $room['Room']['email']) as $e): ?>
+             <?= $html->link($e, 'mailto:' . $e) ?>
+         <? endforeach; ?>
+          </td>
+  </tr>
+  <? endif; ?>
+
+      </table>
+    </div>
+
+    <? if(empty($room['Contact'])): ?>
+    <div class="box">
+      <div class="headline">
+  Assign Contact
+      </div>
+
+      <div class="notice">
+  <h4 class="center" style="margin-bottom: 1em">Assign this room to a contact:</h4>
+
+  <form method="post" action="/rooms/associate/<?= $room['Room']['accountid'] ?>">
+    <div class="select">
+            <label class="right required" for="ContactId">Contact:</label>
+            <?= $html->selectTag('Contact/id', $contacts) ?>
+      <button type="submit">
+        <?= $html->image('check.gif') ?>
+        Assign
+      </button>
+    </div>
+  </form>
+      </div>
+
+    </div>
+    <? else: ?>
+    <div class="box">
+      <div class="headline">
+  Contact
+  [ <?= $html->link('Edit', '/contacts/edit/' . $room['Contact'][0]['id'] ) ?> ]
+      </div>
+
+      <table>
+        <tr>
+          <th>Name:</th>
+          <td>
+      <a href="/contacts/view/<?= $room['Contact'][0]['id'] ?>">
+        <?= $room['Contact'][0]['title'] ?>
+        <?= $room['Contact'][0]['first_name'] ?>
+        <?= $room['Contact'][0]['middle_name'] ?>
+        <?= $room['Contact'][0]['last_name'] ?>
+      </a>
+    </td>
+        </tr>
+        <tr>
+          <th>Email:</th>
+          <td><?= $html->link($room['Contact'][0]['email'], 'mailto:' . $room['Contact'][0]['email']) ?></td>
+        </tr>
+        <tr>
+          <th>Phone Number:</th>
+          <td><?= $room['Contact'][0]['phone'] ?></td>
+        </tr>
+        <tr>
+          <th>Position:</th>
+          <td><?= $room['Contact'][0]['position'] ?></td>
+        </tr>
+        <tr>
+          <th>Address:</th>
+          <td><?= $room['Contact'][0]['address1'] ?></td>
+        </tr>
+  <? if(!empty($room['Contact'][0]['address2'])): ?>
+        <tr>
+          <th></th>
+          <td><?= $room['Contact'][0]['address2'] ?></td>
+        </tr>
+  <?  endif; ?>
+  <? if(!empty($room['Contact'][0]['address3'])): ?>
+        <tr>
+          <th></th>
+          <td><?= $room['Contact'][0]['address3'] ?></td>
+        </tr>
+  <? endif; ?>
+        <tr>
+          <th>City:</th>
+          <td><?= $room['Contact'][0]['city'] ?></td>
+        </tr>
+        <tr>
+          <th>State:</th>
+          <td><?= $room['Contact'][0]['state'] ?></td>
+        </tr>
+        <tr>
+          <th>Postal Code:</th>
+          <td><?= $room['Contact'][0]['zip'] ?></td>
+        </tr>
+        <tr>
+          <th>Country:</th>
+          <td><?= $room['Contact'][0]['country'] ?></td>
+        </tr>
+      </table>
+    </div>
+    <? endif; ?>
+
+    <div class="box">
+      <div class="headline">Notes</div>
+      <table>
+  <tr>
+    <th>Reservation Comments:</th>
+    <td><pre><?= $room['Room']['reservationcomments'] ?></pre></td>
+  </tr>
+  <tr>
+    <th>Note 1:</th>
+    <td class="<?= is_different('note1', $room, $bridge_settings)?>">
+      <pre><?= $room['Room']['note1'] ?></pre>
+    </td>
+  </tr>
+  <tr>
+    <th>Note 2:</th>
+    <td class="<?= is_different('note2', $room, $bridge_settings)?>">
+      <pre><?= $room['Room']['note2'] ?></pre>
+    </td>
+  </tr>
+  <tr>
+    <th>Note 3:</th>
+    <td class="<?= is_different('note3', $room, $bridge_settings)?>">
+      <pre><?= $room['Room']['note3'] ?></pre>
+    </td>
+  </tr>
+  <tr>
+    <th>Note 4:</th>
+    <td class="<?= is_different('note4', $room, $bridge_settings)?>">
+      <pre><?= $room['Room']['note4'] ?></pre>
+    </td>
+  </tr>
+      </table>
+    </div>
+  </div>
+  <div style="clear:both; margin-bottom: 10px">
+    <div class="headline">
+      Recent Usage
+      [<?= $html->link('All', '/codrs/index/?confirmation=' . $room['Room']['accountid'])?>]
+    </div>
+    <table id="usage">
+      <thead>
+  <tr>
+    <th>Date</th>
+    <th>Time</th>
+    <th>Conference Name</th>
+    <th>Total Callers</th>
+    <th>Total Minutes</th>
+    <th>Total Cost</th>
+    <th>Billing Code</th>
+  </tr>
+      </thead>
+      <tbody>
+  <? for($i=0; $i<count($usage); $i++): ?>
+  <tr class="<?= $i%2 ? 'odd' : 'even' ?>">
+    <td><?= date('m/d/Y', strtotime($usage[$i]['ConferenceReport']['conference_start'])) ?></td>
+    <td><?= date('h:i:s', strtotime($usage[$i]['ConferenceReport']['conference_start'])) ?></td>
+    
+    <td><?= $usage[$i]['ConferenceReport']['conference_name'] ?></td>
+    <td><?= $usage[$i]['ConferenceReport']['total_callers'] ?></td>
+    <td><?= $usage[$i]['ConferenceReport']['total_minutes'] ?></td>
+    <td><?= $usage[$i]['ConferenceReport']['total_cost'] ?></td>
+    <td><?= $usage[$i]['ConferenceReport']['billing_code'] ?></td>
+
+  </tr>
+  <? endfor; ?>
+      </tbody>
+    </table>
+  </div>
+  <div style="clear:both">
+    <div class="headline">Requests</div>
+    <table id="queue">
+      <thead>
+  <tr>
+    <th class="left">ID</th>
+    <th>Type</th>
+    <th>Status</th>
+    <th>Creator</th>
+    <th>Created</th>
+  </tr>
+      </thead>
+      <tbody>
+  <? for($i=0; $i<count($requests); $i++): ?>
+     <tr class="<?= $i%2 ? 'odd' : 'even' ?>" id="request<?= $requests[$i]['Request']['id'] ?>">
+       <td>
+         <?= $html->link($requests[$i]['RequestView']['id'], '/requests/index/' . $requests[$i]['RequestView']['id'], aa('class', 'id')) ?>
+       </td>
+       <td><?= $requests[$i]['RequestView']['type_name'] ?></td>
+       <td><?= $requests[$i]['RequestView']['status_name'] ?></td>
+       <td><?= $html->link($requests[$i]['RequestView']['creator_name'], '/users/view/' .  $requests[$i]['RequestView']['creator']) ?></td>
+       <td><?= $time->niceShort($requests[$i]['RequestView']['created']) ?></td>
+     </tr>
+     <? endfor; ?>
+      </tbody>
+    </table>
+  </div>
+
+  <?= $this->renderElement('history', aa('entity', 'Room', 'object_id', $room['Room']['accountid'])) ?>
+
+</div>
+
+<script type="text/javascript">
+$(document).ready(function() {
+
+  $('#sync').click(function() {
+    $.ajax({
+      type: 'POST',
+      url: '/rooms/sync/<?= $room['Room']['accountid'] ?>',
+      data: {'data[Room][accountid]': '<?= $room['Room']['accountid'] ?>'},
+      dataType: 'html',
+      beforeSend: function(xhr) {
+        $('#sync').attr('disabled', 'disabled');
+      },
+      complete: function(xhr, status) {
+        $('#sync').attr('disabled', '');
+      },
+      error: function(xhr, status, err) {
+        window.alert('An error occurred');
+      },
+      success: function(data, status) {
+        $('#sync_holder').html(data);
+      }
+    });
+
+    return false;
+  });
+
+  $('#migrate').click(function() {
+    $.ajax({
+      type: 'POST',
+      url: '/rooms/migrate/<?= $room['Room']['accountid'] ?>',
+      data: {'data[Room][accountid]': '<?= $room['Room']['accountid'] ?>'},
+      dataType: 'html',
+      beforeSend: function(xhr) {
+        $('#migrate').attr('disabled', 'disabled');
+      },
+      complete: function(xhr, status) {
+        $('#migrate').attr('disabled', '');
+      },
+      error: function(xhr, status, err) {
+        window.alert('An error occurred');
+      },
+      success: function(data, status) {
+        $('#migration_holder').html(data);
+      }
+    });
+
+    return false;
+  });
+
+  $('#webinterpoint').click(function() {
+    $.ajax({
+      type: 'POST',
+      url: '/webinterpoint/create/<?= $room['Room']['accountid'] ?>',
+      data: {'data[Room][accountid]': '<?= $room['Room']['accountid'] ?>'},
+      dataType: 'html',
+      beforeSend: function(xhr) {
+        $('#webinterpoint').attr('disabled', 'disabled');
+      },
+      complete: function(xhr, status) {
+        $('#webinterpoint').attr('disabled', '');
+      },
+      error: function(xhr, status, err) {
+        window.alert('An error occurred');
+      },
+      success: function(data, status) {
+        $('#webinterpoint_holder').html(data);
+      }
+    });
+
+    return false;
+  });
+
+});
+</script>

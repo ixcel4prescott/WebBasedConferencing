@@ -1,0 +1,264 @@
+<?
+//------------------------------------------------------------------------------
+//  
+//  Common config between biz/clients
+// 
+//------------------------------------------------------------------------------
+
+if(!defined('BIZ_SIDE'))
+  define('BIZ_SIDE', false);
+
+if(!defined('CLIENT_SIDE'))
+  define('CLIENT_SIDE', false);
+
+define('TZ', 'Eastern');
+date_default_timezone_set('US/' . TZ);
+
+//------------------------------------------------------------------------------
+// Define a window for maintenance
+//------------------------------------------------------------------------------
+
+define('MAINTENANCE_START', null);
+define('MAINTENANCE_END', null);
+
+if(!is_null(MAINTENANCE_START) && !is_null(MAINTENANCE_END) && 
+   $_SERVER['REQUEST_TIME'] >= MAINTENANCE_START && $_SERVER['REQUEST_TIME'] <= MAINTENANCE_END)
+  define('MAINTENANCE_MODE', true);
+else 
+  define('MAINTENANCE_MODE', false);
+
+//------------------------------------------------------------------------------
+//  Request Constants
+//------------------------------------------------------------------------------
+
+// NB: this table must match the requests_types table
+define('REQTYPE_ACCOUNT_UPDATE',         1);
+define('REQTYPE_ROOM_CREATE',            2);
+define('REQTYPE_ROOM_CLOSE',             3);
+define('REQTYPE_ROOM_UPDATE',            4);
+define('REQTYPE_RESERVATION',            5);
+define('REQTYPE_BILLING_UPDATE',         6);
+define('REQTYPE_BILLING_PAYMENT',        7);
+define('REQTYPE_ACCOUNT_STATUS_CHANGE',  8);
+define('REQTYPE_ACCOUNT_REASSIGN',       9);
+define('REQTYPE_RATE_CHANGE',            10);
+define('REQTYPE_ROOM_STATUS_CHANGE',     11);
+define('REQTYPE_ROOM_MOVE',              12);
+define('REQTYPE_CODE_MIGRATION',         13);
+define('REQTYPE_RESELLER_CREATE',        14);
+define('REQTYPE_RESELLER_UPDATE',        15);
+define('REQTYPE_REGISTRATION',           16);
+define('REQTYPE_PIN_CREATION',           17);
+define('REQTYPE_PIN_DELETION',           18);
+define('REQTYPE_PIN_UPDATE',             19);
+define('REQTYPE_SPECTEL_MOVE',           20);
+define('REQTYPE_ROOM_PULL',              21);
+define('REQTYPE_WEBINTERPOINT_CREATION', 22);
+define('REQTYPE_EMAIL',                  23);
+define('REQTYPE_WEBINTERPOINT_DELETION', 24);
+define('REQTYPE_ROOM_SYNC',              25);
+define('REQTYPE_ACCOUNT_CREATION',       26);
+define('REQTYPE_CONTACT_CREATION',       27);
+define('REQTYPE_CONTACT_UPDATE',         28);
+define('REQTYPE_CONTACT_STATUS_CHANGE',  29);
+define('REQTYPE_WEB_ROOM_CREATION',      30);
+define('REQTYPE_CONVERSION_ATTEMPT',     32);
+
+// NB: this table must match the requests_status
+define('REQSTATUS_PENDING',   0);
+define('REQSTATUS_APPROVED',  1);
+define('REQSTATUS_CANCELLED', 2);
+define('REQSTATUS_DENIED',    3);
+define('REQSTATUS_COMPLETED', 9);
+define('REQSTATUS_FAILED',    10);
+
+//------------------------------------------------------------------------------
+//  URL Constants
+//------------------------------------------------------------------------------
+
+define('SIGNUP_URL', 'https://signup.infiniteconferencing.com');
+
+
+//------------------------------------------------------------------------------
+//  Email Constants
+//------------------------------------------------------------------------------
+
+define('EMAIL_LAYOUT',          'email');
+define('CLIENTS_EMAIL_LAYOUT',  'clients_email');
+define('CONVERSION_EMAIL_LAYOUT', 'conversion_email');
+define('EMAIL_ALT_LAYOUT',      'email_alt');
+define('MAILER_FROM',           'do-not-reply@myconferenceadmin.com');
+define('MAILER_FROMNAME',       'MyConferenceAdmin');
+define('MAILER_HOST',           'mail.myconferenceadmin.com');
+
+define('MYCA_SUPPORT_EMAIL',        'myca-support@infiniteconferencing.com');
+define('BILLING_EMAIL',             'billing@infiniteconferencing.com');
+define('CLIENTCARE_EMAIL',          'clientcare@infiniteconferencing.com');
+define('CLIENTCARE_SUPPORT_EMAIL',  'clientcare-support@infiniteconferencing.com');
+define('OPS_EMAIL',                 'ops@infiniteconferencing.com');
+define('IT_EMAIL',                  'it@infiniteconferencing.com');
+define('FEEDBACK_EMAIL',            'feedback@myconferenceadmin.com');
+
+// Path for request notification email templates
+define('NOTIFICATION_LAYOUT',   'notification');
+define('NOTIFICATIONS_PATH',    COMMON_DIR . DS . 'views' . DS . 'notifications');
+
+// Path for welcome email templates and attachemnts
+define('EMAIL_TEMPLATE_PATH',   APP . DS . 'vendors' . DS . 'emails' . DS . 'templates' . DS);
+define('EMAIL_ATTACHMENT_PATH', APP . DS . 'vendors' . DS . 'emails' . DS . 'attachments' . DS);
+
+//------------------------------------------------------------------------------
+//  Misc Constants
+//------------------------------------------------------------------------------
+
+define('VALID_DATE',             '/^\d\d\/\d\d\/\d\d\d\d$/');
+define('VALID_US_PHONE_NUMBER',  '/^\s*(?:1-)?(\d\d\d)[\- \.]?(\d\d\d)[\- \.]?(\d\d\d\d)(?:\s*ext\.?\s*(\d+))?\s*$/');
+
+// Not complete
+define('VALID_URL',              '/^(?#Protocol)(?:(?:ht|f)tp(?:s?)\:\/\/|~\/|\/)?(?#Username:Password)(?:\w+:\w+@)?(?#Subdomains)(?:(?:[-\w]+\.)+(?#TopLevel Domains)(?:com|org|net|gov|mil|biz|info|mobi|name|aero|jobs|museum|travel|[a-z]{2}))(?#Port)(?::[\d]{1,5})?(?#Directories)(?:(?:(?:\/(?:[-\w~!$+|.,=]|%[a-f\d]{2})+)+|\/)+|\?|#)?(?#Query)(?:(?:\?(?:[-\w~!$+|.,*:]|%[a-f\d{2}])+=?(?:[-\w~!$+|.,*:=]|%[a-f\d]{2})*)(?:&(?:[-\w~!$+|.,*:]|%[a-f\d{2}])+=?(?:[-\w~!$+|.,*:=]|%[a-f\d]{2})*)*)*(?#Anchor)(?:#(?:[-\w~!$+|.,*:=]|%[a-f\d]{2})*)?$/');
+
+define('LINES_IN_PAGES',         15);
+define('LOGIN_COOKIE_EXPIRY',    60 * 60 * 24 * 365.25 * 5);
+
+define('DEFAULT_CODE_LEN',       8);
+define('CODE_STRENGTH',          0.4);
+
+define('DIFFLOG_OP_CREATE',      0);
+define('DIFFLOG_OP_UPDATE',      1);
+define('DIFFLOG_OP_DELETE',      2);
+define('DIFFLOG_OP_ROLLBACK',    3);
+
+define('IC_RESELLERID',          1);
+define('CPR_RESELLERID',         55);
+define('ICT_RESELLERID',         8);
+
+define('UNSPECIFIED_BRIDGEID',   1); 
+define('OUTSOURCED_BRIDGEID',    2);
+define('OCI_BRIDGEID',           3);
+define('SPECTEL_BRIDGEID',       4);
+define('SPECTELATL_BRIDGEID',   14);
+define('SPECTELFR_BRIDGEID',    15);
+define('AT1_BRIDGEID',           5);
+define('AT2_BRIDGEID',           6);
+define('INTERCALL_BRIDGEID',     10);
+define('BT_BRIDGEID',            7);
+define('WEBINTERPOINT_BRIDGEID', 8);
+define('WEBEXPRESS_BRIDGEID',   22);
+define('INVISION_BRIDGEID',      9);
+define('WEBEX_BRIDGEID',        12);
+define('LIVE_MEETING_BRIDGEID', 13);
+define('AUDIO_BRIDGE',          'AUDIO');
+define('WEB_BRIDGE',            'WEB');
+
+define('STATUS_ACTIVE',          0);
+define('STATUS_SUSPENDED',       1);
+define('STATUS_CANCELLED',       2);
+define('STATUS_TRIAL',           3);
+
+define('ACCTSTAT_ACTIVE',        0);
+define('ACCTSTAT_SUSPENDED',     1);
+define('ACCTSTAT_CANCELLED',     2);
+define('ACCTSTAT_TRIAL',         3);
+
+define('ROOMSTAT_ACTIVE',        0);
+define('ROOMSTAT_SUSPENDED',     1);
+define('ROOMSTAT_CANCELLED',     2);
+define('ROOMSTAT_TRIAL',         3);
+
+define('SPECTEL_SUSPEND',        false);
+
+define('DEFAULT_WEBINTERPOINT_URL', 'http://www.infiniteconferencing.com/join');
+
+define('METERED_BILLING_CODE',     'PPM');
+define('FLATRATE_BILLING_CODE',    'FLAT');
+define('NONBILLABLE_BILLING_CODE', 'NON');
+
+define('CREDIT_CARD', 6);
+
+define('AUDIO_ONLY',          'AUD_ONLY');
+define('AUDIO_WEBINTERPOINT', 'AUD_WEBI');
+define('AUDIO_WEBEX',         'AUD_WEBEX');
+define('AUDIO_LIVE_MEETING',  'AUD_WEBLM');
+
+define('MEETME_GLOBAL_ACCESS', 42818861);
+define('WEBEX',                66130941);
+define('LIVEMEETING',          1506291);
+
+define('ADMIN_LEVEL', 'admin');
+define('RESELLER_LEVEL', 'reseller');
+define('SALESPERSON_LEVEL', 'salesperson');
+define('ACCOUNTGROUP_LEVEL', 'accountgroup');
+define('ACCOUNT_LEVEL', 'account');
+
+//------------------------------------------------------------------------------
+//  MyCA Specific Stuff
+//------------------------------------------------------------------------------
+
+class Symbols
+{
+  public static $states = Array( "XX" => "Outside US and Canada", "AL" => "Alabama", "AK" => "Alaska", "AZ" => "Arizona", 
+				 "AR" => "Arkansas", "CA" => "California", "CO" => "Colorado", "CT" => "Connecticut", 
+				 "DE" => "Delaware", "DC" => "District Of Columbia", "FL" => "Florida", "GA" => "Georgia", 
+				 "HI" => "Hawaii", "ID" => "Idaho", "IL" => "Illinois", "IN" => "Indiana", 
+				 "IA" => "Iowa", "KS" => "Kansas", "KY" => "Kentucky", "LA" => "Louisiana", "ME" => "Maine", 
+				 "MD" => "Maryland", "MA" => "Massachusetts", "MI" => "Michigan", 
+				 "MN" => "Minnesota", "MS" => "Mississippi", "MO" => "Missouri", "MT" => "Montana", "NE" => "Nebraska", 
+				 "NV" => "Nevada", "NH" => "New Hampshire", "NJ" => "New Jersey", 
+				 "NM" => "New Mexico", "NY" => "New York", "NC" => "North Carolina", "ND" => "North Dakota", 
+				 "OH" => "Ohio", "OK" => "Oklahoma", "OR" => "Oregon", "PA" => "Pennsylvania", 
+				 "PR" => "Puerto Rico", "RI" => "Rhode Island", "SC" => "South Carolina", "SD" => "South Dakota", 
+				 "TN" => "Tennessee", "TX" => "Texas", "UT" => "Utah", "VT" => "Vermont", 
+				 "VA" => "Virginia", "WA" => "Washington", "WV" => "West Virginia", "WI" => "Wisconsin", 
+				 "WY" => "Wyoming", "DC" => "Washington DC", "AS" => "American Samoa", "GU" => "Guam",
+				 "MP" => "Northern Mariana Is", "PW" => "Palau", "VI" => "Virgin Islands", 
+				 "AA" => "Armed Forces Americas", "AE" => "Armed Forces Europe", "AP" => "Armed Forces Pacific", 
+				 "AB" => "Alberta", "BC" => "British Columbia", "MB" => "Manitoba", "NB" => "New Brunswick", 
+				 "NF" => "Newfoundland", "NT" => "Northwest Territories", "NS" => "Nova Scotia", 
+				 "NU" => "Nunavut", "ON" => "Ontario", "PE" => "Prince Edward Island", "QC" => "Quebec", 
+				 "SK" => "Saskatchewan", "YT" => "Yukon Territory");
+
+  public static $bridges = Array(UNSPECIFIED_BRIDGEID => 'Unspecified', 
+				 OCI_BRIDGEID         => 'icbr1', 
+				 SPECTEL_BRIDGEID     => 'icbr2',
+                 SPECTELATL_BRIDGEID  => 'icbr3',
+                 SPECTELFR_BRIDGEID  =>  'icbr4',				 
+				 INTERCALL_BRIDGEID   => 'osbr1', 
+				 BT_BRIDGEID          => 'osbr2');
+
+
+  public static $titles = Array( 'Ms'     => 'Ms',
+				 'Miss'   => 'Miss',
+				 'Mrs'	  => 'Mrs',
+				 'Mr'	  => 'Mr',
+				 'Master' => 'Master',
+				 'Rev'	  => 'Reverend',
+				 'Fr'	  => 'Father',
+				 'Dr'	  => 'Doctor',
+				 'Atty'   => 'Attorney',
+				 'Prof'   => 'Professor',
+				 'Hon'	  => 'Honorable',
+				 'Pres'   => 'President',
+				 'Gov'	  => 'Governor',
+				 'Coach'  => 'Coach',
+				 'Ofc'	  => 'Officer',
+				 'Msgr'   => 'Monsignor',
+				 'Sr'	  => 'Sister',
+				 'Br'	  => 'Brother',
+				 'Supt'   => 'Superintendent',
+				 'Rep'	  => 'Representative',
+				 'Sen'	  => 'Senator',
+				 'Amb'	  => 'Ambassador',
+				 'Treas'  => 'Treasurer',
+				 'Sec'	  => 'Secretary',
+				 'Pvt'	  => 'Private',
+				 'Cpl'    => 'Corporal',
+				 'Sgt'    => 'Sargent',
+				 'Adm'    => 'Administrative',
+				 'Maj'    => 'Major',
+				 'Capt'   => 'Captain',
+				 'Cmdr'   => 'Commander',
+				 'Lt'	  => 'Lieutenant',
+				 'Lt Col' => 'Lieutenant Colonel',
+				 'Col'    => 'Colonel',
+				 'Gen'	  => 'General' );
+}

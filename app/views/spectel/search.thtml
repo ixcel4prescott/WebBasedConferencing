@@ -1,0 +1,23 @@
+<? if($too_many): ?>
+<div style="margin-bottom:1em">
+  <strong>Too many results returned. Please refine your query.</strong>
+</div>
+<? endif; ?>
+
+<table id="matching_clients">
+  <tr>
+    <th>ClientRef</th>
+    <th>Name</th>
+    <th>Account</th>
+    <th>Contact</th>
+  </tr>
+
+  <? foreach($clients as $c): ?>
+  <tr>
+    <td><?= $html->link($c['SpectelClient']['ClientRef'], $c['SpectelClient']['ClientRef']) ?></td>
+    <td><?= $c['SpectelClient']['ClientName'] ?></td>
+    <td><?= $c['SpectelClient']['ClientMainICC'] ?></td>
+    <td><?= $c['SpectelClient']['ContactName'] ?></td>
+  </tr>
+  <? endforeach; ?>
+</table>

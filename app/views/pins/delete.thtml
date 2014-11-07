@@ -1,0 +1,99 @@
+<style type="text/css">
+#edit_pane {
+   margin: auto;
+   padding-bottom: 20px;
+   border: 1px solid #ccc;
+   padding: 10px 20px;
+}
+
+.content #edit_pane h1 {
+    border: 1px solid #900;
+    background: #FFDFDF;
+    color: #900;
+    text-align: center;
+    margin-bottom: 10px;
+    padding: 0.5em 0;
+}
+
+#pins_pane th,#pins_pane td {
+  padding: 3px 5px;
+  text-align: left;
+}
+
+#pins_pane th {
+  text-align: right
+}
+
+#pins_pane tr.even td {
+  background: #EFF7FF;
+}
+</style>
+
+<div id="edit_pane">
+  <form method="post">
+    
+    <?= $html->hidden('Pin/id') ?>
+
+    <fieldset>
+      <legend>Delete PIN</legend>
+
+      <h1>Are you sure you want to delete this pin?</h1>
+
+  <table style="margin-top: 1em">
+    <tr>
+      <th>ID:</th>
+      <td><?= $pin['Pin']['id'] ?></td>
+    </tr>
+    <tr>
+      <th>PIN:</th>
+      <td><?= $pin['Pin']['pin'] ?></td>
+    </tr>
+    <tr>
+      <th>Bridge:</th>
+      <td><?= $bridges[$pin['Pin']['bridgeid']] ?></td>
+    </tr>
+    <tr>
+      <th>First Name:</th>
+      <td><?= $pin['Pin']['first_name'] ?></td>
+    </tr>
+    <tr>
+      <th>Last Name:</th>
+      <td><?= $pin['Pin']['last_name'] ?></td>
+    </tr>
+    <tr>
+      <th>Company:</th>
+      <td><?= $pin['Pin']['company'] ?></td>
+    </tr>
+    <tr>
+      <th>PIN ID on Bridge:</th>
+      <td><?= $pin['Pin']['external_id'] ?></td>
+    </tr>
+    <tr>
+      <th>Active:</th>
+      <td>
+	<? if($pin['Pin']['active']): ?>
+	<?= $html->image('check.gif') ?>
+	<? else: ?>
+	<?= $html->image('cross.gif') ?>
+	<? endif; ?>
+      </td>
+    </tr>
+  </table>
+
+      <div class="submit">
+	<button class="cancel" type="button">
+	  <?= $html->image('cross.gif') ?> Cancel
+	</button>
+	<button class="submit" type="submit">
+	  <?= $html->image('check.gif') ?> Delete
+	</button>
+      </div>
+      
+    </fieldset>
+  </form>
+</div>
+<script type="text/javascript">
+$(document).ready( function() {
+  $('button.cancel').back('/pins/index/<?= $acctgrpid ?>');
+});
+</script>

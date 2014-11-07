@@ -1,0 +1,42 @@
+<style type="text/css">
+div#email {
+  font-family: Verdana, sans-serif;
+}
+
+div#notice {
+  color: #888;
+  text-align: center;
+  font-size: 8pt;
+  font-style: italic;
+  margin-bottom: 0.5em;
+}
+
+div#greeting {
+  margin-bottom: 1em;
+}
+
+div#body {
+  margin-bottom: 1em;
+}
+
+table {
+  width: 100%;
+  border: 0px ;
+  font-family: Verdana, sans-serif;
+}
+
+td,th {
+  text-align: left;
+  padding: 3px 5px;
+  border-collapse: collapse;
+  border-top: 0px;
+}
+</style>
+
+<div id="email">
+
+  <div id="body">
+    <?= $content_for_layout ?>
+  </div>
+
+</div>
